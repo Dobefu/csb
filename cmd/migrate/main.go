@@ -8,12 +8,16 @@ import (
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 )
 
-func Main() error {
+func Main(reset bool) error {
 	driver, err := mysql.WithInstance(database.DB, &mysql.Config{})
 	m, err := migrate.NewWithDatabaseInstance("file://db/migrations", "mysql", driver)
 
 	if err != nil {
 		return err
+	}
+
+	if reset {
+		m.Down()
 	}
 
 	err = m.Up()

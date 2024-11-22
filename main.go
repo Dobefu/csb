@@ -37,12 +37,15 @@ func init() {
 }
 
 func main() {
-	cmd := parseSubCommands()
+	cmdName, cmd := parseSubCommands()
 	var err error
 
-	switch cmd {
+	switch cmdName {
 	case "migrate":
-		err = migrate.Main()
+		reset := cmd.flag.Bool("reset", false, "Migrate from a clean database. Warning: this will delete existing data")
+		cmd.flag.Parse(os.Args[2:])
+
+		err = migrate.Main(*reset)
 		break
 	default:
 		break
@@ -53,7 +56,7 @@ func main() {
 	}
 }
 
-func parseSubCommands() string {
+func parseSubCommands() (string, subCommand) {
 	cmds := map[string]subCommand{
 		"migrate": {
 			flag: flag.NewFlagSet("migrate", flag.ExitOnError),
@@ -65,24 +68,22 @@ func parseSubCommands() string {
 		listCmds(cmds)
 	}
 
-	_, subCmdExists := cmds[os.Args[1]]
+	subCmd, subCmdExists := cmds[os.Args[1]]
 
 	if !subCmdExists {
 		listCmds(cmds)
 	}
 
-	return os.Args[1]
+	return os.Args[1], subCmd
 }
 
 func listCmds(cmds map[string]subCommand) {
 	fmt.Fprintf(flag.CommandLine.Output(), "Usage of %s:\n", os.Args[0])
-	fmt.Println("")
 
 	for idx, cmd := range cmds {
-		fmt.Printf("%s:\n", idx)
-		fmt.Printf("  %s\n", cmd.desc)
+		fmt.Printf("  %s:\n", idx)
+		fmt.Printf("    %s\n", cmd.desc)
 	}
 
-	fmt.Println("")
 	os.Exit(1)
 }
