@@ -36,6 +36,10 @@ func init() {
 }
 
 func main() {
+	parseSubCommands()
+}
+
+func parseSubCommands() {
 	cmds := map[string]subCommand{
 		"init": {
 			flag: flag.NewFlagSet("Init", flag.ExitOnError),
@@ -66,4 +70,5 @@ func listCmds(cmds map[string]subCommand) {
 	}
 
 	fmt.Println("")
+	os.Exit(1)
 }
