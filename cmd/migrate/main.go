@@ -10,13 +10,17 @@ import (
 
 func Main() error {
 	driver, err := mysql.WithInstance(database.DB, &mysql.Config{})
-	m, err := migrate.NewWithDatabaseInstance("file://migrations", "mysql", driver)
+	m, err := migrate.NewWithDatabaseInstance("file://db/migrations", "mysql", driver)
 
 	if err != nil {
 		return err
 	}
 
 	err = m.Up()
+
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
