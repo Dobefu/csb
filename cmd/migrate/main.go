@@ -1,0 +1,22 @@
+package migrate
+
+import (
+	"github.com/Dobefu/csb/cmd/database"
+	"github.com/golang-migrate/migrate/v4"
+	"github.com/golang-migrate/migrate/v4/database/mysql"
+
+	_ "github.com/golang-migrate/migrate/v4/source/file"
+)
+
+func Main() error {
+	driver, err := mysql.WithInstance(database.DB, &mysql.Config{})
+	m, err := migrate.NewWithDatabaseInstance("file://migrations", "mysql", driver)
+
+	if err != nil {
+		return err
+	}
+
+	err = m.Up()
+
+	return nil
+}

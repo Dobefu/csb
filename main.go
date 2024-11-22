@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"github.com/Dobefu/csb/cmd/database"
+	"github.com/Dobefu/csb/cmd/migrate"
 	"github.com/joho/godotenv"
 )
 
@@ -36,14 +37,27 @@ func init() {
 }
 
 func main() {
-	parseSubCommands()
+	cmd := parseSubCommands()
+	var err error
+
+	switch cmd {
+	case "migrate":
+		err = migrate.Main()
+		break
+	default:
+		break
+	}
+
+	if err != nil {
+		log.Fatalln(err)
+	}
 }
 
-func parseSubCommands() {
+func parseSubCommands() string {
 	cmds := map[string]subCommand{
-		"init": {
-			flag: flag.NewFlagSet("Init", flag.ExitOnError),
-			desc: "Initialise the database",
+		"migrate": {
+			flag: flag.NewFlagSet("migrate", flag.ExitOnError),
+			desc: "Migrate or initialise the database",
 		},
 	}
 
@@ -57,7 +71,7 @@ func parseSubCommands() {
 		listCmds(cmds)
 	}
 
-	flag.PrintDefaults()
+	return os.Args[1]
 }
 
 func listCmds(cmds map[string]subCommand) {
