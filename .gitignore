@@ -1,0 +1,19 @@
+# Binaries for programs and plugins.
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+csb
+
+# MacOS directory settings.
+.DS_Store
+
+# Test binaries.
+*.test
+
+# Go coverage output.
+*.out
+
+# env file.
+.env
