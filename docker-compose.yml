@@ -1,0 +1,10 @@
+services:
+  db:
+    image: mariadb:latest
+    container_name: db
+    restart: on-failure
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: db
+    ports:
+      - "6033:3306"

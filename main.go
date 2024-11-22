@@ -1,12 +1,29 @@
 package main
 
-import "github.com/joho/godotenv"
+import (
+	"log"
+
+	"github.com/Dobefu/csb/cmd/database"
+	"github.com/joho/godotenv"
+)
 
 func init() {
 	err := godotenv.Load(".env")
 
 	if err != nil {
-		panic("No .env file found. Please copy it from the .env.example and enter your credentials.")
+		log.Fatalln("No .env file found. Please copy it from the .env.example and enter your credentials")
+	}
+
+	err = database.Connect()
+
+	if err != nil {
+		log.Fatalln("Could not connect to the database: " + err.Error())
+	}
+
+	err = database.DB.Ping()
+
+	if err != nil {
+		log.Fatalln("Could not connect to the database: " + err.Error())
 	}
 }
 
