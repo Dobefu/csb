@@ -1,11 +1,19 @@
 package main
 
 import (
+	"flag"
+	"fmt"
 	"log"
+	"os"
 
 	"github.com/Dobefu/csb/cmd/database"
 	"github.com/joho/godotenv"
 )
+
+type subCommand struct {
+	flag *flag.FlagSet
+	desc string
+}
 
 func init() {
 	err := godotenv.Load(".env")
@@ -28,5 +36,34 @@ func init() {
 }
 
 func main() {
-	// Main.
+	cmds := map[string]subCommand{
+		"init": {
+			flag: flag.NewFlagSet("Init", flag.ExitOnError),
+			desc: "Initialise the database",
+		},
+	}
+
+	if len(os.Args) < 2 {
+		listCmds(cmds)
+	}
+
+	_, subCmdExists := cmds[os.Args[1]]
+
+	if !subCmdExists {
+		listCmds(cmds)
+	}
+
+	flag.PrintDefaults()
+}
+
+func listCmds(cmds map[string]subCommand) {
+	fmt.Fprintf(flag.CommandLine.Output(), "Usage of %s:\n", os.Args[0])
+	fmt.Println("")
+
+	for idx, cmd := range cmds {
+		fmt.Printf("%s:\n", idx)
+		fmt.Printf("  %s\n", cmd.desc)
+	}
+
+	fmt.Println("")
 }
