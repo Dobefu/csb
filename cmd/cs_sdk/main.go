@@ -33,7 +33,7 @@ func RequestRaw(path string, method string) (*http.Response, error) {
 	return res, nil
 }
 
-func Request(path string, method string) (interface{}, error) {
+func Request(path string, method string) (map[string]interface{}, error) {
 	res, err := RequestRaw(path, method)
 
 	if err != nil {
@@ -46,7 +46,7 @@ func Request(path string, method string) (interface{}, error) {
 		return nil, err
 	}
 
-	var data interface{}
+	var data map[string]interface{}
 
 	err = json.Unmarshal(body, &data)
 

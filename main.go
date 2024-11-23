@@ -45,7 +45,10 @@ func main() {
 		break
 
 	case "remote:sync":
-		err = remote_sync.Sync()
+		reset := cmd.flag.Bool("reset", false, "Synchronise all data, instead of starting from the last sync token")
+		cmd.flag.Parse(os.Args[2:])
+
+		err = remote_sync.Sync(*reset)
 		break
 	default:
 		break
