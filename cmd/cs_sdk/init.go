@@ -8,9 +8,11 @@ import (
 )
 
 var URL string
+var VERSION string
 
 func init() {
 	URL = getUrl()
+	VERSION := "v3"
 }
 
 func getUrl() string {
@@ -24,5 +26,5 @@ func getUrl() string {
 		extension = "io"
 	}
 
-	return fmt.Sprintf("https://%scdn.contentstack.%s/", region, extension)
+	return fmt.Sprintf("https://%scdn.contentstack.%s", region, extension)
 }
