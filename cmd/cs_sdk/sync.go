@@ -8,6 +8,8 @@ import (
 )
 
 func Sync(reset bool) error {
+	var routes []Route
+
 	syncToken := ""
 	paginationToken := ""
 
@@ -24,7 +26,13 @@ func Sync(reset bool) error {
 			database.SetState("sync_token", newSyncToken)
 		}
 
-		err = processSyncData(data)
+		err = addSyncRoutes(data, &routes)
+
+		if err != nil {
+			return err
+		}
+
+		err = processSyncData(routes)
 
 		if err != nil {
 			return err
@@ -68,7 +76,7 @@ func getSyncData(paginationToken string, reset bool, syncToken string) (map[stri
 	return data, nil
 }
 
-func processSyncData(data map[string]interface{}) error {
+func addSyncRoutes(data map[string]interface{}, routes *[]Route) error {
 	items, hasItems := data["items"].([]interface{})
 
 	if !hasItems {
@@ -96,11 +104,26 @@ func processSyncData(data map[string]interface{}) error {
 		locale := publishDetails["locale"].(string)
 		uid := data["uid"].(string)
 		contentType := item["content_type_uid"].(string)
-		url := slug
 		parent := ""
 		isPublished := hasPublishDetails
 
-		err := database.SetRoute(uid, contentType, locale, slug, url, parent, isPublished)
+		*routes = append(*routes, Route{
+			uid:         uid,
+			contentType: contentType,
+			locale:      locale,
+			slug:        slug,
+			url:         slug,
+			parent:      parent,
+			published:   isPublished,
+		})
+	}
+
+	return nil
+}
+
+func processSyncData(routes []Route) error {
+	for _, route := range routes {
+		err := database.SetRoute(route.uid, route.contentType, route.locale, route.slug, route.url, route.parent, route.published)
 
 		if err != nil {
 			return err
