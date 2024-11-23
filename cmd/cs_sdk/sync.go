@@ -183,11 +183,7 @@ func constructRouteUrl(route structs.Route, routes map[string]structs.Route) str
 		}
 
 		url = fmt.Sprintf("%s%s", currentRoute.Slug, url)
-
 		parentUid := currentRoute.Parent
-		if !currentRoute.Published {
-			fmt.Println(currentRoute)
-		}
 
 		if parentUid == "" {
 			break
@@ -198,6 +194,14 @@ func constructRouteUrl(route structs.Route, routes map[string]structs.Route) str
 
 		if !hasParent {
 			return url
+		}
+
+		if !parent.Published {
+			log.Printf(
+				"⚠️ The entry %s, a parent of %s, is unpublished. This will break the URL. Please be sure to publish it\n",
+				parent.Uid,
+				route.Uid,
+			)
 		}
 
 		currentRoute = parent
