@@ -62,13 +62,18 @@ func main() {
 func parseSubCommands() (string, subCommand) {
 	cmds := map[string]subCommand{
 		"migrate:db": {
-			flag: flag.NewFlagSet("migrate:db", flag.ExitOnError),
 			desc: "Migrate or initialise the database",
 		},
 		"remote:sync": {
-			flag: flag.NewFlagSet("remote:sync", flag.ExitOnError),
 			desc: "Synchronise Contentstack data into the database",
 		},
+	}
+
+	for cmdName, cmd := range cmds {
+		cmds[cmdName] = subCommand{
+			flag: flag.NewFlagSet(cmdName, flag.ExitOnError),
+			desc: cmd.desc,
+		}
 	}
 
 	if len(os.Args) < 2 {
