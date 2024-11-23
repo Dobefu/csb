@@ -4,11 +4,12 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/Dobefu/csb/cmd/cs_sdk/structs"
 	"github.com/Dobefu/csb/cmd/database"
 )
 
 func Sync(reset bool) error {
-	var routes []Route
+	var routes []structs.Route
 
 	syncToken := ""
 	paginationToken := ""
@@ -76,7 +77,7 @@ func getSyncData(paginationToken string, reset bool, syncToken string) (map[stri
 	return data, nil
 }
 
-func addSyncRoutes(data map[string]interface{}, routes *[]Route) error {
+func addSyncRoutes(data map[string]interface{}, routes *[]structs.Route) error {
 	items, hasItems := data["items"].([]interface{})
 
 	if !hasItems {
@@ -107,23 +108,23 @@ func addSyncRoutes(data map[string]interface{}, routes *[]Route) error {
 		parent := ""
 		isPublished := hasPublishDetails
 
-		*routes = append(*routes, Route{
-			uid:         uid,
-			contentType: contentType,
-			locale:      locale,
-			slug:        slug,
-			url:         slug,
-			parent:      parent,
-			published:   isPublished,
+		*routes = append(*routes, structs.Route{
+			Uid:         uid,
+			ContentType: contentType,
+			Locale:      locale,
+			Slug:        slug,
+			Url:         slug,
+			Parent:      parent,
+			Published:   isPublished,
 		})
 	}
 
 	return nil
 }
 
-func processSyncData(routes []Route) error {
+func processSyncData(routes []structs.Route) error {
 	for _, route := range routes {
-		err := database.SetRoute(route.uid, route.contentType, route.locale, route.slug, route.url, route.parent, route.published)
+		err := database.SetRoute(route)
 
 		if err != nil {
 			return err

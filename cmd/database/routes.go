@@ -1,15 +1,13 @@
 package database
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/Dobefu/csb/cmd/cs_sdk/structs"
+)
 
 func SetRoute(
-	uid string,
-	contentType string,
-	locale string,
-	slug string,
-	url string,
-	parent string,
-	published bool,
+	route structs.Route,
 ) error {
 	_, err := DB.Exec(
 		`INSERT INTO routes
@@ -25,18 +23,19 @@ func SetRoute(
       parent = VALUES(parent),
       published = VALUES(published)
   `,
-		fmt.Sprintf("%s%s", uid, locale),
-		uid,
-		contentType,
-		locale,
-		slug,
-		url,
-		parent,
-		published,
+		fmt.Sprintf("%s%s", route.Uid, route.Locale),
+		route.Uid,
+		route.ContentType,
+		route.Locale,
+		route.Slug,
+		route.Url,
+		route.Parent,
+		route.Published,
 	)
 
 	if err != nil {
 		return err
 	}
+
 	return nil
 }
