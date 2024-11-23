@@ -50,6 +50,8 @@ func Sync(reset bool) error {
 		return err
 	}
 
+	log.Println("Data sync completed successfully")
+
 	return nil
 }
 
