@@ -1,7 +1,8 @@
 package database
 
+import "fmt"
+
 func SetRoute(
-	id string,
 	uid string,
 	contentType string,
 	locale string,
@@ -24,7 +25,7 @@ func SetRoute(
       parent = VALUES(parent),
       published = VALUES(published)
   `,
-		id,
+		fmt.Sprintf("%s%s", uid, locale),
 		uid,
 		contentType,
 		locale,

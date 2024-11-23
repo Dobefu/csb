@@ -95,13 +95,12 @@ func processSyncData(data map[string]interface{}) error {
 
 		locale := publishDetails["locale"].(string)
 		uid := data["uid"].(string)
-		id := fmt.Sprintf("%s%s", uid, locale)
 		contentType := item["content_type_uid"].(string)
 		url := slug
 		parent := ""
 		isPublished := hasPublishDetails
 
-		err := database.SetRoute(id, uid, contentType, locale, slug, url, parent, isPublished)
+		err := database.SetRoute(uid, contentType, locale, slug, url, parent, isPublished)
 
 		if err != nil {
 			return err
