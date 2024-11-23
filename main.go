@@ -6,10 +6,12 @@ import (
 	"log"
 	"os"
 
+	"github.com/Dobefu/csb/cmd/cs_sdk"
 	"github.com/Dobefu/csb/cmd/database"
 	"github.com/Dobefu/csb/cmd/migrate_db"
 	"github.com/Dobefu/csb/cmd/remote_sync"
-	"github.com/joho/godotenv"
+
+	_ "github.com/Dobefu/csb/cmd/init"
 )
 
 type subCommand struct {
@@ -18,13 +20,7 @@ type subCommand struct {
 }
 
 func init() {
-	err := godotenv.Load(".env")
-
-	if err != nil {
-		log.Fatalln("No .env file found. Please copy it from the .env.example and enter your credentials")
-	}
-
-	err = database.Connect()
+	err := database.Connect()
 
 	if err != nil {
 		log.Fatalln("Could not connect to the database: " + err.Error())
@@ -51,6 +47,7 @@ func main() {
 
 	case "remote:sync":
 		err = remote_sync.Sync()
+		fmt.Println(cs_sdk.URL)
 		break
 	default:
 		break
