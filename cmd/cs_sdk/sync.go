@@ -8,28 +8,11 @@ import (
 )
 
 func Sync(reset bool) error {
+	syncToken := ""
 	paginationToken := ""
 
 	for {
-		var data map[string]interface{}
-
-		syncToken := ""
-		var err error
-
-		if !reset {
-			syncToken, err = database.GetState("sync_token")
-		}
-
-		if paginationToken != "" {
-			path := fmt.Sprintf("stacks/sync?pagination_token=%s", paginationToken)
-			data, err = Request(path, "GET")
-		} else if err != nil || reset {
-			path := fmt.Sprintf("stacks/sync?init=true&type=entry_published,entry_unpublished")
-			data, err = Request(path, "GET")
-		} else {
-			path := fmt.Sprintf("stacks/sync?sync_token=%s", syncToken)
-			data, err = Request(path, "GET")
-		}
+		data, err := getSyncData(paginationToken, reset, syncToken)
 
 		if err != nil {
 			return err
@@ -57,6 +40,32 @@ func Sync(reset bool) error {
 	}
 
 	return nil
+}
+
+func getSyncData(paginationToken string, reset bool, syncToken string) (map[string]interface{}, error) {
+	var data map[string]interface{}
+	var err error
+
+	if !reset {
+		syncToken, err = database.GetState("sync_token")
+	}
+
+	if paginationToken != "" {
+		path := fmt.Sprintf("stacks/sync?pagination_token=%s", paginationToken)
+		data, err = Request(path, "GET")
+	} else if err != nil || reset {
+		path := fmt.Sprintf("stacks/sync?init=true&type=entry_published,entry_unpublished")
+		data, err = Request(path, "GET")
+	} else {
+		path := fmt.Sprintf("stacks/sync?sync_token=%s", syncToken)
+		data, err = Request(path, "GET")
+	}
+
+	if err != nil {
+		return nil, err
+	}
+
+	return data, nil
 }
 
 func processSyncData(data map[string]interface{}) error {
