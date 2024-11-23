@@ -3,13 +3,14 @@ package cs_sdk
 import (
 	"errors"
 	"fmt"
+	"log"
 
 	"github.com/Dobefu/csb/cmd/cs_sdk/structs"
 	"github.com/Dobefu/csb/cmd/database"
 )
 
 func Sync(reset bool) error {
-	var routes []structs.Route
+	routes := make(map[string]structs.Route)
 
 	syncToken := ""
 	paginationToken := ""
@@ -77,7 +78,7 @@ func getSyncData(paginationToken string, reset bool, syncToken string) (map[stri
 	return data, nil
 }
 
-func addSyncRoutes(data map[string]interface{}, routes *[]structs.Route) error {
+func addSyncRoutes(data map[string]interface{}, routes *map[string]structs.Route) error {
 	items, hasItems := data["items"].([]interface{})
 
 	if !hasItems {
@@ -107,8 +108,9 @@ func addSyncRoutes(data map[string]interface{}, routes *[]structs.Route) error {
 		contentType := item["content_type_uid"].(string)
 		parent := getParentUid(data)
 		isPublished := hasPublishDetails
+		id := fmt.Sprintf("%s%s", uid, locale)
 
-		*routes = append(*routes, structs.Route{
+		(*routes)[id] = structs.Route{
 			Uid:         uid,
 			ContentType: contentType,
 			Locale:      locale,
@@ -116,7 +118,7 @@ func addSyncRoutes(data map[string]interface{}, routes *[]structs.Route) error {
 			Url:         slug,
 			Parent:      parent,
 			Published:   isPublished,
-		})
+		}
 	}
 
 	return nil
@@ -144,9 +146,21 @@ func getParentUid(data map[string]interface{}) string {
 	return parentUid
 }
 
-func processSyncData(routes []structs.Route) error {
-	for _, route := range routes {
-		err := database.SetRoute(route)
+func processSyncData(routes map[string]structs.Route) error {
+	for idx, route := range routes {
+		url := constructRouteUrl(route, routes)
+
+		routes[idx] = structs.Route{
+			Uid:         route.Uid,
+			ContentType: route.ContentType,
+			Locale:      route.Locale,
+			Slug:        route.Slug,
+			Url:         url,
+			Parent:      route.Parent,
+			Published:   route.Published,
+		}
+
+		err := database.SetRoute(routes[idx])
 
 		if err != nil {
 			return err
@@ -154,4 +168,41 @@ func processSyncData(routes []structs.Route) error {
 	}
 
 	return nil
+}
+
+func constructRouteUrl(route structs.Route, routes map[string]structs.Route) string {
+	url := ""
+	currentRoute := route
+	depth := 0
+	maxDepth := 10
+
+	for {
+		if depth > maxDepth {
+			log.Printf("⚠️ Maximum nesting depth of %d exceeded in entry %s\n", maxDepth, route.Uid)
+			return url
+		}
+
+		url = fmt.Sprintf("%s%s", currentRoute.Slug, url)
+
+		parentUid := currentRoute.Parent
+		if !currentRoute.Published {
+			fmt.Println(currentRoute)
+		}
+
+		if parentUid == "" {
+			break
+		}
+
+		parentId := fmt.Sprintf("%s%s", parentUid, currentRoute.Locale)
+		parent, hasParent := routes[parentId]
+
+		if !hasParent {
+			return url
+		}
+
+		currentRoute = parent
+		depth += 1
+	}
+
+	return url
 }
