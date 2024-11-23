@@ -12,7 +12,7 @@ var VERSION string
 
 func init() {
 	URL = getUrl()
-	VERSION := "v3"
+	VERSION = "v3"
 }
 
 func getUrl() string {
