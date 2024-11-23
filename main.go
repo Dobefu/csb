@@ -7,7 +7,8 @@ import (
 	"os"
 
 	"github.com/Dobefu/csb/cmd/database"
-	"github.com/Dobefu/csb/cmd/migrate"
+	"github.com/Dobefu/csb/cmd/migrate_db"
+	"github.com/Dobefu/csb/cmd/remote_sync"
 	"github.com/joho/godotenv"
 )
 
@@ -41,11 +42,15 @@ func main() {
 	var err error
 
 	switch cmdName {
-	case "migrate":
+	case "migrate:db":
 		reset := cmd.flag.Bool("reset", false, "Migrate from a clean database. Warning: this will delete existing data")
 		cmd.flag.Parse(os.Args[2:])
 
-		err = migrate.Main(*reset)
+		err = migrate_db.Main(*reset)
+		break
+
+	case "remote:sync":
+		err = remote_sync.Sync()
 		break
 	default:
 		break
@@ -58,9 +63,13 @@ func main() {
 
 func parseSubCommands() (string, subCommand) {
 	cmds := map[string]subCommand{
-		"migrate": {
-			flag: flag.NewFlagSet("migrate", flag.ExitOnError),
+		"migrate:db": {
+			flag: flag.NewFlagSet("migrate:db", flag.ExitOnError),
 			desc: "Migrate or initialise the database",
+		},
+		"remote:sync": {
+			flag: flag.NewFlagSet("remote:sync", flag.ExitOnError),
+			desc: "Synchronise Contentstack data into the database",
 		},
 	}
 

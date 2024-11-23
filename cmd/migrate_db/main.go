@@ -1,4 +1,4 @@
-package migrate
+package migrate_db
 
 import (
 	"github.com/Dobefu/csb/cmd/database"
