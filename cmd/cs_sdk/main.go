@@ -1,6 +1,7 @@
 package cs_sdk
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -32,13 +33,26 @@ func RequestRaw(path string, method string) (*http.Response, error) {
 	return res, nil
 }
 
-func Request(path string, method string) (string, error) {
+func Request(path string, method string) (interface{}, error) {
 	res, err := RequestRaw(path, method)
 
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	body, err := io.ReadAll(res.Body)
-	return string(body), nil
+
+	if err != nil {
+		return nil, err
+	}
+
+	var data interface{}
+
+	err = json.Unmarshal(body, &data)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return data, nil
 }
