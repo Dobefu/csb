@@ -1,5 +1,6 @@
 CREATE TABLE IF NOT EXISTS routes(
-  uid varchar(64) NOT NULL PRIMARY KEY UNIQUE,
+  id varchar(48) NOT NULL PRIMARY KEY UNIQUE,
+  uid varchar(32) NOT NULL,
   contentType varchar(255) NOT NULL,
   locale varchar(16) NOT NULL,
   slug varchar(255) NOT NULL,
