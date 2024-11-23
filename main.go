@@ -6,7 +6,6 @@ import (
 	"log"
 	"os"
 
-	"github.com/Dobefu/csb/cmd/cs_sdk"
 	"github.com/Dobefu/csb/cmd/database"
 	"github.com/Dobefu/csb/cmd/migrate_db"
 	"github.com/Dobefu/csb/cmd/remote_sync"
@@ -47,7 +46,7 @@ func main() {
 
 	case "remote:sync":
 		err = remote_sync.Sync()
-		fmt.Println(cs_sdk.URL)
+		fmt.Println(err)
 		break
 	default:
 		break

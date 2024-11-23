@@ -1,5 +1,7 @@
 package remote_sync
 
+import "github.com/Dobefu/csb/cmd/cs_sdk"
+
 func Sync() error {
-	return nil
+	return cs_sdk.Sync()
 }
