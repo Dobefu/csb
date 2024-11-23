@@ -1,6 +1,7 @@
 package cs_sdk
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/Dobefu/csb/cmd/database"
@@ -23,7 +24,7 @@ func Sync(reset bool) error {
 			path := fmt.Sprintf("stacks/sync?pagination_token=%s", paginationToken)
 			data, err = Request(path, "GET")
 		} else if err != nil || reset {
-			path := fmt.Sprintf("stacks/sync?init=true")
+			path := fmt.Sprintf("stacks/sync?init=true&type=entry_published,entry_unpublished")
 			data, err = Request(path, "GET")
 		} else {
 			path := fmt.Sprintf("stacks/sync?sync_token=%s", syncToken)
@@ -40,7 +41,11 @@ func Sync(reset bool) error {
 			database.SetState("sync_token", newSyncToken)
 		}
 
-		processSyncData(data)
+		err = processSyncData(data)
+
+		if err != nil {
+			return err
+		}
 
 		var hasPaginationToken bool
 
@@ -54,6 +59,45 @@ func Sync(reset bool) error {
 	return nil
 }
 
-func processSyncData(data map[string]interface{}) {
+func processSyncData(data map[string]interface{}) error {
+	items, hasItems := data["items"].([]interface{})
 
+	if !hasItems {
+		return errors.New("sync data has no items")
+	}
+
+	for _, item := range items {
+		item := item.(map[string]interface{})
+		data := item["data"].(map[string]interface{})
+
+		publishDetails, hasPublishDetails := data["publish_details"].(map[string]interface{})
+
+		if !hasPublishDetails {
+			publishDetails = map[string]interface{}{
+				"locale": data["locale"],
+			}
+		}
+
+		slug, hasSlug := data["url"].(string)
+
+		if !hasSlug {
+			slug = ""
+		}
+
+		locale := publishDetails["locale"].(string)
+		uid := data["uid"].(string)
+		id := fmt.Sprintf("%s%s", uid, locale)
+		contentType := item["content_type_uid"].(string)
+		url := slug
+		parent := ""
+		isPublished := hasPublishDetails
+
+		err := database.SetRoute(id, uid, contentType, locale, slug, url, parent, isPublished)
+
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
