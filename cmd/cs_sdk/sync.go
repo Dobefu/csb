@@ -34,12 +34,6 @@ func Sync(reset bool) error {
 			return err
 		}
 
-		err = processSyncData(routes)
-
-		if err != nil {
-			return err
-		}
-
 		var hasPaginationToken bool
 
 		paginationToken, hasPaginationToken = data["pagination_token"].(string)
@@ -47,6 +41,13 @@ func Sync(reset bool) error {
 		if !hasPaginationToken {
 			break
 		}
+	}
+
+	log.Println("Processing the sync items")
+	err := processSyncData(routes)
+
+	if err != nil {
+		return err
 	}
 
 	return nil
@@ -61,12 +62,15 @@ func getSyncData(paginationToken string, reset bool, syncToken string) (map[stri
 	}
 
 	if paginationToken != "" {
+		log.Println("Getting a new sync page")
 		path := fmt.Sprintf("stacks/sync?pagination_token=%s", paginationToken)
 		data, err = Request(path, "GET")
 	} else if err != nil || reset {
-		path := fmt.Sprintf("stacks/sync?init=true&type=entry_published,entry_unpublished")
+		log.Println("Initialising a fresh sync")
+		path := fmt.Sprintf("stacks/sync?init=true&type=entry_published,entry_unpublished,entry_deleted")
 		data, err = Request(path, "GET")
 	} else {
+		log.Println("Syncing data using an existing sync token")
 		path := fmt.Sprintf("stacks/sync?sync_token=%s", syncToken)
 		data, err = Request(path, "GET")
 	}
@@ -85,7 +89,11 @@ func addSyncRoutes(data map[string]interface{}, routes *map[string]structs.Route
 		return errors.New("sync data has no items")
 	}
 
-	for _, item := range items {
+	itemCount := len(items)
+
+	for idx, item := range items {
+		log.Printf("Fetching item data (%d/%d)\n", (idx + 1), itemCount)
+
 		item := item.(map[string]interface{})
 		data := item["data"].(map[string]interface{})
 
@@ -109,6 +117,8 @@ func addSyncRoutes(data map[string]interface{}, routes *map[string]structs.Route
 		parent := getParentUid(data)
 		isPublished := hasPublishDetails
 		id := fmt.Sprintf("%s%s", uid, locale)
+
+		log.Printf("Found entry: %s\n", uid)
 
 		(*routes)[id] = structs.Route{
 			Uid:         uid,
@@ -147,10 +157,15 @@ func getParentUid(data map[string]interface{}) string {
 }
 
 func processSyncData(routes map[string]structs.Route) error {
-	for idx, route := range routes {
+	routeCount := len(routes)
+	idx := 0
+
+	for uid, route := range routes {
+		log.Printf("Processing entry %s (%d/%d)\n", route.Uid, (idx + 1), routeCount)
+
 		url := constructRouteUrl(route, routes)
 
-		routes[idx] = structs.Route{
+		routes[uid] = structs.Route{
 			Uid:         route.Uid,
 			ContentType: route.ContentType,
 			Locale:      route.Locale,
@@ -160,11 +175,13 @@ func processSyncData(routes map[string]structs.Route) error {
 			Published:   route.Published,
 		}
 
-		err := database.SetRoute(routes[idx])
+		err := database.SetRoute(routes[uid])
 
 		if err != nil {
 			return err
 		}
+
+		idx += 1
 	}
 
 	return nil
