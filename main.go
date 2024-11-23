@@ -46,7 +46,6 @@ func main() {
 
 	case "remote:sync":
 		err = remote_sync.Sync()
-		fmt.Println(err)
 		break
 	default:
 		break
