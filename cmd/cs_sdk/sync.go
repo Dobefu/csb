@@ -105,7 +105,7 @@ func addSyncRoutes(data map[string]interface{}, routes *[]structs.Route) error {
 		locale := publishDetails["locale"].(string)
 		uid := data["uid"].(string)
 		contentType := item["content_type_uid"].(string)
-		parent := ""
+		parent := getParentUid(data)
 		isPublished := hasPublishDetails
 
 		*routes = append(*routes, structs.Route{
@@ -120,6 +120,28 @@ func addSyncRoutes(data map[string]interface{}, routes *[]structs.Route) error {
 	}
 
 	return nil
+}
+
+func getParentUid(data map[string]interface{}) string {
+	parents, hasParents := data["parent"].([]interface{})
+
+	if !hasParents || len(parents) <= 0 {
+		return ""
+	}
+
+	parentData, hasParentData := parents[0].(map[string]interface{})
+
+	if !hasParentData {
+		return ""
+	}
+
+	parentUid, hasParentUid := parentData["uid"].(string)
+
+	if !hasParentUid {
+		return ""
+	}
+
+	return parentUid
 }
 
 func processSyncData(routes []structs.Route) error {
