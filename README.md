@@ -1,6 +1,15 @@
 # Contentstack Bridge
 
-Adds a layer between your application and Contentstack, to provide some much-needed conveniences.
+Adds a layer between your application and Contentstack,
+to provide some much-needed conveniences.
+
+## Table Of Contents
+
+<!-- toc -->
+
+- [Building](#building)
+
+<!-- tocstop -->
 
 ## Building
 
