@@ -17,3 +17,6 @@ csb
 
 # env file.
 .env
+
+# Goreleaser generated files.
+dist/
