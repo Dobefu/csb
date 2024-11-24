@@ -3,10 +3,10 @@ package main
 import (
 	"flag"
 	"fmt"
-	"log"
 	"os"
 
 	"github.com/Dobefu/csb/cmd/database"
+	"github.com/Dobefu/csb/cmd/logger"
 	"github.com/Dobefu/csb/cmd/migrate_db"
 	"github.com/Dobefu/csb/cmd/remote_sync"
 
@@ -22,13 +22,13 @@ func init() {
 	err := database.Connect()
 
 	if err != nil {
-		log.Fatalln("Could not connect to the database: " + err.Error())
+		logger.Fatal("Could not connect to the database: " + err.Error())
 	}
 
 	err = database.DB.Ping()
 
 	if err != nil {
-		log.Fatalln("Could not connect to the database: " + err.Error())
+		logger.Fatal("Could not connect to the database: " + err.Error())
 	}
 }
 
@@ -55,7 +55,7 @@ func main() {
 	}
 
 	if err != nil {
-		log.Fatalln(err)
+		logger.Fatal(err.Error())
 	}
 }
 
