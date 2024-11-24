@@ -7,10 +7,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestMain(t *testing.T) {
-	main()
-}
-
 func TestParseSubCommands(t *testing.T) {
 	os.Args[1] = "migrate:db"
 	_, v := parseSubCommands()

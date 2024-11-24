@@ -12,6 +12,8 @@ func TestLogMessage(t *testing.T) {
 }
 
 func TestLogVerbose(t *testing.T) {
+	SetExitOnFatal(false)
+
 	SetLogLevel(LOG_VERBOSE)
 	assert.NotEmpty(t, Verbose("test"))
 	SetLogLevel(LOG_INFO)
@@ -25,6 +27,8 @@ func TestLogVerbose(t *testing.T) {
 }
 
 func TestLogInfo(t *testing.T) {
+	SetExitOnFatal(false)
+
 	SetLogLevel(LOG_VERBOSE)
 	assert.NotEmpty(t, Info("test"))
 	SetLogLevel(LOG_INFO)
@@ -38,6 +42,8 @@ func TestLogInfo(t *testing.T) {
 }
 
 func TestLogWarning(t *testing.T) {
+	SetExitOnFatal(false)
+
 	SetLogLevel(LOG_VERBOSE)
 	assert.NotEmpty(t, Warning("test"))
 	SetLogLevel(LOG_INFO)
@@ -51,6 +57,8 @@ func TestLogWarning(t *testing.T) {
 }
 
 func TestLogError(t *testing.T) {
+	SetExitOnFatal(false)
+
 	SetLogLevel(LOG_VERBOSE)
 	assert.NotEmpty(t, Error("test"))
 	SetLogLevel(LOG_INFO)
@@ -64,6 +72,8 @@ func TestLogError(t *testing.T) {
 }
 
 func TestLogFatal(t *testing.T) {
+	SetExitOnFatal(false)
+
 	SetLogLevel(LOG_VERBOSE)
 	assert.NotEmpty(t, Fatal("test"))
 	SetLogLevel(LOG_INFO)

@@ -1,7 +1,6 @@
 package logger
 
 import (
-	"flag"
 	"fmt"
 	"os"
 	"time"
@@ -18,6 +17,7 @@ var (
 )
 
 var LOGLEVEL byte = LOG_INFO
+var EXIT_ON_FATAL = true
 
 func logMessage(level byte, format string, a ...any) string {
 	if level < LOGLEVEL {
@@ -74,7 +74,7 @@ func Error(format string, a ...any) string {
 func Fatal(format string, a ...any) string {
 	output := logMessage(LOG_FATAL, format, a...)
 
-	if flag.Lookup("test.v") == nil {
+	if EXIT_ON_FATAL {
 		os.Exit(1)
 	}
 
@@ -83,4 +83,8 @@ func Fatal(format string, a ...any) string {
 
 func SetLogLevel(level byte) {
 	LOGLEVEL = level
+}
+
+func SetExitOnFatal(value bool) {
+	EXIT_ON_FATAL = value
 }
