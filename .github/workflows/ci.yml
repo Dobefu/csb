@@ -36,5 +36,8 @@ jobs:
         with:
           go-version: "1.23"
 
+      - name: Create empty .env
+        run: touch .env
+
       - name: Run tests
         run: go test --cover ./...
