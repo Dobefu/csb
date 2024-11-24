@@ -128,7 +128,7 @@ func addSyncRoutes(data map[string]interface{}, routes *map[string]structs.Route
 		isPublished := hasPublishDetails
 		id := utils.GenerateId(structs.Route{Uid: uid, Locale: locale})
 
-		logger.Info("Found entry: %s", uid)
+		logger.Verbose("Found entry: %s", uid)
 
 		(*routes)[id] = structs.Route{
 			Uid:         uid,
