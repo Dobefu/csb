@@ -1,11 +1,5 @@
 name: CI
 
-on:
-  push:
-    branches: ["main"]
-  pull_request:
-    branches: ["main"]
-
 jobs:
   build:
     name: "Build"
@@ -38,3 +32,18 @@ jobs:
 
       - name: Run tests
         run: go test --cover ./...
+
+  deploy:
+    name: "Release"
+    needs: [test]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: "Run GoReleaser"
+        uses: goreleaser/goreleaser-action@v5
+        with:
+          distribution: goreleaser
+          version: "semver"
+          args: release --clean
+    if:
+      contains('refs/heads/main', github.ref)
