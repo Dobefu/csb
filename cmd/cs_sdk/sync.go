@@ -6,6 +6,7 @@ import (
 	"log"
 
 	"github.com/Dobefu/csb/cmd/cs_sdk/structs"
+	"github.com/Dobefu/csb/cmd/cs_sdk/utils"
 	"github.com/Dobefu/csb/cmd/database"
 )
 
@@ -125,7 +126,7 @@ func addSyncRoutes(data map[string]interface{}, routes *map[string]structs.Route
 		contentType := item["content_type_uid"].(string)
 		parent := getParentUid(data)
 		isPublished := hasPublishDetails
-		id := fmt.Sprintf("%s%s", uid, locale)
+		id := utils.GenerateId(structs.Route{Uid: uid, Locale: locale})
 
 		log.Printf("Found entry: %s\n", uid)
 
@@ -171,7 +172,7 @@ func addRouteChildren(route structs.Route, routes *map[string]structs.Route, dep
 			continue
 		}
 
-		id := fmt.Sprintf("%s%s", childRoute.Uid, childRoute.Locale)
+		id := utils.GenerateId(childRoute)
 		(*routes)[id] = childRoute
 
 		addRouteChildren(childRoute, routes, depth+1)
@@ -252,7 +253,7 @@ func constructRouteUrl(route structs.Route, routes map[string]structs.Route) str
 			break
 		}
 
-		parentId := fmt.Sprintf("%s%s", parentUid, currentRoute.Locale)
+		parentId := utils.GenerateId(structs.Route{Uid: parentUid, Locale: currentRoute.Locale})
 		parent, hasParent := routes[parentId]
 
 		if !hasParent {

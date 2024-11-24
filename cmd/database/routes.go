@@ -1,9 +1,8 @@
 package database
 
 import (
-	"fmt"
-
 	"github.com/Dobefu/csb/cmd/cs_sdk/structs"
+	"github.com/Dobefu/csb/cmd/cs_sdk/utils"
 )
 
 func SetRoute(
@@ -23,7 +22,7 @@ func SetRoute(
       parent = VALUES(parent),
       published = VALUES(published)
   `,
-		fmt.Sprintf("%s%s", route.Uid, route.Locale),
+		utils.GenerateId(route),
 		route.Uid,
 		route.ContentType,
 		route.Locale,
