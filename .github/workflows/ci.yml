@@ -45,5 +45,7 @@ jobs:
           distribution: goreleaser
           version: "semver"
           args: release --clean
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     if:
       contains('refs/heads/main', github.ref)
