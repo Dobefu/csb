@@ -1,5 +1,7 @@
 # Contentstack Bridge
 
+<img src="https://github.com/Dobefu/csb/actions/workflows/ci.yml/badge.svg" />
+
 Adds a layer between your application and Contentstack,
 to provide some much-needed conveniences.
 
