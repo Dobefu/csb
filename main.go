@@ -22,13 +22,13 @@ func init() {
 	err := database.Connect()
 
 	if err != nil {
-		logger.Fatal("Could not connect to the database: " + err.Error())
+		logger.Fatal("Could not connect to the database: %s", err.Error())
 	}
 
 	err = database.DB.Ping()
 
 	if err != nil {
-		logger.Fatal("Could not connect to the database: " + err.Error())
+		logger.Fatal("Could not connect to the database: %s", err.Error())
 	}
 }
 

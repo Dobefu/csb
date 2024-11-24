@@ -1,6 +1,7 @@
 package logger
 
 import (
+	"flag"
 	"fmt"
 	"os"
 	"time"
@@ -9,18 +10,18 @@ import (
 )
 
 var (
-	LOG_VERBOSE uint8 = 0
-	LOG_INFO    uint8 = 1
-	LOG_WARNING uint8 = 2
-	LOG_ERROR   uint8 = 3
-	LOG_FATAL   uint8 = 4
+	LOG_VERBOSE byte = 0
+	LOG_INFO    byte = 1
+	LOG_WARNING byte = 2
+	LOG_ERROR   byte = 3
+	LOG_FATAL   byte = 4
 )
 
-var LOGLEVEL uint8 = LOG_INFO
+var LOGLEVEL byte = LOG_INFO
 
-func log(level byte, format string, a ...any) {
+func logMessage(level byte, format string, a ...any) string {
 	if level < LOGLEVEL {
-		return
+		return ""
 	}
 
 	timestamp := time.Now().Format(time.DateTime)
@@ -48,31 +49,38 @@ func log(level byte, format string, a ...any) {
 	}
 
 	str = fmt.Sprintf("[%s] %s\n", timestamp, str)
+	output := fmt.Sprintf(str, a...)
 
-	fmt.Printf(str, a...)
+	fmt.Print(output)
+	return output
 }
 
-func Verbose(format string, a ...any) {
-	log(LOG_VERBOSE, format, a...)
+func Verbose(format string, a ...any) string {
+	return logMessage(LOG_VERBOSE, format, a...)
 }
 
-func Info(format string, a ...any) {
-	log(LOG_INFO, format, a...)
+func Info(format string, a ...any) string {
+	return logMessage(LOG_INFO, format, a...)
 }
 
-func Warning(format string, a ...any) {
-	log(LOG_WARNING, format, a...)
+func Warning(format string, a ...any) string {
+	return logMessage(LOG_WARNING, format, a...)
 }
 
-func Error(format string, a ...any) {
-	log(LOG_ERROR, format, a...)
+func Error(format string, a ...any) string {
+	return logMessage(LOG_ERROR, format, a...)
 }
 
-func Fatal(format string, a ...any) {
-	log(LOG_FATAL, format, a...)
-	os.Exit(1)
+func Fatal(format string, a ...any) string {
+	output := logMessage(LOG_FATAL, format, a...)
+
+	if flag.Lookup("test.v") == nil {
+		os.Exit(1)
+	}
+
+	return output
 }
 
-func SetLogLevel(level uint8) {
+func SetLogLevel(level byte) {
 	LOGLEVEL = level
 }
