@@ -69,8 +69,8 @@ func main() {
 	}
 }
 
-func parseSubCommands() (string, subCommand) {
-	cmds := map[string]subCommand{
+func getSubCommands() map[string]subCommand {
+	return map[string]subCommand{
 		"migrate:db": {
 			desc: "Migrate or initialise the database",
 		},
@@ -78,6 +78,11 @@ func parseSubCommands() (string, subCommand) {
 			desc: "Synchronise Contentstack data into the database",
 		},
 	}
+
+}
+
+func parseSubCommands() (string, subCommand) {
+	cmds := getSubCommands()
 
 	for cmdName, cmd := range cmds {
 		cmds[cmdName] = subCommand{
@@ -87,19 +92,21 @@ func parseSubCommands() (string, subCommand) {
 	}
 
 	if len(os.Args) < 2 {
-		listCmds(cmds)
+		listCmds()
 	}
 
 	subCmd, subCmdExists := cmds[os.Args[1]]
 
 	if !subCmdExists {
-		listCmds(cmds)
+		listCmds()
 	}
 
 	return os.Args[1], subCmd
 }
 
-func listCmds(cmds map[string]subCommand) {
+func listCmds() {
+	cmds := getSubCommands()
+
 	fmt.Fprintf(flag.CommandLine.Output(), "Usage of %s:\n", os.Args[0])
 
 	for idx, cmd := range cmds {
