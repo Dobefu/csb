@@ -34,6 +34,13 @@ func Sync(reset bool) error {
 			return err
 		}
 
+		log.Println("Adding child routes")
+		err = addChildRoutes(&routes)
+
+		if err != nil {
+			return err
+		}
+
 		var hasPaginationToken bool
 
 		paginationToken, hasPaginationToken = data["pagination_token"].(string)
@@ -131,6 +138,43 @@ func addSyncRoutes(data map[string]interface{}, routes *map[string]structs.Route
 			Parent:      parent,
 			Published:   isPublished,
 		}
+	}
+
+	return nil
+}
+
+func addChildRoutes(routes *map[string]structs.Route) error {
+	for _, route := range *routes {
+		err := addRouteChildren(route, routes, 0)
+
+		if err != nil {
+			continue
+		}
+	}
+
+	return nil
+}
+
+func addRouteChildren(route structs.Route, routes *map[string]structs.Route, depth uint8) error {
+	if depth > 10 {
+		return errors.New("potential infinite loop detected")
+	}
+
+	childRoutes, err := database.GetChildEntriesByUid(route.Uid, route.Locale)
+
+	if err != nil {
+		return err
+	}
+
+	for _, childRoute := range childRoutes {
+		if childRoute.Uid == "" {
+			continue
+		}
+
+		id := fmt.Sprintf("%s%s", childRoute.Uid, childRoute.Locale)
+		(*routes)[id] = childRoute
+
+		addRouteChildren(childRoute, routes, depth+1)
 	}
 
 	return nil

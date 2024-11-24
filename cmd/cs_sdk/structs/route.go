@@ -1,6 +1,7 @@
 package structs
 
 type Route struct {
+	Id          string
 	Uid         string
 	ContentType string
 	Locale      string
