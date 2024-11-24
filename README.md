@@ -12,6 +12,9 @@ to provide some much-needed conveniences.
     * [Setting up the .env file](#setting-up-the-env-file)
     * [Contentstack credentials](#contentstack-credentials)
     * [Database credentials](#database-credentials)
+- [Usage](#usage)
+    * [Database migration](#database-migration)
+    * [Remote sync](#remote-sync)
 
 <!-- tocstop -->
 
@@ -57,3 +60,26 @@ A database can quickly be spun up locally:
 docker compose up -d
 ```
 
+
+## Usage
+
+### Database migration
+When first starting the application, the database will be completely empty.
+To add all necessary tables and rows to the database, run the following command:
+
+```bash
+./csb migrate:db
+```
+
+This will create the necessary tables and rows in order for the application to work.
+
+### Remote sync
+
+To synchronise all data from Contentstack, the following command can be used:
+```bash
+./csb remote:sync
+```
+
+This will perform a full synchronisation with the Contentstack data.
+This is meant to populate the database, and perform any computationally expensive
+operations ahead of time.
