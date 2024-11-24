@@ -25,7 +25,8 @@ jobs:
         run: go build
 
   test:
-    name: "Build"
+    name: "Test"
+    needs: [build]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -34,9 +35,6 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version: "1.23"
-
-      - name: Install dependencies
-        run: go get .
 
       - name: Run tests
         run: go test
