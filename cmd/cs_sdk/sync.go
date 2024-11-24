@@ -3,11 +3,11 @@ package cs_sdk
 import (
 	"errors"
 	"fmt"
-	"log"
 
 	"github.com/Dobefu/csb/cmd/cs_sdk/structs"
 	"github.com/Dobefu/csb/cmd/cs_sdk/utils"
 	"github.com/Dobefu/csb/cmd/database"
+	"github.com/Dobefu/csb/cmd/logger"
 )
 
 func Sync(reset bool) error {
@@ -35,7 +35,7 @@ func Sync(reset bool) error {
 			return err
 		}
 
-		log.Println("Adding child routes")
+		logger.Info("Adding child routes")
 		err = addChildRoutes(&routes)
 
 		if err != nil {
@@ -51,14 +51,14 @@ func Sync(reset bool) error {
 		}
 	}
 
-	log.Println("Processing the sync items")
+	logger.Info("Processing the sync items")
 	err := processSyncData(routes)
 
 	if err != nil {
 		return err
 	}
 
-	log.Println("Data sync completed successfully")
+	logger.Info("Data sync completed successfully")
 
 	return nil
 }
@@ -72,15 +72,15 @@ func getSyncData(paginationToken string, reset bool, syncToken string) (map[stri
 	}
 
 	if paginationToken != "" {
-		log.Println("Getting a new sync page")
+		logger.Info("Getting a new sync page")
 		path := fmt.Sprintf("stacks/sync?pagination_token=%s", paginationToken)
 		data, err = Request(path, "GET")
 	} else if err != nil || reset {
-		log.Println("Initialising a fresh sync")
+		logger.Info("Initialising a fresh sync")
 		path := fmt.Sprintf("stacks/sync?init=true&type=entry_published,entry_unpublished,entry_deleted")
 		data, err = Request(path, "GET")
 	} else {
-		log.Println("Syncing data using an existing sync token")
+		logger.Info("Syncing data using an existing sync token")
 		path := fmt.Sprintf("stacks/sync?sync_token=%s", syncToken)
 		data, err = Request(path, "GET")
 	}
@@ -102,7 +102,7 @@ func addSyncRoutes(data map[string]interface{}, routes *map[string]structs.Route
 	itemCount := len(items)
 
 	for idx, item := range items {
-		log.Printf("Fetching item data (%d/%d)\n", (idx + 1), itemCount)
+		logger.Info("Fetching item data (%d/%d)", (idx + 1), itemCount)
 
 		item := item.(map[string]interface{})
 		data := item["data"].(map[string]interface{})
@@ -128,7 +128,7 @@ func addSyncRoutes(data map[string]interface{}, routes *map[string]structs.Route
 		isPublished := hasPublishDetails
 		id := utils.GenerateId(structs.Route{Uid: uid, Locale: locale})
 
-		log.Printf("Found entry: %s\n", uid)
+		logger.Info("Found entry: %s", uid)
 
 		(*routes)[id] = structs.Route{
 			Uid:         uid,
@@ -208,7 +208,7 @@ func processSyncData(routes map[string]structs.Route) error {
 	idx := 0
 
 	for uid, route := range routes {
-		log.Printf("Processing entry %s (%d/%d)\n", route.Uid, (idx + 1), routeCount)
+		logger.Info("Processing entry %s (%d/%d)", route.Uid, (idx + 1), routeCount)
 
 		url := constructRouteUrl(route, routes)
 
@@ -242,7 +242,7 @@ func constructRouteUrl(route structs.Route, routes map[string]structs.Route) str
 
 	for {
 		if depth > maxDepth {
-			log.Printf("⚠️ Maximum nesting depth of %d exceeded in entry %s\n", maxDepth, route.Uid)
+			logger.Warning("Maximum nesting depth of %d exceeded in entry %s", maxDepth, route.Uid)
 			return url
 		}
 
@@ -261,8 +261,8 @@ func constructRouteUrl(route structs.Route, routes map[string]structs.Route) str
 		}
 
 		if !parent.Published {
-			log.Printf(
-				"⚠️ The entry %s, a parent of %s, is unpublished. This will break the URL. Please be sure to publish it\n",
+			logger.Warning(
+				"The entry %s, a parent of %s, is unpublished. This will break the URL. Please be sure to publish it",
 				parent.Uid,
 				route.Uid,
 			)
