@@ -92,19 +92,19 @@ func parseSubCommands() (string, subCommand) {
 	}
 
 	if len(os.Args) < 2 {
-		listCmds()
+		listSubCommands()
 	}
 
 	subCmd, subCmdExists := cmds[os.Args[1]]
 
 	if !subCmdExists {
-		listCmds()
+		listSubCommands()
 	}
 
 	return os.Args[1], subCmd
 }
 
-func listCmds() {
+func listSubCommands() {
 	cmds := getSubCommands()
 
 	fmt.Fprintf(flag.CommandLine.Output(), "Usage of %s:\n", os.Args[0])
@@ -114,5 +114,7 @@ func listCmds() {
 		fmt.Printf("    %s\n", cmd.desc)
 	}
 
-	os.Exit(1)
+	if flag.Lookup("test.v") == nil {
+		os.Exit(1)
+	}
 }
