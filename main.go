@@ -40,10 +40,15 @@ func main() {
 	case "migrate:db":
 		reset := cmd.flag.Bool("reset", false, "Migrate from a clean database. Warning: this will delete existing data")
 		verbose := cmd.flag.Bool("verbose", false, "Enable verbose logging")
+		quiet := cmd.flag.Bool("quiet", false, "Only log warnings and errors")
 		cmd.flag.Parse(os.Args[2:])
 
 		if *verbose {
 			logger.SetLogLevel(logger.LOG_VERBOSE)
+		}
+
+		if *quiet {
+			logger.SetLogLevel(logger.LOG_WARNING)
 		}
 
 		err = migrate_db.Main(*reset)
@@ -52,10 +57,15 @@ func main() {
 	case "remote:sync":
 		reset := cmd.flag.Bool("reset", false, "Synchronise all data, instead of starting from the last sync token")
 		verbose := cmd.flag.Bool("verbose", false, "Enable verbose logging")
+		quiet := cmd.flag.Bool("quiet", false, "Only log warnings and errors")
 		cmd.flag.Parse(os.Args[2:])
 
 		if *verbose {
 			logger.SetLogLevel(logger.LOG_VERBOSE)
+		}
+
+		if *quiet {
+			logger.SetLogLevel(logger.LOG_WARNING)
 		}
 
 		err = remote_sync.Sync(*reset)
