@@ -46,12 +46,18 @@ func main() {
 		listSubCommands()
 	}
 
-	cmdName := args[0]
+	err := runSubCommand(args)
+
+	if err != nil {
+		logger.Fatal(err.Error())
+	}
+}
+
+func runSubCommand(args []string) error {
+	flag := flag.NewFlagSet(args[0], flag.ExitOnError)
 	var err error
 
-	flag := flag.NewFlagSet(cmdName, flag.ExitOnError)
-
-	switch cmdName {
+	switch args[0] {
 	case "migrate:db":
 		reset := flag.Bool("reset", false, "Migrate from a clean database. Warning: this will delete existing data")
 		registerGlobalFlags(flag)
@@ -73,9 +79,7 @@ func main() {
 		break
 	}
 
-	if err != nil {
-		logger.Fatal(err.Error())
-	}
+	return err
 }
 
 func registerGlobalFlags(fset *flag.FlagSet) {
