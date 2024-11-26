@@ -18,6 +18,11 @@ type subCommand struct {
 	desc string
 }
 
+var (
+	verbose = flag.Bool("verbose", false, "Enable verbose logging")
+	quiet   = flag.Bool("quiet", false, "Only log warnings and errors")
+)
+
 func init() {
 	err := database.Connect()
 
@@ -33,23 +38,26 @@ func init() {
 }
 
 func main() {
-	parseGlobalFlags()
-	args := flag.Args()
+	flag.Parse()
+	applyGlobalFlags()
 
-	cmdName, cmd := parseSubCommands()
+	args := flag.Args()
+	cmdName := args[0]
 	var err error
+
+	flag := flag.NewFlagSet(cmdName, flag.ExitOnError)
 
 	switch cmdName {
 	case "migrate:db":
-		reset := cmd.flag.Bool("reset", false, "Migrate from a clean database. Warning: this will delete existing data")
-		cmd.flag.Parse(args[1:])
+		reset := flag.Bool("reset", false, "Migrate from a clean database. Warning: this will delete existing data")
+		flag.Parse(args[1:])
 
 		err = migrate_db.Main(*reset)
 		break
 
 	case "remote:sync":
-		reset := cmd.flag.Bool("reset", false, "Synchronise all data, instead of starting from the last sync token")
-		cmd.flag.Parse(args[1:])
+		reset := flag.Bool("reset", false, "Synchronise all data, instead of starting from the last sync token")
+		flag.Parse(args[1:])
 
 		err = remote_sync.Sync(*reset)
 		break
@@ -62,20 +70,14 @@ func main() {
 	}
 }
 
-func parseGlobalFlags() {
-	verbose := flag.Bool("verbose", false, "Enable verbose logging")
-
+func applyGlobalFlags() {
 	if *verbose {
 		logger.SetLogLevel(logger.LOG_VERBOSE)
 	}
 
-	quiet := flag.Bool("quiet", false, "Only log warnings and errors")
-
 	if *quiet {
 		logger.SetLogLevel(logger.LOG_WARNING)
 	}
-
-	flag.Parse()
 }
 
 func getSubCommands() map[string]subCommand {
@@ -87,32 +89,6 @@ func getSubCommands() map[string]subCommand {
 			desc: "Synchronise Contentstack data into the database",
 		},
 	}
-
-}
-
-func parseSubCommands() (string, subCommand) {
-	cmds := getSubCommands()
-	args := flag.Args()
-
-	for cmdName, cmd := range cmds {
-		cmds[cmdName] = subCommand{
-			flag: flag.NewFlagSet(cmdName, flag.ExitOnError),
-			desc: cmd.desc,
-		}
-	}
-
-	if len(args) < 1 {
-		flag.Usage()
-		listSubCommands()
-	}
-
-	subCmd, subCmdExists := cmds[args[0]]
-
-	if !subCmdExists {
-		listSubCommands()
-	}
-
-	return args[0], subCmd
 }
 
 func listSubCommands() {
