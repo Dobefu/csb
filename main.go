@@ -33,40 +33,23 @@ func init() {
 }
 
 func main() {
+	parseGlobalFlags()
+	args := flag.Args()
+
 	cmdName, cmd := parseSubCommands()
 	var err error
 
 	switch cmdName {
 	case "migrate:db":
 		reset := cmd.flag.Bool("reset", false, "Migrate from a clean database. Warning: this will delete existing data")
-		verbose := cmd.flag.Bool("verbose", false, "Enable verbose logging")
-		quiet := cmd.flag.Bool("quiet", false, "Only log warnings and errors")
-		cmd.flag.Parse(os.Args[2:])
-
-		if *verbose {
-			logger.SetLogLevel(logger.LOG_VERBOSE)
-		}
-
-		if *quiet {
-			logger.SetLogLevel(logger.LOG_WARNING)
-		}
+		cmd.flag.Parse(args[1:])
 
 		err = migrate_db.Main(*reset)
 		break
 
 	case "remote:sync":
 		reset := cmd.flag.Bool("reset", false, "Synchronise all data, instead of starting from the last sync token")
-		verbose := cmd.flag.Bool("verbose", false, "Enable verbose logging")
-		quiet := cmd.flag.Bool("quiet", false, "Only log warnings and errors")
-		cmd.flag.Parse(os.Args[2:])
-
-		if *verbose {
-			logger.SetLogLevel(logger.LOG_VERBOSE)
-		}
-
-		if *quiet {
-			logger.SetLogLevel(logger.LOG_WARNING)
-		}
+		cmd.flag.Parse(args[1:])
 
 		err = remote_sync.Sync(*reset)
 		break
@@ -77,6 +60,22 @@ func main() {
 	if err != nil {
 		logger.Fatal(err.Error())
 	}
+}
+
+func parseGlobalFlags() {
+	verbose := flag.Bool("verbose", false, "Enable verbose logging")
+
+	if *verbose {
+		logger.SetLogLevel(logger.LOG_VERBOSE)
+	}
+
+	quiet := flag.Bool("quiet", false, "Only log warnings and errors")
+
+	if *quiet {
+		logger.SetLogLevel(logger.LOG_WARNING)
+	}
+
+	flag.Parse()
 }
 
 func getSubCommands() map[string]subCommand {
@@ -93,6 +92,7 @@ func getSubCommands() map[string]subCommand {
 
 func parseSubCommands() (string, subCommand) {
 	cmds := getSubCommands()
+	args := flag.Args()
 
 	for cmdName, cmd := range cmds {
 		cmds[cmdName] = subCommand{
@@ -101,17 +101,18 @@ func parseSubCommands() (string, subCommand) {
 		}
 	}
 
-	if len(os.Args) < 2 {
+	if len(args) < 1 {
+		flag.Usage()
 		listSubCommands()
 	}
 
-	subCmd, subCmdExists := cmds[os.Args[1]]
+	subCmd, subCmdExists := cmds[args[0]]
 
 	if !subCmdExists {
 		listSubCommands()
 	}
 
-	return os.Args[1], subCmd
+	return args[0], subCmd
 }
 
 func listSubCommands() {
