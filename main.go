@@ -39,9 +39,13 @@ func init() {
 
 func main() {
 	flag.Parse()
-	applyGlobalFlags()
 
 	args := flag.Args()
+
+	if len(args) < 1 {
+		listSubCommands()
+	}
+
 	cmdName := args[0]
 	var err error
 
@@ -50,14 +54,18 @@ func main() {
 	switch cmdName {
 	case "migrate:db":
 		reset := flag.Bool("reset", false, "Migrate from a clean database. Warning: this will delete existing data")
+		registerGlobalFlags(flag)
 		flag.Parse(args[1:])
+		applyGlobalFlags()
 
 		err = migrate_db.Main(*reset)
 		break
 
 	case "remote:sync":
 		reset := flag.Bool("reset", false, "Synchronise all data, instead of starting from the last sync token")
+		registerGlobalFlags(flag)
 		flag.Parse(args[1:])
+		applyGlobalFlags()
 
 		err = remote_sync.Sync(*reset)
 		break
@@ -68,6 +76,12 @@ func main() {
 	if err != nil {
 		logger.Fatal(err.Error())
 	}
+}
+
+func registerGlobalFlags(fset *flag.FlagSet) {
+	flag.VisitAll(func(f *flag.Flag) {
+		fset.Var(f.Value, f.Name, f.Usage)
+	})
 }
 
 func applyGlobalFlags() {
