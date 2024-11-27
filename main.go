@@ -14,7 +14,6 @@ import (
 )
 
 type subCommand struct {
-	flag *flag.FlagSet
 	desc string
 }
 
@@ -61,20 +60,28 @@ func runSubCommand(args []string) error {
 	case "migrate:db":
 		reset := flag.Bool("reset", false, "Migrate from a clean database. Warning: this will delete existing data")
 		registerGlobalFlags(flag)
-		flag.Parse(args[1:])
+		err = flag.Parse(args[1:])
+
+		if err != nil {
+			break
+		}
+
 		applyGlobalFlags()
 
 		err = migrate_db.Main(*reset)
-		break
 
 	case "remote:sync":
 		reset := flag.Bool("reset", false, "Synchronise all data, instead of starting from the last sync token")
 		registerGlobalFlags(flag)
-		flag.Parse(args[1:])
+		err = flag.Parse(args[1:])
+
+		if err != nil {
+			break
+		}
+
 		applyGlobalFlags()
 
 		err = remote_sync.Sync(*reset)
-		break
 	default:
 		break
 	}
