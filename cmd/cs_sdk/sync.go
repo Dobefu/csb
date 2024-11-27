@@ -26,7 +26,11 @@ func Sync(reset bool) error {
 		newSyncToken, hasNewSyncToken := data["sync_token"].(string)
 
 		if hasNewSyncToken {
-			database.SetState("sync_token", newSyncToken)
+			err = database.SetState("sync_token", newSyncToken)
+
+			if err != nil {
+				return err
+			}
 		}
 
 		err = addSyncRoutes(data, &routes)
@@ -77,7 +81,7 @@ func getSyncData(paginationToken string, reset bool, syncToken string) (map[stri
 		data, err = Request(path, "GET")
 	} else if err != nil || reset {
 		logger.Info("Initialising a fresh sync")
-		path := fmt.Sprintf("stacks/sync?init=true&type=entry_published,entry_unpublished,entry_deleted")
+		path := "stacks/sync?init=true&type=entry_published,entry_unpublished,entry_deleted"
 		data, err = Request(path, "GET")
 	} else {
 		logger.Info("Syncing data using an existing sync token")
@@ -175,7 +179,12 @@ func addRouteChildren(route structs.Route, routes *map[string]structs.Route, dep
 		id := utils.GenerateId(childRoute)
 		(*routes)[id] = childRoute
 
-		addRouteChildren(childRoute, routes, depth+1)
+		err = addRouteChildren(childRoute, routes, depth+1)
+
+		if err != nil {
+			logger.Warning("Error getting a child route for %s: %s", id, err.Error())
+			return err
+		}
 	}
 
 	return nil
