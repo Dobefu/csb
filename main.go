@@ -105,8 +105,8 @@ func applyGlobalFlags() {
 	}
 }
 
-func getSubCommands() map[string]subCommand {
-	return map[string]subCommand{
+func listSubCommands() {
+	cmds := map[string]subCommand{
 		"migrate:db": {
 			desc: "Migrate or initialise the database",
 		},
@@ -114,10 +114,6 @@ func getSubCommands() map[string]subCommand {
 			desc: "Synchronise Contentstack data into the database",
 		},
 	}
-}
-
-func listSubCommands() {
-	cmds := getSubCommands()
 
 	fmt.Fprintf(flag.CommandLine.Output(), "Usage of %s:\n", os.Args[0])
 
