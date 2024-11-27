@@ -64,18 +64,9 @@ func down() error {
 		}
 
 		logger.Info("Running migration: %s", name)
-
-		queryBytes, err := content.ReadFile(fmt.Sprintf("migrations/%s", name))
-
-		if err != nil {
-			_ = setMigrationState(migrationIndex, true)
-			return err
-		}
-
-		_, err = database.DB.Exec(string(queryBytes))
+		err = runMigration(name, migrationIndex)
 
 		if err != nil {
-			_ = setMigrationState(migrationIndex, true)
 			return err
 		}
 	}
@@ -117,18 +108,9 @@ func up() error {
 		}
 
 		logger.Info("Running migration: %s", name)
-
-		queryBytes, err := content.ReadFile(fmt.Sprintf("migrations/%s", name))
-
-		if err != nil {
-			_ = setMigrationState(migrationIndex, true)
-			return err
-		}
-
-		_, err = database.DB.Exec(string(queryBytes))
+		err = runMigration(name, migrationIndex)
 
 		if err != nil {
-			_ = setMigrationState(migrationIndex, true)
 			return err
 		}
 	}
@@ -207,6 +189,24 @@ func setMigrationState(version int, dirty bool) error {
 	)
 
 	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func runMigration(filename string, index int) error {
+	queryBytes, err := content.ReadFile(fmt.Sprintf("migrations/%s", filename))
+
+	if err != nil {
+		_ = setMigrationState(index, true)
+		return err
+	}
+
+	_, err = database.DB.Exec(string(queryBytes))
+
+	if err != nil {
+		_ = setMigrationState(index, true)
 		return err
 	}
 
