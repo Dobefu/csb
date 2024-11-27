@@ -30,22 +30,16 @@ func logMessage(level byte, format string, a ...any) string {
 	switch level {
 	case LOG_VERBOSE:
 		str = fmt.Sprintf(color.HiBlackString("  %s"), format)
-		break
 	case LOG_INFO:
 		str = fmt.Sprintf(color.HiCyanString("ℹ %s"), format)
-		break
 	case LOG_WARNING:
 		str = fmt.Sprintf(color.YellowString("⚠ %s"), format)
-		break
 	case LOG_ERROR:
 		str = fmt.Sprintf(color.HiRedString("‼ %s"), format)
-		break
 	case LOG_FATAL:
 		str = fmt.Sprintf(color.RedString("‼ %s"), format)
-		break
 	default:
-		str = fmt.Sprintf("%s", format)
-		break
+		str = format
 	}
 
 	str = fmt.Sprintf("[%s] %s\n", timestamp, str)
