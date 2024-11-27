@@ -1,35 +1,210 @@
 package migrate_db
 
 import (
-	"github.com/Dobefu/csb/cmd/database"
-	"github.com/golang-migrate/migrate/v4"
-	"github.com/golang-migrate/migrate/v4/database/mysql"
+	"embed"
+	"fmt"
+	"strings"
 
-	_ "github.com/golang-migrate/migrate/v4/source/file"
+	"github.com/Dobefu/csb/cmd/database"
+	"github.com/Dobefu/csb/cmd/logger"
 )
 
+//go:embed migrations/*
+var content embed.FS
+
 func Main(reset bool) error {
-	driver, err := mysql.WithInstance(database.DB, &mysql.Config{})
-
-	if err != nil {
-		return err
-	}
-
-	m, err := migrate.NewWithDatabaseInstance("file://db/migrations", "mysql", driver)
-
-	if err != nil {
-		return err
-	}
+	var err error
 
 	if reset {
-		err = m.Down()
+		logger.Info("Reverting existing migrations")
+		err = down()
 
 		if err != nil {
 			return err
 		}
 	}
 
-	err = m.Up()
+	logger.Info("Performing migrations")
+	err = up()
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func down() error {
+	version, _, err := getMigrationState()
+
+	if err != nil {
+		return err
+	}
+
+	if version == 0 {
+		logger.Info("Nothing to revert")
+		return nil
+	}
+
+	files, err := content.ReadDir("migrations")
+	migrationIndex := version + 1
+
+	for i := len(files) - 1; i >= 0; i-- {
+		file := files[i]
+		name := file.Name()
+
+		if strings.Split(name, ".")[1] != "down" {
+			continue
+		}
+
+		migrationIndex = i
+
+		if migrationIndex > version {
+			continue
+		}
+
+		logger.Info("Running migration: %s", name)
+
+		queryBytes, err := content.ReadFile(fmt.Sprintf("migrations/%s", name))
+
+		if err != nil {
+			_ = setMigrationState(migrationIndex, true)
+			return err
+		}
+
+		_, err = database.DB.Exec(string(queryBytes))
+
+		if err != nil {
+			_ = setMigrationState(migrationIndex, true)
+			return err
+		}
+	}
+
+	if err != nil {
+		return err
+	}
+
+	err = setMigrationState(migrationIndex, false)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func up() error {
+	version, _, err := getMigrationState()
+
+	if err != nil {
+		return err
+	}
+
+	files, err := content.ReadDir("migrations")
+	migrationIndex := 0
+
+	for _, file := range files {
+		name := file.Name()
+
+		if strings.Split(name, ".")[1] != "up" {
+			continue
+		}
+
+		migrationIndex += 1
+
+		if migrationIndex <= version {
+			continue
+		}
+
+		logger.Info("Running migration: %s", name)
+
+		queryBytes, err := content.ReadFile(fmt.Sprintf("migrations/%s", name))
+
+		if err != nil {
+			_ = setMigrationState(migrationIndex, true)
+			return err
+		}
+
+		_, err = database.DB.Exec(string(queryBytes))
+
+		if err != nil {
+			_ = setMigrationState(migrationIndex, true)
+			return err
+		}
+	}
+
+	if err != nil {
+		return err
+	}
+
+	err = setMigrationState(migrationIndex, false)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func createMigrationsTable() error {
+	_, err := database.DB.Exec(
+		`CREATE TABLE IF NOT EXISTS migrations(
+      version bigint NOT NULL PRIMARY KEY,
+      dirty boolean NOT NULL
+    );`,
+	)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func getMigrationState() (int, bool, error) {
+	err := createMigrationsTable()
+
+	if err != nil {
+		return 0, true, err
+	}
+
+	row := database.DB.QueryRow(
+		"SELECT version, dirty FROM migrations LIMIT 1",
+	)
+
+	var version int
+	var dirty bool
+
+	err = row.Scan(&version, &dirty)
+
+	// If nothing is found, the table is empty.
+	// This is fine, since an initial migration might produce this result.
+	// When this happens, default values should be returned.
+	if err != nil {
+		return 0, false, nil
+	}
+
+	return version, dirty, nil
+}
+
+func setMigrationState(version int, dirty bool) error {
+	err := createMigrationsTable()
+
+	if err != nil {
+		return err
+	}
+
+	_, err = database.DB.Exec("TRUNCATE migrations")
+
+	if err != nil {
+		return err
+	}
+
+	_, err = database.DB.Exec(
+		"INSERT INTO migrations (version, dirty) VALUES (?, ?)",
+		version,
+		dirty,
+	)
 
 	if err != nil {
 		return err
