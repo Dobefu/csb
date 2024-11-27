@@ -10,6 +10,11 @@ import (
 
 func Main(reset bool) error {
 	driver, err := mysql.WithInstance(database.DB, &mysql.Config{})
+
+	if err != nil {
+		return err
+	}
+
 	m, err := migrate.NewWithDatabaseInstance("file://db/migrations", "mysql", driver)
 
 	if err != nil {
@@ -17,7 +22,11 @@ func Main(reset bool) error {
 	}
 
 	if reset {
-		m.Down()
+		err = m.Down()
+
+		if err != nil {
+			return err
+		}
 	}
 
 	err = m.Up()
