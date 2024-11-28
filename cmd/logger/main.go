@@ -25,6 +25,7 @@ func logMessage(level byte, format string, a ...any) string {
 	}
 
 	timestamp := time.Now().Format(time.DateTime)
+	timestamp = fmt.Sprintf("[%s]", timestamp)
 	var str string
 
 	switch level {
@@ -42,7 +43,7 @@ func logMessage(level byte, format string, a ...any) string {
 		str = format
 	}
 
-	str = fmt.Sprintf("[%s] %s\n", timestamp, str)
+	str = fmt.Sprintf("%s %s\n", color.HiBlackString(timestamp), str)
 	output := fmt.Sprintf(str, a...)
 
 	fmt.Print(output)
