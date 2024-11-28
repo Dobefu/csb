@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/Dobefu/csb/cmd/database"
+	"github.com/Dobefu/csb/cmd/database/query"
 	"github.com/Dobefu/csb/cmd/logger"
 )
 
@@ -150,9 +151,7 @@ func getMigrationState() (int, bool, error) {
 		return 0, true, err
 	}
 
-	row := database.DB.QueryRow(
-		"SELECT version, dirty FROM migrations LIMIT 1",
-	)
+	row := query.QueryRow("migrations", []string{"version", "dirty"})
 
 	var version int
 	var dirty bool
