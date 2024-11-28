@@ -20,3 +20,6 @@ csb
 
 # Goreleaser generated files.
 dist/
+
+# SQLite3 databases.
+*.sqlite3
