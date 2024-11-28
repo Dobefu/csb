@@ -12,16 +12,10 @@ import (
 var DB *sql.DB
 
 func Connect() error {
-	connString := os.Getenv("DB_CONN")
+	connString, dbType, err := getConnectionDetails()
 
-	if connString == "" {
-		return errors.New("DB_CONN is not set")
-	}
-
-	dbType := os.Getenv("DB_TYPE")
-
-	if dbType == "" {
-		return errors.New("DB_TYPR is not set")
+	if err != nil {
+		return err
 	}
 
 	db, err := sql.Open(dbType, connString)
@@ -32,4 +26,20 @@ func Connect() error {
 
 	DB = db
 	return nil
+}
+
+func getConnectionDetails() (string, string, error) {
+	connString := os.Getenv("DB_CONN")
+
+	if connString == "" {
+		return "", "", errors.New("DB_CONN is not set")
+	}
+
+	dbType := os.Getenv("DB_TYPE")
+
+	if dbType == "" {
+		return "", "", errors.New("DB_TYPE is not set")
+	}
+
+	return connString, dbType, nil
 }
