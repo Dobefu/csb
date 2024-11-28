@@ -176,7 +176,13 @@ func setMigrationState(version int, dirty bool) error {
 		return err
 	}
 
-	_, err = database.DB.Exec("DELETE FROM migrations")
+	_, err = database.DB.Exec("DROP table migrations")
+
+	if err != nil {
+		return err
+	}
+
+	err = createMigrationsTable()
 
 	if err != nil {
 		return err
