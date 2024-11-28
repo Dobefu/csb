@@ -9,18 +9,9 @@ func SetRoute(
 	route structs.Route,
 ) error {
 	_, err := DB.Exec(
-		`INSERT INTO routes
+		`REPLACE INTO routes
       (id, uid, contentType, locale, slug, url, parent, published)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-      ON DUPLICATE KEY UPDATE
-      id = VALUES(id),
-      uid = VALUES(uid),
-      contentType = VALUES(contentType),
-      locale = VALUES(locale),
-      slug = VALUES(slug),
-      url = VALUES(url),
-      parent = VALUES(parent),
-      published = VALUES(published)
   `,
 		utils.GenerateId(route),
 		route.Uid,

@@ -15,7 +15,7 @@ func GetState(name string) (string, error) {
 
 func SetState(name string, value string) error {
 	_, err := DB.Exec(
-		"INSERT INTO state (name, value) VALUES (?, ?) ON DUPLICATE KEY UPDATE value = VALUES(value)",
+		"REPLACE INTO state (name, value) VALUES (?, ?)",
 		name,
 		value,
 	)
