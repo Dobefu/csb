@@ -1,7 +1,13 @@
 package color
 
+import "fmt"
+
+const escape = "\x1b"
+
+type Color int
+
 const (
-	Reset int = iota
+	Reset Color = iota
 	Bold
 	Dim
 	Italic
@@ -9,7 +15,7 @@ const (
 )
 
 const (
-	FgBlack int = iota + 30
+	FgBlack Color = iota + 30
 	FgRed
 	FgGreen
 	FgYellow
@@ -19,7 +25,7 @@ const (
 )
 
 const (
-	FgDarkGray int = iota + 90
+	FgDarkGray Color = iota + 90
 	FgLightRed
 	FgLightGreen
 	FgLightYellow
@@ -28,3 +34,34 @@ const (
 	FgLightCyan
 	FgWhite
 )
+
+const (
+	BgDefault Color = iota + 49
+	BgBlack
+	BgRed
+	BgGreen
+	BgYellow
+	BgBlue
+	BgMagenta
+	BgCyan
+	BgLightGray
+)
+
+const (
+	BgDarkGray Color = iota + 100
+	BgLightRed
+	BgLightGreen
+	BgLightYellow
+	BgLightBlue
+	BgLightMagenta
+	BgLightCyan
+	BgWhite
+)
+
+func SprintColor(fg Color, bg Color, message string) string {
+	return fmt.Sprintf("%s[%d;%dm%s%s[0;0m", escape, fg, bg, message, escape)
+}
+
+func PrintColor(fg Color, bg Color, message string) {
+	fmt.Println(SprintColor(fg, bg, message))
+}

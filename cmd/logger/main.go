@@ -5,7 +5,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/fatih/color"
+	"github.com/Dobefu/csb/cmd/color"
 )
 
 var (
@@ -30,20 +30,20 @@ func logMessage(level byte, format string, a ...any) string {
 
 	switch level {
 	case LOG_VERBOSE:
-		str = fmt.Sprintf(color.HiBlackString("  %s"), format)
+		str = fmt.Sprintf(color.SprintColor(color.FgDarkGray, color.BgDefault, "  %s"), format)
 	case LOG_INFO:
-		str = fmt.Sprintf(color.HiCyanString("ℹ %s"), format)
+		str = fmt.Sprintf(color.SprintColor(color.FgLightCyan, color.BgDefault, "ℹ %s"), format)
 	case LOG_WARNING:
-		str = fmt.Sprintf(color.YellowString("⚠ %s"), format)
+		str = fmt.Sprintf(color.SprintColor(color.FgYellow, color.BgDefault, "⚠ %s"), format)
 	case LOG_ERROR:
-		str = fmt.Sprintf(color.HiRedString("‼ %s"), format)
+		str = fmt.Sprintf(color.SprintColor(color.FgLightRed, color.BgDefault, "‼ %s"), format)
 	case LOG_FATAL:
-		str = fmt.Sprintf(color.RedString("‼ %s"), format)
+		str = fmt.Sprintf(color.SprintColor(color.FgRed, color.BgDefault, "‼ %s"), format)
 	default:
 		str = format
 	}
 
-	str = fmt.Sprintf("%s %s\n", color.HiBlackString(timestamp), str)
+	str = fmt.Sprintf("%s %s\n", color.SprintColor(color.FgDarkGray, color.BgDefault, timestamp), str)
 	output := fmt.Sprintf(str, a...)
 
 	fmt.Print(output)
