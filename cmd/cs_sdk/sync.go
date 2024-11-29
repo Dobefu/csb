@@ -48,6 +48,12 @@ func Sync(reset bool) error {
 			return err
 		}
 
+		err = addParentRoutes(&routes)
+
+		if err != nil {
+			return err
+		}
+
 		var hasPaginationToken bool
 
 		paginationToken, hasPaginationToken = data["pagination_token"].(string)
@@ -162,6 +168,18 @@ func addChildRoutes(routes *map[string]structs.Route) error {
 	return nil
 }
 
+func addParentRoutes(routes *map[string]structs.Route) error {
+	for _, route := range *routes {
+		err := addRouteParents(route, routes, 0)
+
+		if err != nil {
+			continue
+		}
+	}
+
+	return nil
+}
+
 func addRouteChildren(route structs.Route, routes *map[string]structs.Route, depth uint8) error {
 	if depth > 10 {
 		return errors.New("potential infinite loop detected")
@@ -187,6 +205,41 @@ func addRouteChildren(route structs.Route, routes *map[string]structs.Route, dep
 			logger.Warning("Error getting a child route for %s: %s", id, err.Error())
 			return err
 		}
+	}
+
+	return nil
+}
+
+func addRouteParents(route structs.Route, routes *map[string]structs.Route, depth uint8) error {
+	if depth > 10 {
+		return errors.New("potential infinite loop detected")
+	}
+
+	parentId := utils.GenerateId(structs.Route{Uid: route.Parent, Locale: route.Locale})
+	parentRoute := (*routes)[parentId]
+
+	var err error
+
+	// If the parent page cannot be found in the routes, check the database.
+	if parentRoute.Uid == "" {
+		parentRoute, err = api.GetEntry(route.Parent, route.Locale)
+
+		// If there is no parent, there will be an error.
+		// This is expected, since the database will not have any results.
+		// When this happens, we can just return without any error.
+		if err != nil {
+			return nil
+		}
+	}
+
+	id := utils.GenerateId(parentRoute)
+	(*routes)[id] = parentRoute
+
+	err = addRouteParents(parentRoute, routes, depth+1)
+
+	if err != nil {
+		logger.Warning("Error getting a parent route for %s: %s", id, err.Error())
+		return err
 	}
 
 	return nil
@@ -220,7 +273,6 @@ func processSyncData(routes map[string]structs.Route) error {
 
 	for uid, route := range routes {
 		logger.Info("Processing entry %s (%d/%d)", route.Uid, (idx + 1), routeCount)
-
 		url := constructRouteUrl(route, routes)
 
 		routes[uid] = structs.Route{
