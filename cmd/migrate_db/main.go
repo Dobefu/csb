@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/Dobefu/csb/cmd/database"
 	"github.com/Dobefu/csb/cmd/database/query"
+	"github.com/Dobefu/csb/cmd/database/structs"
 	"github.com/Dobefu/csb/cmd/logger"
 )
 
@@ -187,11 +187,16 @@ func setMigrationState(version int, dirty bool) error {
 		return err
 	}
 
-	_, err = database.DB.Exec(
-		"INSERT INTO migrations (version, dirty) VALUES (?, ?)",
-		version,
-		dirty,
-	)
+	err = query.Insert("migrations", []structs.QueryValue{
+		{
+			Name:  "version",
+			Value: version,
+		},
+		{
+			Name:  "dirty",
+			Value: dirty,
+		},
+	})
 
 	if err != nil {
 		return err
@@ -208,7 +213,7 @@ func runMigration(filename string, index int) error {
 		return err
 	}
 
-	_, err = database.DB.Exec(string(queryBytes))
+	_, err = query.QueryRaw(string(queryBytes))
 
 	if err != nil {
 		_ = setMigrationState(index, true)
