@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/Dobefu/csb/cmd/api"
 	"github.com/Dobefu/csb/cmd/cs_sdk/structs"
 	"github.com/Dobefu/csb/cmd/cs_sdk/utils"
 	"github.com/Dobefu/csb/cmd/database"
@@ -166,7 +167,7 @@ func addRouteChildren(route structs.Route, routes *map[string]structs.Route, dep
 		return errors.New("potential infinite loop detected")
 	}
 
-	childRoutes, err := database.GetChildEntriesByUid(route.Uid, route.Locale)
+	childRoutes, err := api.GetChildEntriesByUid(route.Uid, route.Locale)
 
 	if err != nil {
 		return err
