@@ -151,7 +151,7 @@ func getMigrationState() (int, bool, error) {
 		return 0, true, err
 	}
 
-	row := query.QueryRow("migrations", []string{"version", "dirty"})
+	row := query.QueryRow("migrations", []string{"version", "dirty"}, nil)
 
 	var version int
 	var dirty bool
