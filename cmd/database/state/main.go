@@ -1,7 +1,6 @@
 package state
 
 import (
-	"github.com/Dobefu/csb/cmd/database"
 	"github.com/Dobefu/csb/cmd/database/query"
 	"github.com/Dobefu/csb/cmd/database/structs"
 )
@@ -20,11 +19,16 @@ func GetState(name string) (string, error) {
 }
 
 func SetState(name string, value string) error {
-	_, err := database.DB.Exec(
-		"REPLACE INTO state (name, value) VALUES (?, ?)",
-		name,
-		value,
-	)
+	err := query.Upsert("state", []structs.QueryValue{
+		{
+			Name:  "name",
+			Value: name,
+		},
+		{
+			Name:  "value",
+			Value: value,
+		},
+	})
 
 	if err != nil {
 		return err

@@ -7,7 +7,7 @@ import (
 	"github.com/Dobefu/csb/cmd/api"
 	"github.com/Dobefu/csb/cmd/cs_sdk/structs"
 	"github.com/Dobefu/csb/cmd/cs_sdk/utils"
-	"github.com/Dobefu/csb/cmd/database"
+	db_routes "github.com/Dobefu/csb/cmd/database/routes"
 	"github.com/Dobefu/csb/cmd/database/state"
 	"github.com/Dobefu/csb/cmd/logger"
 )
@@ -233,7 +233,7 @@ func processSyncData(routes map[string]structs.Route) error {
 			Published:   route.Published,
 		}
 
-		err := database.SetRoute(routes[uid])
+		err := db_routes.SetRoute(routes[uid])
 
 		if err != nil {
 			return err
