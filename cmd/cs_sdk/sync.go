@@ -35,20 +35,7 @@ func Sync(reset bool) error {
 			}
 		}
 
-		err = addSyncRoutes(data, &routes)
-
-		if err != nil {
-			return err
-		}
-
-		logger.Info("Adding child routes")
-		err = addChildRoutes(&routes)
-
-		if err != nil {
-			return err
-		}
-
-		err = addParentRoutes(&routes)
+		err = addAllRoutes(data, &routes)
 
 		if err != nil {
 			return err
@@ -71,6 +58,30 @@ func Sync(reset bool) error {
 	}
 
 	logger.Info("Data sync completed successfully")
+
+	return nil
+}
+
+func addAllRoutes(data map[string]interface{}, routes *map[string]structs.Route) error {
+	err := addSyncRoutes(data, routes)
+
+	if err != nil {
+		return err
+	}
+
+	logger.Info("Adding child routes")
+	err = addChildRoutes(routes)
+
+	if err != nil {
+		return err
+	}
+
+	logger.Info("Adding parent routes")
+	err = addParentRoutes(routes)
+
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
