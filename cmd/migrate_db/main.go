@@ -175,7 +175,7 @@ func setMigrationState(version int, dirty bool) error {
 		return err
 	}
 
-	_, err = database.DB.Exec("DROP table migrations")
+	err = query.DropTable("migrations")
 
 	if err != nil {
 		return err
