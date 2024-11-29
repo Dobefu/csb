@@ -31,13 +31,17 @@ func queryRowMysql(table string, fields string, where []structs.QueryWhere) *sql
 		table,
 	)}
 
+	var args []any
+
 	if where != nil {
-		sql = append(sql, utils.ConstructWhere(where))
+		whereString, newArgs := utils.ConstructWhere(where)
+
+		sql = append(sql, whereString)
+		args = append(args, newArgs...)
 	}
 
 	sql = append(sql, "LIMIT 1")
-
-	return database.DB.QueryRow(strings.Join(sql, " "))
+	return database.DB.QueryRow(strings.Join(sql, " "), args...)
 }
 
 func queryRowSqlite3(table string, fields string, where []structs.QueryWhere) *sql.Row {
