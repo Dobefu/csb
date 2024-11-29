@@ -7,6 +7,7 @@ import (
 	"github.com/Dobefu/csb/cmd/cs_sdk/structs"
 	"github.com/Dobefu/csb/cmd/cs_sdk/utils"
 	"github.com/Dobefu/csb/cmd/database"
+	"github.com/Dobefu/csb/cmd/database/state"
 	"github.com/Dobefu/csb/cmd/logger"
 )
 
@@ -26,7 +27,7 @@ func Sync(reset bool) error {
 		newSyncToken, hasNewSyncToken := data["sync_token"].(string)
 
 		if hasNewSyncToken {
-			err = database.SetState("sync_token", newSyncToken)
+			err = state.SetState("sync_token", newSyncToken)
 
 			if err != nil {
 				return err
@@ -72,7 +73,7 @@ func getSyncData(paginationToken string, reset bool, syncToken string) (map[stri
 	var err error
 
 	if !reset {
-		syncToken, err = database.GetState("sync_token")
+		syncToken, err = state.GetState("sync_token")
 	}
 
 	if paginationToken != "" {

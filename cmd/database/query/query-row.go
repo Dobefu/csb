@@ -26,7 +26,7 @@ func QueryRow(table string, fields []string, where []structs.QueryWhere) *sql.Ro
 
 func queryRowMysql(table string, fields string, where []structs.QueryWhere) *sql.Row {
 	sql := []string{fmt.Sprintf(
-		"SELECT %s FROM %s LIMIT 1",
+		"SELECT %s FROM %s",
 		fields,
 		table,
 	)}
@@ -34,6 +34,8 @@ func queryRowMysql(table string, fields string, where []structs.QueryWhere) *sql
 	if where != nil {
 		sql = append(sql, utils.ConstructWhere(where))
 	}
+
+	sql = append(sql, "LIMIT 1")
 
 	return database.DB.QueryRow(strings.Join(sql, " "))
 }
