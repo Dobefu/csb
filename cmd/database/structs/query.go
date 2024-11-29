@@ -11,5 +11,7 @@ const (
 )
 
 type Query struct {
-	Type QueryType
+	Type   QueryType
+	Fields []string
+	Where  []QueryWhere
 }
