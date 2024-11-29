@@ -130,7 +130,7 @@ func up() error {
 }
 
 func createMigrationsTable() error {
-	_, err := database.DB.Exec(
+	_, err := query.QueryRaw(
 		`CREATE TABLE IF NOT EXISTS migrations(
       version bigint NOT NULL PRIMARY KEY,
       dirty boolean NOT NULL
