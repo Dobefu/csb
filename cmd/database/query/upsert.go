@@ -1,9 +1,9 @@
 package query
 
 import (
-	"database/sql"
 	"fmt"
 	"os"
+	"regexp"
 	"strings"
 
 	"github.com/Dobefu/csb/cmd/database"
@@ -11,20 +11,24 @@ import (
 )
 
 func Upsert(table string, values []structs.QueryValue) error {
-	var err error
+	var (
+		sql  string
+		args []any
+	)
 
 	switch os.Getenv("DB_TYPE") {
 	case "mysql":
-		_, err = upsertRowMysql(table, values)
+		sql, args = upsertRowMysql(table, values)
 	case "sqlite3":
-		_, err = upsertRowSqlite3(table, values)
-
+		sql, args = upsertRowSqlite3(table, values)
 	}
+
+	_, err := database.DB.Exec(sql, args...)
 
 	return err
 }
 
-func upsertRowMysql(table string, values []structs.QueryValue) (sql.Result, error) {
+func upsertRowMysql(table string, values []structs.QueryValue) (string, []any) {
 	sql := []string{fmt.Sprintf(
 		"INSERT INTO %s",
 		table,
@@ -47,31 +51,14 @@ func upsertRowMysql(table string, values []structs.QueryValue) (sql.Result, erro
 	sql = append(sql, "ON DUPLICATE KEY UPDATE")
 	sql = append(sql, strings.Join(duplicateValues, ", "))
 
-	return database.DB.Exec(strings.Join(sql, " "), args...)
+	return strings.Join(sql, " "), args
 }
 
-func upsertRowSqlite3(table string, values []structs.QueryValue) (sql.Result, error) {
-	sql := []string{fmt.Sprintf(
-		"INSERT INTO %s",
-		table,
-	)}
+func upsertRowSqlite3(table string, values []structs.QueryValue) (string, []any) {
+	sql, args := upsertRowMysql(table, values)
+	sql = strings.Replace(sql, "DUPLICATE KEY UPDATE", "CONFLICT DO UPDATE SET", 1)
 
-	var valueNames []string
-	var valuePlaceholders []string
-	var args []any
-	var duplicateValues []string
+	sql = regexp.MustCompile(`VALUES\((.+?)\)`).ReplaceAllString(sql, "excluded.$1")
 
-	for _, value := range values {
-		valueNames = append(valueNames, value.Name)
-		valuePlaceholders = append(valuePlaceholders, "?")
-		args = append(args, value.Value)
-		duplicateValues = append(duplicateValues, fmt.Sprintf("%s = excluded.%s", value.Name, value.Name))
-	}
-
-	sql = append(sql, fmt.Sprintf("(%s)", strings.Join(valueNames, ", ")))
-	sql = append(sql, fmt.Sprintf("VALUES (%s)", strings.Join(valuePlaceholders, ", ")))
-	sql = append(sql, "ON CONFLICT DO UPDATE SET")
-	sql = append(sql, strings.Join(duplicateValues, ", "))
-
-	return database.DB.Exec(strings.Join(sql, " "), args...)
+	return sql, args
 }
