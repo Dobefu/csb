@@ -8,6 +8,7 @@ import (
 	"github.com/Dobefu/csb/cmd/api"
 	"github.com/Dobefu/csb/cmd/cs_sdk/structs"
 	"github.com/Dobefu/csb/cmd/cs_sdk/utils"
+	"github.com/Dobefu/csb/cmd/database/query"
 	db_routes "github.com/Dobefu/csb/cmd/database/routes"
 	"github.com/Dobefu/csb/cmd/database/state"
 	"github.com/Dobefu/csb/cmd/logger"
@@ -15,6 +16,15 @@ import (
 
 func Sync(reset bool) error {
 	routes := make(map[string]structs.Route)
+
+	if reset {
+		logger.Info("Truncating the routes table")
+		err := query.Truncate("routes")
+
+		if err != nil {
+			return err
+		}
+	}
 
 	syncToken := ""
 	paginationToken := ""
