@@ -1,10 +1,21 @@
 services:
-  db:
+  mariadb:
     image: mariadb:latest
-    container_name: db
+    container_name: mariadb
     restart: on-failure
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: db
     ports:
       - "6033:3306"
+
+  postgres:
+    image: postgres:latest
+    container_name: postgres
+    restart: on-failure
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: db
+    ports:
+      - "2345:5432"
