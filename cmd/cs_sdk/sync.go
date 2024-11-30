@@ -197,7 +197,7 @@ func addRouteChildren(route structs.Route, routes *map[string]structs.Route, dep
 		return errors.New("potential infinite loop detected")
 	}
 
-	childRoutes, err := api.GetChildEntriesByUid(route.Uid, route.Locale)
+	childRoutes, err := api.GetChildEntriesByUid(route.Uid, route.Locale, true)
 
 	if err != nil {
 		return err
@@ -234,7 +234,7 @@ func addRouteParents(route structs.Route, routes *map[string]structs.Route, dept
 
 	// If the parent page cannot be found in the routes, check the database.
 	if parentRoute.Uid == "" {
-		parentRoute, err = api.GetEntry(route.Parent, route.Locale)
+		parentRoute, err = api.GetEntry(route.Parent, route.Locale, true)
 
 		// If there is no parent, there will be an error.
 		// This is expected, since the database will not have any results.

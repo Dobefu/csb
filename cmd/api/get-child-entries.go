@@ -6,20 +6,29 @@ import (
 	db_structs "github.com/Dobefu/csb/cmd/database/structs"
 )
 
-func GetChildEntriesByUid(uid string, locale string) ([]structs.Route, error) {
+func GetChildEntriesByUid(uid string, locale string, includeUnpublished bool) ([]structs.Route, error) {
+	where := []db_structs.QueryWhere{
+		{
+			Name:  "parent",
+			Value: uid,
+		},
+		{
+			Name:  "locale",
+			Value: locale,
+		},
+	}
+
+	if !includeUnpublished {
+		where = append(where, db_structs.QueryWhere{
+			Name:  "published",
+			Value: true,
+		})
+	}
+
 	rows, err := query.QueryRows(
 		"routes",
 		[]string{"*"},
-		[]db_structs.QueryWhere{
-			{
-				Name:  "parent",
-				Value: uid,
-			},
-			{
-				Name:  "locale",
-				Value: locale,
-			},
-		},
+		where,
 	)
 
 	if err != nil {

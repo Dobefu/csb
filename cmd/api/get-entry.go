@@ -6,8 +6,8 @@ import (
 	db_structs "github.com/Dobefu/csb/cmd/database/structs"
 )
 
-func GetEntry(uid string, locale string) (structs.Route, error) {
-	row := query.QueryRow("routes", []string{"*"}, []db_structs.QueryWhere{
+func GetEntry(uid string, locale string, includeUnpublished bool) (structs.Route, error) {
+	where := []db_structs.QueryWhere{
 		{
 			Name:  "uid",
 			Value: uid,
@@ -16,7 +16,16 @@ func GetEntry(uid string, locale string) (structs.Route, error) {
 			Name:  "locale",
 			Value: locale,
 		},
-	})
+	}
+
+	if !includeUnpublished {
+		where = append(where, db_structs.QueryWhere{
+			Name:  "published",
+			Value: true,
+		})
+	}
+
+	row := query.QueryRow("routes", []string{"*"}, where)
 
 	var result structs.Route
 
