@@ -9,6 +9,7 @@ import (
 	"github.com/Dobefu/csb/cmd/logger"
 	"github.com/Dobefu/csb/cmd/migrate_db"
 	"github.com/Dobefu/csb/cmd/remote_sync"
+	"github.com/Dobefu/csb/cmd/server"
 
 	_ "github.com/Dobefu/csb/cmd/init"
 )
@@ -82,6 +83,19 @@ func runSubCommand(args []string) error {
 		applyGlobalFlags()
 
 		err = remote_sync.Sync(*reset)
+
+	case "server":
+		port := flag.Uint("reset", 4000, "The port to use for the web server")
+		registerGlobalFlags(flag)
+		err = flag.Parse(args[1:])
+
+		if err != nil {
+			break
+		}
+
+		applyGlobalFlags()
+		err = server.Start(*port)
+
 	default:
 		break
 	}
@@ -112,6 +126,9 @@ func listSubCommands() {
 		},
 		"remote:sync": {
 			desc: "Synchronise Contentstack data into the database",
+		},
+		"server": {
+			desc: "Run a webserver with API endpoints",
 		},
 	}
 
