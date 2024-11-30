@@ -12,6 +12,8 @@ func Start(port uint) error {
 
 	mux := http.NewServeMux()
 
+	HandleRoutes(mux)
+
 	logger.Info("Starting server on %s", url)
 	err := http.ListenAndServe(url, mux)
 
