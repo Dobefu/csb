@@ -8,6 +8,7 @@ import (
 
 	"github.com/Dobefu/csb/cmd/database"
 	"github.com/Dobefu/csb/cmd/database/structs"
+	"github.com/Dobefu/csb/cmd/logger"
 )
 
 func Upsert(table string, values []structs.QueryValue) error {
@@ -16,11 +17,20 @@ func Upsert(table string, values []structs.QueryValue) error {
 		args []any
 	)
 
-	switch os.Getenv("DB_TYPE") {
+	dbType := os.Getenv("DB_TYPE")
+
+	switch dbType {
 	case "mysql":
 		sql, args = upsertRowMysql(table, values)
 	case "sqlite3":
 		sql, args = upsertRowSqlite3(table, values)
+	case "postgres":
+		sql, args = upsertRowPostgres(table, values)
+	default:
+		logger.Fatal(
+			"The database type %s has no corresponding QueryRow function",
+			dbType,
+		)
 	}
 
 	_, err := database.DB.Exec(sql, args...)
@@ -59,6 +69,33 @@ func upsertRowSqlite3(table string, values []structs.QueryValue) (string, []any)
 	sql = strings.Replace(sql, "DUPLICATE KEY UPDATE", "CONFLICT DO UPDATE SET", 1)
 
 	sql = regexp.MustCompile(`VALUES\((.+?)\)`).ReplaceAllString(sql, "excluded.$1")
+
+	return sql, args
+}
+
+func upsertRowPostgres(table string, values []structs.QueryValue) (string, []any) {
+	sql, args := upsertRowMysql(table, values)
+	sql = strings.Replace(
+		sql,
+		"DUPLICATE KEY UPDATE",
+		fmt.Sprintf("CONFLICT ON CONSTRAINT %s_pkey DO UPDATE SET", table),
+		1,
+	)
+
+	sql = regexp.MustCompile(`VALUES\((.+?)\)`).ReplaceAllString(sql, "EXCLUDED.$1")
+
+	iteration := 0
+
+	for {
+		iteration += 1
+		newSql := strings.Replace(sql, "?", fmt.Sprintf("$%d", iteration), 1)
+
+		if newSql == sql {
+			break
+		}
+
+		sql = newSql
+	}
 
 	return sql, args
 }
