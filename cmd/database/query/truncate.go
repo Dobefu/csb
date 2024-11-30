@@ -5,15 +5,25 @@ import (
 	"os"
 
 	"github.com/Dobefu/csb/cmd/database"
+	"github.com/Dobefu/csb/cmd/logger"
 )
 
 func Truncate(table string) error {
-	switch os.Getenv("DB_TYPE") {
+	dbType := os.Getenv("DB_TYPE")
+
+	switch dbType {
 	case "mysql":
 		return truncateMysql(table)
 	case "sqlite3":
 		return truncateSqlite3(table)
+	case "postgres":
+		return truncatePostgres(table)
 	default:
+		logger.Fatal(
+			"The database type %s has no corresponding Truncate function",
+			dbType,
+		)
+
 		return nil
 	}
 }
@@ -38,4 +48,8 @@ func truncateSqlite3(table string) error {
 	}
 
 	return nil
+}
+
+func truncatePostgres(table string) error {
+	return truncateMysql(table)
 }
