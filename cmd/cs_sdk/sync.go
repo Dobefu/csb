@@ -36,14 +36,10 @@ func Sync(reset bool) error {
 			return err
 		}
 
-		newSyncToken, hasNewSyncToken := data["sync_token"].(string)
+		_, err = getNewSyncToken(data)
 
-		if hasNewSyncToken {
-			err = state.SetState("sync_token", newSyncToken)
-
-			if err != nil {
-				return err
-			}
+		if err != nil {
+			return err
 		}
 
 		err = addAllRoutes(data, &routes)
@@ -71,6 +67,20 @@ func Sync(reset bool) error {
 	logger.Info("Data sync completed successfully")
 
 	return nil
+}
+
+func getNewSyncToken(data map[string]interface{}) (string, error) {
+	newSyncToken, hasNewSyncToken := data["sync_token"].(string)
+
+	if hasNewSyncToken {
+		err := state.SetState("sync_token", newSyncToken)
+
+		if err != nil {
+			return "", err
+		}
+	}
+
+	return newSyncToken, nil
 }
 
 func addAllRoutes(data map[string]interface{}, routes *map[string]structs.Route) error {
