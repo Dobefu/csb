@@ -3,6 +3,7 @@ package cs_sdk
 import (
 	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/Dobefu/csb/cmd/api"
 	"github.com/Dobefu/csb/cmd/cs_sdk/structs"
@@ -346,5 +347,5 @@ func constructRouteUrl(route structs.Route, routes map[string]structs.Route) str
 		depth += 1
 	}
 
-	return url
+	return strings.ReplaceAll(url, "//", "/")
 }
