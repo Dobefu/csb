@@ -9,17 +9,26 @@ import (
 	"github.com/Dobefu/csb/cmd/database"
 	"github.com/Dobefu/csb/cmd/database/structs"
 	"github.com/Dobefu/csb/cmd/database/utils"
+	"github.com/Dobefu/csb/cmd/logger"
 )
 
 func QueryRow(table string, fields []string, where []structs.QueryWhere) *sql.Row {
 	fieldsString := strings.Join(fields, ", ")
+	dbType := os.Getenv("DB_TYPE")
 
-	switch os.Getenv("DB_TYPE") {
+	switch dbType {
 	case "mysql":
 		return queryRowMysql(table, fieldsString, where)
 	case "sqlite3":
 		return queryRowSqlite3(table, fieldsString, where)
+	case "postgres":
+		return queryRowPostgres(table, fieldsString, where)
 	default:
+		logger.Fatal(
+			"The database type %s has no corresponding QueryRow function",
+			dbType,
+		)
+
 		return nil
 	}
 }
@@ -45,5 +54,9 @@ func queryRowMysql(table string, fields string, where []structs.QueryWhere) *sql
 }
 
 func queryRowSqlite3(table string, fields string, where []structs.QueryWhere) *sql.Row {
+	return queryRowMysql(table, fields, where)
+}
+
+func queryRowPostgres(table string, fields string, where []structs.QueryWhere) *sql.Row {
 	return queryRowMysql(table, fields, where)
 }
