@@ -85,7 +85,7 @@ func runSubCommand(args []string) error {
 		err = remote_sync.Sync(*reset)
 
 	case "server":
-		port := flag.Uint("reset", 4000, "The port to use for the web server")
+		port := flag.Uint("port", 4000, "The port to use for the web server")
 		registerGlobalFlags(flag)
 		err = flag.Parse(args[1:])
 
