@@ -88,3 +88,10 @@ To synchronise all data from Contentstack, the following command can be used:
 This will perform a full synchronisation with the Contentstack data.
 This is meant to populate the database, and perform any computationally expensive
 operations ahead of time.
+Every subsequent time that the command is run, the sync will only process
+changes that have occured since the last sync.
+
+If the sync needs to be restarted from scratch, the following command can be used:
+```bash
+./csb remote:sync --reset
+```
