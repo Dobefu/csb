@@ -1,30 +1,45 @@
 package query
 
 import (
-	"database/sql"
 	"fmt"
 	"os"
 	"strings"
 
 	"github.com/Dobefu/csb/cmd/database"
 	"github.com/Dobefu/csb/cmd/database/structs"
+	"github.com/Dobefu/csb/cmd/logger"
 )
 
 func Insert(table string, values []structs.QueryValue) error {
-	var err error
+	var (
+		sql  string
+		args []any
+	)
 
-	switch os.Getenv("DB_TYPE") {
+	dbType := os.Getenv("DB_TYPE")
+
+	switch dbType {
 	case "mysql":
-		_, err = insertRowMysql(table, values)
+		sql, args = insertRowMysql(table, values)
 	case "sqlite3":
-		_, err = insertRowSqlite3(table, values)
+		sql, args = insertRowSqlite3(table, values)
+	case "postgres":
+		sql, args = insertRowPostgres(table, values)
+	default:
+		logger.Fatal(
+			"The database type %s has no corresponding Insert function",
+			dbType,
+		)
 
+		return nil
 	}
+
+	_, err := database.DB.Exec(sql, args...)
 
 	return err
 }
 
-func insertRowMysql(table string, values []structs.QueryValue) (sql.Result, error) {
+func insertRowMysql(table string, values []structs.QueryValue) (string, []any) {
 	sql := []string{fmt.Sprintf(
 		"INSERT INTO %s",
 		table,
@@ -43,9 +58,30 @@ func insertRowMysql(table string, values []structs.QueryValue) (sql.Result, erro
 	sql = append(sql, fmt.Sprintf("(%s)", strings.Join(valueNames, ", ")))
 	sql = append(sql, fmt.Sprintf("VALUES (%s)", strings.Join(valuePlaceholders, ", ")))
 
-	return database.DB.Exec(strings.Join(sql, " "), args...)
+	return strings.Join(sql, " "), args
 }
 
-func insertRowSqlite3(table string, values []structs.QueryValue) (sql.Result, error) {
-	return insertRowMysql(table, values)
+func insertRowSqlite3(table string, values []structs.QueryValue) (string, []any) {
+	sql, args := insertRowMysql(table, values)
+
+	return sql, args
+}
+
+func insertRowPostgres(table string, values []structs.QueryValue) (string, []any) {
+	sql, args := insertRowMysql(table, values)
+
+	iteration := 0
+
+	for {
+		iteration += 1
+		newSql := strings.Replace(sql, "?", fmt.Sprintf("$%d", iteration), 1)
+
+		if newSql == sql {
+			break
+		}
+
+		sql = newSql
+	}
+
+	return sql, args
 }
