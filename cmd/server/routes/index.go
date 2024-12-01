@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+
+	"github.com/Dobefu/csb/cmd/logger"
 )
 
 func Index(w http.ResponseWriter, r *http.Request, apiPath string) {
@@ -14,11 +16,13 @@ func Index(w http.ResponseWriter, r *http.Request, apiPath string) {
 		"error": nil,
 	}
 
-	o, err := json.Marshal(output)
+	json, err := json.Marshal(output)
 
 	if err != nil {
-		fmt.Fprint(w, err)
+		logger.Error(err.Error())
+		fmt.Fprintf(w, `{"error": %s}`, err.Error())
+		return
 	}
 
-	fmt.Fprint(w, string(o))
+	fmt.Fprint(w, string(json))
 }
