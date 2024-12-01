@@ -16,12 +16,8 @@ func Index(w http.ResponseWriter, r *http.Request, apiPath string) {
 		return
 	}
 
-	output := map[string]interface{}{
-		"data": map[string]interface{}{
-			"api_endpoints": []string{apiPath},
-		},
-		"error": nil,
-	}
+	output := utils.ConstructOutput()
+	output["data"]["api_endpoints"] = []string{apiPath}
 
 	json, err := json.Marshal(output)
 

@@ -33,12 +33,8 @@ func GetEntryByUrl(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	output := map[string]interface{}{
-		"data": map[string]interface{}{
-			"entry": entry,
-		},
-		"error": nil,
-	}
+	output := utils.ConstructOutput()
+	output["data"]["entry"] = entry
 
 	json, err := json.Marshal(output)
 
