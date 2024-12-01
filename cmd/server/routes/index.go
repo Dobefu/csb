@@ -8,7 +8,10 @@ import (
 
 func Index(w http.ResponseWriter, r *http.Request, apiPath string) {
 	output := map[string]interface{}{
-		"api_endpoints": []string{apiPath},
+		"data": map[string]interface{}{
+			"api_endpoints": []string{apiPath},
+		},
+		"error": nil,
 	}
 
 	o, err := json.Marshal(output)
