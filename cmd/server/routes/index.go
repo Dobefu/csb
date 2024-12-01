@@ -26,7 +26,7 @@ func Index(w http.ResponseWriter, r *http.Request, apiPath string) {
 
 	if err != nil {
 		logger.Error(err.Error())
-		fmt.Fprintf(w, `{"error": %s}`, err.Error())
+		fmt.Fprintf(w, `{"data": null, "error": "%s"}`, err.Error())
 		return
 	}
 

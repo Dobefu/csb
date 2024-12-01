@@ -29,7 +29,5 @@ func CheckRequiredQueryParams(r *http.Request, params ...string) (map[string]any
 		)
 	}
 
-	fmt.Println(missingParams)
-
 	return values, nil
 }
