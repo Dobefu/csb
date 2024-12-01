@@ -16,4 +16,5 @@ func HandleRoutes(mux *http.ServeMux) {
 	})
 
 	mux.HandleFunc(fmt.Sprintf("GET %s/get-entry-by-url", apiPath), v1.GetEntryByUrl)
+	mux.HandleFunc(fmt.Sprintf("GET %s/get-entry-by-uid", apiPath), v1.GetEntryByUid)
 }
