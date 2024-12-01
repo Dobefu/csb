@@ -7,6 +7,7 @@ import (
 
 	"github.com/Dobefu/csb/cmd/api"
 	"github.com/Dobefu/csb/cmd/logger"
+	"github.com/Dobefu/csb/cmd/server/utils"
 	"github.com/Dobefu/csb/cmd/server/validation"
 )
 
@@ -28,7 +29,7 @@ func GetEntryByUrl(w http.ResponseWriter, r *http.Request) {
 	entry, err := api.GetEntryByUrl(url, locale, false)
 
 	if err != nil {
-		fmt.Fprintf(w, `{"data": null, "error": "%s"}`, err.Error())
+		utils.PrintError(w, err)
 		return
 	}
 
@@ -43,7 +44,7 @@ func GetEntryByUrl(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		logger.Error(err.Error())
-		fmt.Fprintf(w, `{"data": null, "error": "%s"}`, err.Error())
+		utils.PrintError(w, err)
 		return
 	}
 

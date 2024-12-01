@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/Dobefu/csb/cmd/logger"
+	"github.com/Dobefu/csb/cmd/server/utils"
 )
 
 func Index(w http.ResponseWriter, r *http.Request, apiPath string) {
@@ -26,7 +27,7 @@ func Index(w http.ResponseWriter, r *http.Request, apiPath string) {
 
 	if err != nil {
 		logger.Error(err.Error())
-		fmt.Fprintf(w, `{"data": null, "error": "%s"}`, err.Error())
+		utils.PrintError(w, err)
 		return
 	}
 
