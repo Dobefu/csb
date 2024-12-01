@@ -22,8 +22,8 @@ func GetEntryByUrl(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	url := params["url"].([]string)[0]
-	locale := params["locale"].([]string)[0]
+	url := params["url"].(string)
+	locale := params["locale"].(string)
 
 	entry, err := api.GetEntryByUrl(url, locale, false)
 

@@ -13,7 +13,7 @@ func CheckRequiredQueryParams(r *http.Request, params ...string) (map[string]any
 	query := r.URL.Query()
 
 	for _, param := range params {
-		paramValue := query[param]
+		paramValue := query.Get(param)
 
 		if len(paramValue) == 0 {
 			missingParams = append(missingParams, param)
