@@ -9,6 +9,12 @@ import (
 )
 
 func Index(w http.ResponseWriter, r *http.Request, apiPath string) {
+	// If not on the homepage, return a 404.
+	if r.URL.Path != "/" {
+		http.NotFound(w, r)
+		return
+	}
+
 	output := map[string]interface{}{
 		"data": map[string]interface{}{
 			"api_endpoints": []string{apiPath},
