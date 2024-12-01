@@ -254,7 +254,7 @@ func addRouteParents(route structs.Route, routes *map[string]structs.Route, dept
 
 	// If the parent page cannot be found in the routes, check the database.
 	if parentRoute.Uid == "" {
-		parentRoute, err = api.GetEntry(route.Parent, route.Locale, true)
+		parentRoute, err = api.GetEntryByUid(route.Parent, route.Locale, true)
 
 		// If there is no parent, there will be an error.
 		// This is expected, since the database will not have any results.

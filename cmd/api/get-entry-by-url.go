@@ -6,11 +6,11 @@ import (
 	db_structs "github.com/Dobefu/csb/cmd/database/structs"
 )
 
-func GetEntry(uid string, locale string, includeUnpublished bool) (structs.Route, error) {
+func GetEntryByUrl(url string, locale string, includeUnpublished bool) (structs.Route, error) {
 	where := []db_structs.QueryWhere{
 		{
-			Name:  "uid",
-			Value: uid,
+			Name:  "url",
+			Value: url,
 		},
 		{
 			Name:  "locale",
