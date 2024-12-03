@@ -12,7 +12,20 @@ func ConstructWhere(where []structs.QueryWhere) (string, []any) {
 	var whereArgs []any
 
 	for _, whereSingle := range where {
-		whereStrings = append(whereStrings, fmt.Sprintf("%s = %v", whereSingle.Name, "?"))
+		operator, err := ParseOperator(whereSingle.Operator)
+
+		if err != nil {
+			continue
+		}
+
+		whereString := fmt.Sprintf(
+			"%s %s %v",
+			whereSingle.Name,
+			operator,
+			"?",
+		)
+
+		whereStrings = append(whereStrings, whereString)
 		whereArgs = append(whereArgs, whereSingle.Value)
 	}
 

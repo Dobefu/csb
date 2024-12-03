@@ -19,6 +19,11 @@ func GetAltLocales(entry structs.Route) ([]structs.Route, error) {
 				Name:  "published",
 				Value: true,
 			},
+			{
+				Name:     "locale",
+				Value:    entry.Locale,
+				Operator: db_structs.NOT_EQUALS,
+			},
 		},
 	)
 
@@ -43,10 +48,6 @@ func GetAltLocales(entry structs.Route) ([]structs.Route, error) {
 		)
 
 		if err != nil {
-			continue
-		}
-
-		if result.Locale == entry.Locale {
 			continue
 		}
 
