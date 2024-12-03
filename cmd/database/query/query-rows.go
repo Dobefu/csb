@@ -13,16 +13,21 @@ import (
 )
 
 func QueryRows(table string, fields []string, where []structs.QueryWhere) (*sql.Rows, error) {
+	var (
+		sql  string
+		args []any
+	)
+
 	fieldsString := strings.Join(fields, ", ")
 	dbType := os.Getenv("DB_TYPE")
 
 	switch dbType {
 	case "mysql":
-		return queryRowsMysql(table, fieldsString, where)
+		sql, args = queryRowsMysql(table, fieldsString, where)
 	case "sqlite3":
-		return queryRowsSqlite3(table, fieldsString, where)
+		sql, args = queryRowsSqlite3(table, fieldsString, where)
 	case "postgres":
-		return queryRowsPostgres(table, fieldsString, where)
+		sql, args = queryRowsPostgres(table, fieldsString, where)
 	default:
 		logger.Fatal(
 			"The database type %s has no corresponding QueryRows function",
@@ -31,9 +36,11 @@ func QueryRows(table string, fields []string, where []structs.QueryWhere) (*sql.
 
 		return nil, nil
 	}
+
+	return database.DB.Query(sql, args...)
 }
 
-func queryRowsMysql(table string, fields string, where []structs.QueryWhere) (*sql.Rows, error) {
+func queryRowsMysql(table string, fields string, where []structs.QueryWhere) (string, []any) {
 	sql := []string{fmt.Sprintf(
 		"SELECT %s FROM %s",
 		fields,
@@ -49,13 +56,28 @@ func queryRowsMysql(table string, fields string, where []structs.QueryWhere) (*s
 		args = append(args, newArgs...)
 	}
 
-	return database.DB.Query(strings.Join(sql, " "), args...)
+	return strings.Join(sql, " "), args
 }
 
-func queryRowsSqlite3(table string, fields string, where []structs.QueryWhere) (*sql.Rows, error) {
+func queryRowsSqlite3(table string, fields string, where []structs.QueryWhere) (string, []any) {
 	return queryRowsMysql(table, fields, where)
 }
 
-func queryRowsPostgres(table string, fields string, where []structs.QueryWhere) (*sql.Rows, error) {
-	return queryRowsMysql(table, fields, where)
+func queryRowsPostgres(table string, fields string, where []structs.QueryWhere) (string, []any) {
+	sql, args := queryRowsMysql(table, fields, where)
+
+	iteration := 0
+
+	for {
+		iteration += 1
+		newSql := strings.Replace(sql, "?", fmt.Sprintf("$%d", iteration), 1)
+
+		if newSql == sql {
+			break
+		}
+
+		sql = newSql
+	}
+
+	return sql, args
 }

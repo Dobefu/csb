@@ -13,16 +13,21 @@ import (
 )
 
 func QueryRow(table string, fields []string, where []structs.QueryWhere) *sql.Row {
+	var (
+		sql  string
+		args []any
+	)
+
 	fieldsString := strings.Join(fields, ", ")
 	dbType := os.Getenv("DB_TYPE")
 
 	switch dbType {
 	case "mysql":
-		return queryRowMysql(table, fieldsString, where)
+		sql, args = queryRowMysql(table, fieldsString, where)
 	case "sqlite3":
-		return queryRowSqlite3(table, fieldsString, where)
+		sql, args = queryRowSqlite3(table, fieldsString, where)
 	case "postgres":
-		return queryRowPostgres(table, fieldsString, where)
+		sql, args = queryRowPostgres(table, fieldsString, where)
 	default:
 		logger.Fatal(
 			"The database type %s has no corresponding QueryRow function",
@@ -31,9 +36,11 @@ func QueryRow(table string, fields []string, where []structs.QueryWhere) *sql.Ro
 
 		return nil
 	}
+
+	return database.DB.QueryRow(sql, args...)
 }
 
-func queryRowMysql(table string, fields string, where []structs.QueryWhere) *sql.Row {
+func queryRowMysql(table string, fields string, where []structs.QueryWhere) (string, []any) {
 	sql := []string{fmt.Sprintf(
 		"SELECT %s FROM %s",
 		fields,
@@ -50,13 +57,28 @@ func queryRowMysql(table string, fields string, where []structs.QueryWhere) *sql
 	}
 
 	sql = append(sql, "LIMIT 1")
-	return database.DB.QueryRow(strings.Join(sql, " "), args...)
+	return strings.Join(sql, " "), args
 }
 
-func queryRowSqlite3(table string, fields string, where []structs.QueryWhere) *sql.Row {
+func queryRowSqlite3(table string, fields string, where []structs.QueryWhere) (string, []any) {
 	return queryRowMysql(table, fields, where)
 }
 
-func queryRowPostgres(table string, fields string, where []structs.QueryWhere) *sql.Row {
-	return queryRowMysql(table, fields, where)
+func queryRowPostgres(table string, fields string, where []structs.QueryWhere) (string, []any) {
+	sql, args := queryRowMysql(table, fields, where)
+
+	iteration := 0
+
+	for {
+		iteration += 1
+		newSql := strings.Replace(sql, "?", fmt.Sprintf("$%d", iteration), 1)
+
+		if newSql == sql {
+			break
+		}
+
+		sql = newSql
+	}
+
+	return sql, args
 }
