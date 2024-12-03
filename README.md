@@ -1,6 +1,7 @@
 # Contentstack Bridge
 
-<img src="https://github.com/Dobefu/csb/actions/workflows/ci.yml/badge.svg" />
+[![CI Status](https://github.com/Dobefu/csb/actions/workflows/ci.yml/badge.svg)](https://github.com/Dobefu/csb/actions/workflows/ci.yml)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=Dobefu_contentstack-bridge&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=Dobefu_contentstack-bridge)
 
 Adds a layer between your application and Contentstack,
 to provide some much-needed conveniences.
