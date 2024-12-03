@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/Dobefu/csb/cmd/api"
+	api_utils "github.com/Dobefu/csb/cmd/api/utils"
 	"github.com/Dobefu/csb/cmd/logger"
 	"github.com/Dobefu/csb/cmd/server/utils"
 	"github.com/Dobefu/csb/cmd/server/validation"
@@ -33,8 +34,16 @@ func GetEntryByUid(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	altLocales, err := api_utils.GetAltLocales(entry)
+
+	if err != nil {
+		utils.PrintError(w, err)
+		return
+	}
+
 	output := utils.ConstructOutput()
 	output["data"]["entry"] = entry
+	output["data"]["alt_locales"] = altLocales
 
 	json, err := json.Marshal(output)
 
