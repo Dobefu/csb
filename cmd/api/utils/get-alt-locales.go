@@ -4,12 +4,21 @@ import (
 	"github.com/Dobefu/csb/cmd/cs_sdk/structs"
 	"github.com/Dobefu/csb/cmd/database/query"
 	db_structs "github.com/Dobefu/csb/cmd/database/structs"
+	"github.com/Dobefu/csb/cmd/logger"
 )
 
-func GetAltLocales(entry structs.Route) ([]structs.Route, error) {
+type AltLocale struct {
+	Uid         string `json:"uid"`
+	ContentType string `json:"content_type"`
+	Locale      string `json:"locale"`
+	Slug        string `json:"slug"`
+	Url         string `json:"url"`
+}
+
+func GetAltLocales(entry structs.Route) ([]AltLocale, error) {
 	rows, err := query.QueryRows(
 		"routes",
-		[]string{"*"},
+		[]string{"uid", "contentType", "locale", "slug", "url"},
 		[]db_structs.QueryWhere{
 			{
 				Name:  "uid",
@@ -31,23 +40,21 @@ func GetAltLocales(entry structs.Route) ([]structs.Route, error) {
 		return nil, err
 	}
 
-	var results []structs.Route
+	var results []AltLocale
 
 	for rows.Next() {
-		var result structs.Route
+		var result AltLocale
 
 		err := rows.Scan(
-			&result.Id,
 			&result.Uid,
 			&result.ContentType,
 			&result.Locale,
 			&result.Slug,
 			&result.Url,
-			&result.Parent,
-			&result.Published,
 		)
 
 		if err != nil {
+			logger.Warning(err.Error())
 			continue
 		}
 
