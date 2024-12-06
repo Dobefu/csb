@@ -9,10 +9,10 @@ import (
 
 func Start(port uint) error {
 	url := fmt.Sprintf(":%d", port)
-
 	mux := http.NewServeMux()
+	apiPath := "/api/v1"
 
-	HandleRoutes(mux)
+	HandleRoutes(mux, apiPath)
 
 	logger.Info("Starting server on %s", url)
 	err := http.ListenAndServe(url, mux)
