@@ -40,10 +40,7 @@ func GetEntryByUrl(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	output := utils.ConstructOutput()
-	output["data"]["entry"] = csEntry
-	output["data"]["alt_locales"] = altLocales
-
+	output := utils.ConstructEntryOutput(csEntry, altLocales)
 	json, err := json.Marshal(output)
 
 	if err != nil {
