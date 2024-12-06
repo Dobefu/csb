@@ -1,21 +1,14 @@
 package utils
 
 import (
+	api_structs "github.com/Dobefu/csb/cmd/api/structs"
 	"github.com/Dobefu/csb/cmd/cs_sdk/structs"
 	"github.com/Dobefu/csb/cmd/database/query"
 	db_structs "github.com/Dobefu/csb/cmd/database/structs"
 	"github.com/Dobefu/csb/cmd/logger"
 )
 
-type AltLocale struct {
-	Uid         string `json:"uid"`
-	ContentType string `json:"content_type"`
-	Locale      string `json:"locale"`
-	Slug        string `json:"slug"`
-	Url         string `json:"url"`
-}
-
-func GetAltLocales(entry structs.Route) ([]AltLocale, error) {
+func GetAltLocales(entry structs.Route) ([]api_structs.AltLocale, error) {
 	rows, err := query.QueryRows(
 		"routes",
 		[]string{"uid", "contentType", "locale", "slug", "url"},
@@ -40,10 +33,10 @@ func GetAltLocales(entry structs.Route) ([]AltLocale, error) {
 		return nil, err
 	}
 
-	var results []AltLocale
+	var results []api_structs.AltLocale
 
 	for rows.Next() {
-		var result AltLocale
+		var result api_structs.AltLocale
 
 		err := rows.Scan(
 			&result.Uid,
