@@ -7,7 +7,6 @@ import (
 
 	"github.com/Dobefu/csb/cmd/api"
 	cs_api "github.com/Dobefu/csb/cmd/cs_sdk/api"
-	"github.com/Dobefu/csb/cmd/logger"
 	"github.com/Dobefu/csb/cmd/server/utils"
 	"github.com/Dobefu/csb/cmd/server/validation"
 )
@@ -30,14 +29,14 @@ func GetEntryByUrl(w http.ResponseWriter, r *http.Request) {
 	entry, err := api.GetEntryByUrl(url, locale, false)
 
 	if err != nil {
-		utils.PrintError(w, err)
+		utils.PrintError(w, err, false)
 		return
 	}
 
 	csEntry, altLocales, err := cs_api.GetEntryWithAltLocales(entry)
 
 	if err != nil {
-		utils.PrintError(w, err)
+		utils.PrintError(w, err, false)
 		return
 	}
 
@@ -48,8 +47,7 @@ func GetEntryByUrl(w http.ResponseWriter, r *http.Request) {
 	json, err := json.Marshal(output)
 
 	if err != nil {
-		logger.Error(err.Error())
-		utils.PrintError(w, err)
+		utils.PrintError(w, err, true)
 		return
 	}
 
