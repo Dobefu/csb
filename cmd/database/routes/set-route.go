@@ -30,7 +30,7 @@ func getRouteValues(route structs.Route) []db_structs.QueryValue {
 			Value: route.Uid,
 		},
 		{
-			Name:  "contentType",
+			Name:  "content_type",
 			Value: route.ContentType,
 		},
 		{

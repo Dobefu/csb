@@ -11,7 +11,7 @@ import (
 func GetAltLocales(entry structs.Route) ([]api_structs.AltLocale, error) {
 	rows, err := query.QueryRows(
 		"routes",
-		[]string{"uid", "contentType", "locale", "slug", "url"},
+		[]string{"uid", "content_type", "locale", "slug", "url"},
 		[]db_structs.QueryWhere{
 			{
 				Name:  "uid",
