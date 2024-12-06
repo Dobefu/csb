@@ -1,13 +1,13 @@
 package structs
 
 type Route struct {
-	Id             string
-	Uid            string
-	ContentType    string
-	Locale         string
-	Slug           string
-	Url            string
-	Parent         string
-	ExcludeSitemap bool
-	Published      bool
+	Id             string `json:"id"`
+	Uid            string `json:"uid"`
+	ContentType    string `json:"content_type"`
+	Locale         string `json:"locale"`
+	Slug           string `json:"slug"`
+	Url            string `json:"url"`
+	Parent         string `json:"parent"`
+	ExcludeSitemap bool   `json:"exclude_sitemap"`
+	Published      bool   `json:"published"`
 }
