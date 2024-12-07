@@ -3,19 +3,11 @@ package cs_sdk
 import (
 	"fmt"
 	"os"
-
-	_ "github.com/Dobefu/csb/cmd/init"
 )
 
-var URL string
-var VERSION string
+var VERSION = "v3"
 
-func init() {
-	URL = getUrl()
-	VERSION = "v3"
-}
-
-func getUrl() string {
+func GetUrl() string {
 	region := os.Getenv("CS_REGION")
 	extension := "com"
 

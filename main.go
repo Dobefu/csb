@@ -6,12 +6,11 @@ import (
 	"os"
 
 	"github.com/Dobefu/csb/cmd/database"
+	"github.com/Dobefu/csb/cmd/init_env"
 	"github.com/Dobefu/csb/cmd/logger"
 	"github.com/Dobefu/csb/cmd/migrate_db"
 	"github.com/Dobefu/csb/cmd/remote_sync"
 	"github.com/Dobefu/csb/cmd/server"
-
-	_ "github.com/Dobefu/csb/cmd/init"
 )
 
 type subCommand struct {
@@ -21,9 +20,10 @@ type subCommand struct {
 var (
 	verbose = flag.Bool("verbose", false, "Enable verbose logging")
 	quiet   = flag.Bool("quiet", false, "Only log warnings and errors")
+	envPath = flag.String("env-file", ".env", "The location of the .env file. Defaults to .env")
 )
 
-func init() {
+func initDB() {
 	err := database.Connect()
 
 	if err != nil {
@@ -117,6 +117,9 @@ func applyGlobalFlags() {
 	if *quiet {
 		logger.SetLogLevel(logger.LOG_WARNING)
 	}
+
+	init_env.Main(*envPath)
+	initDB()
 }
 
 func listSubCommands() {

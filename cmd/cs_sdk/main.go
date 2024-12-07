@@ -9,7 +9,7 @@ import (
 )
 
 func RequestRaw(path string, method string) (*http.Response, error) {
-	url := fmt.Sprintf("%s/%s/%s", URL, VERSION, path)
+	url := fmt.Sprintf("%s/%s/%s", GetUrl(), VERSION, path)
 
 	client := http.Client{}
 	req, err := http.NewRequest(method, url, nil)
