@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/Dobefu/csb/cmd/database/structs"
+	"github.com/Dobefu/csb/cmd/logger"
 )
 
 func ConstructWhere(where []structs.QueryWhere) (string, []any) {
@@ -15,6 +16,7 @@ func ConstructWhere(where []structs.QueryWhere) (string, []any) {
 		operator, err := ParseOperator(whereSingle.Operator)
 
 		if err != nil {
+			logger.Error(err.Error())
 			continue
 		}
 

@@ -18,6 +18,6 @@ func setArgs(args ...string) {
 	os.Args = append(os.Args, args...)
 }
 
-func TestListSubcommands(t *testing.T) {
+func TestListSubCommands(t *testing.T) {
 	listSubCommands()
 }
