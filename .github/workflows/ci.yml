@@ -40,8 +40,16 @@ jobs:
         with:
           go-version: "1.23"
 
+      - name: Create a .env.test file
+        run: |
+          touch .env.test
+          echo "CS_API_KEY=\"${{ vars.CS_API_KEY }}\"" >> .env.test
+
       - name: Run tests
         run: go test --cover ./...
+
+      - name: Delete the .env.test file after tests are completed
+        run: rm .env.test
 
   deploy:
     name: "Release"
