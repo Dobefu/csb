@@ -6,10 +6,10 @@ import (
 )
 
 func TestMain(t *testing.T) {
-	setArgs("migrate:db", "--reset", "--env-file=.env.test")
+	setArgs("migrate:db", "--reset", "--verbose", "--env-file=.env.test")
 	main()
 
-	setArgs("remote:sync", "--reset", "--env-file=.env.test")
+	setArgs("remote:sync", "--reset", "--quiet", "--env-file=.env.test")
 	main()
 }
 
