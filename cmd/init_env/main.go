@@ -9,6 +9,6 @@ func Main(envPath string) {
 	err := godotenv.Load(envPath)
 
 	if err != nil {
-		logger.Fatal("No .env file found. Please copy it from the .env.example and enter your credentials")
+		logger.Fatal("No %s file found. Please copy it from the .env.example and enter your credentials", envPath)
 	}
 }
