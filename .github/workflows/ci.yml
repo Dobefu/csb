@@ -44,6 +44,12 @@ jobs:
         run: |
           touch .env.test
           echo "CS_API_KEY=\"${{ vars.CS_API_KEY }}\"" >> .env.test
+          echo "CS_DELIVERY_TOKEN=\"${{ vars.CS_DELIVERY_TOKEN }}\"" >> .env.test
+          echo "CS_BRANCH=\"${{ vars.CS_BRANCH }}\"" >> .env.test
+          echo "CS_REGION=\"${{ vars.CS_REGION }}\"" >> .env.test
+          echo "DEBUG_AUTH_BYPASS=1" >> .env.test
+          echo "DB_CONN=\"file:db_test.sqlite3\"" >> .env.test
+          echo "DB_TYPE=\"sqlite3\"" >> .env.test
 
       - name: Run tests
         run: go test --cover ./...
