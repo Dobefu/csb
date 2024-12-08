@@ -1,3 +1,5 @@
+<img src="https://raw.githubusercontent.com/Dobefu/csb/refs/heads/main/logo.svg" width="64px">
+
 # Contentstack Bridge
 
 [![CI Status](https://github.com/Dobefu/csb/actions/workflows/ci.yml/badge.svg)](https://github.com/Dobefu/csb/actions/workflows/ci.yml)
