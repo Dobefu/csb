@@ -1,6 +1,7 @@
 baseURL = 'https://dobefu.github.io/csb/'
 languageCode = 'en-us'
 title = 'Contentstack Bridge'
+contentDir = 'content'
 disableHugoGeneratorInject = true
 
 [params]
