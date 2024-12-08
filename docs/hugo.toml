@@ -10,6 +10,11 @@ disableHugoGeneratorInject = true
   showVisitedLinks = false
   disableGeneratorVersion = true
 
+[outputs]
+  home = ['html', 'rss', 'print']
+  page = ['html', 'rss', 'print']
+  section = ['html', 'rss', 'print']
+
 [module]
   [[module.imports]]
     path = 'github.com/McShelby/hugo-theme-relearn'
