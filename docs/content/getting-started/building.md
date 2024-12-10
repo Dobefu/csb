@@ -4,7 +4,6 @@ type = "default"
 description = "Building instructions for the application"
 +++
 
-
 To build the application, simply run `go build`.
 
 This will create a new file, called `csb`. Running it now will throw an error,
