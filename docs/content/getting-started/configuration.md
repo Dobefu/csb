@@ -30,8 +30,8 @@ if the URL is `app.contentstack.io`, the region will be `us`.
 When testing the application locally, the `DB_*` variables can be left as-is.
 This will create a file called `db.sqlite3`. This can be handy for local testing.
 
-Alternatively, databases like MySQL are supported as well.
-A MariaDB database can quickly be spun up locally:
+For production use, databases like MySQL and Postgres are supported as well.
+For testing, alternative databases can quickly be spun up locally:
 ```bash
 docker compose up -d
 ```
