@@ -1,7 +1,7 @@
 +++
-title = "CLI Options"
+title = "CLI"
 type = "default"
-description = "An overview of all CLI options, as well as some examples"
+description = "Information on the subcommands and CLI flags in the Contentstack Bridge CLI"
 menuPre = "<i class='fa-solid fa-fw fa-terminal'></i> "
 weight = 2
 +++
