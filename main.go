@@ -128,7 +128,7 @@ func listSubCommands() {
 			desc: "Migrate or initialise the database",
 		},
 		"remote:sync": {
-			desc: "Synchronise Contentstack data into the database",
+			desc: "Synchronise all Contentstack entries into the database",
 		},
 		"server": {
 			desc: "Run a webserver with API endpoints",
