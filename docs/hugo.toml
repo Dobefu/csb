@@ -4,6 +4,17 @@ title = 'Contentstack Bridge'
 contentDir = 'content'
 disableHugoGeneratorInject = true
 
+[markup]
+  [markup.goldmark]
+    [markup.goldmark.extensions]
+      [markup.goldmark.extensions.extras]
+        [markup.goldmark.extensions.extras.delete]
+          enable = true
+        [markup.goldmark.extensions.extras.superscript]
+          enable = true
+        [markup.goldmark.extensions.extras.subscript]
+          enable = true
+
 [params]
   linkTitle = 'CSB Docs'
   themeVariant = 'zen-dark'
