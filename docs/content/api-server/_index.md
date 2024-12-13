@@ -12,4 +12,6 @@ The API server allows the Contentstack Bridge to be used as an alternative to th
 - Data can be transformed locally, since it's stored in a local database
 - Full URLs can be saved, using a parenting system within the content types of entries
 
-{{% children containerstyle="div" style="h2" description=true %}}
+## Subpages
+
+{{% children containerstyle="div" style="h3" description=true %}}

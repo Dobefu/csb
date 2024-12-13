@@ -7,9 +7,12 @@ description = "Configuring the Contentstack Bridge"
 ### Setting up the .env file
 
 Configuration is done with a `.env` file. To start, copy the `.env.example`:
-``` bash
+
+```bash
 cp .env.example .env
 ```
+
+An example `.env` file can also be found [in the GitHub repository](https://github.com/Dobefu/csb/blob/main/.env.example).
 
 ### Contentstack credentials
 
@@ -32,6 +35,7 @@ This will create a file called `db.sqlite3`. This can be handy for local testing
 
 For production use, databases like MySQL and Postgres are supported as well.
 For testing, alternative databases can quickly be spun up locally:
+
 ```bash
 docker compose up -d
 ```
