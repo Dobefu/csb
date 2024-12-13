@@ -15,6 +15,15 @@ description = "An overview of all CLI options"
 
 ## Subcommands
 
+### check:health
+
+Check the health of the application and the configuration.
+Useful when configuring or updating the application.
+
+#### Flags
+
+--
+
 ### migrate:db
 
 Perform database migrations. This will be needed during the initial setup,
