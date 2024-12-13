@@ -4,6 +4,12 @@ title = 'Contentstack Bridge'
 contentDir = 'content'
 disableHugoGeneratorInject = true
 
+[[menu.shortcuts]]
+  pre = '<i class="fa-fw fab fa-github"></i> '
+  name = 'GitHub Repo'
+  url = 'https://github.com/Dobefu/csb'
+  weight = 10
+
 [markup]
   [markup.goldmark]
     [markup.goldmark.extensions]
