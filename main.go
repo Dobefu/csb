@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/Dobefu/csb/cmd/check_health"
 	"github.com/Dobefu/csb/cmd/database"
 	"github.com/Dobefu/csb/cmd/init_env"
 	"github.com/Dobefu/csb/cmd/logger"
@@ -58,6 +59,18 @@ func runSubCommand(args []string) error {
 	var err error
 
 	switch args[0] {
+	case "check:health":
+		registerGlobalFlags(flag)
+		err = flag.Parse(args[1:])
+
+		if err != nil {
+			break
+		}
+
+		applyGlobalFlags()
+
+		err = check_health.Main()
+
 	case "migrate:db":
 		reset := flag.Bool("reset", false, "Migrate from a clean database. Warning: this will delete existing data")
 		registerGlobalFlags(flag)
@@ -97,7 +110,7 @@ func runSubCommand(args []string) error {
 		err = server.Start(*port)
 
 	default:
-		break
+		listSubCommands()
 	}
 
 	return err
@@ -124,6 +137,9 @@ func applyGlobalFlags() {
 
 func listSubCommands() {
 	cmds := map[string]subCommand{
+		"check:health": {
+			desc: "Validate the health of the application configuration",
+		},
 		"migrate:db": {
 			desc: "Migrate or initialise the database",
 		},
