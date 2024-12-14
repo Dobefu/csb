@@ -1,6 +1,7 @@
 package cs_sdk
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -8,20 +9,35 @@ import (
 	"os"
 )
 
-func RequestRaw(path string, method string) (*http.Response, error) {
-	url := fmt.Sprintf("%s/%s/%s", GetUrl(), VERSION, path)
+func RequestRaw(path string, method string, body map[string]interface{}) (*http.Response, error) {
+	url := fmt.Sprintf("%s/%s/%s", GetUrl(method), VERSION, path)
+
+	bodyJson, err := json.Marshal(body)
+
+	if err != nil {
+		return nil, err
+	}
 
 	client := http.Client{}
-	req, err := http.NewRequest(method, url, nil)
+	req, err := http.NewRequest(method, url, bytes.NewBuffer(bodyJson))
 
 	if err != nil {
 		return nil, err
 	}
 
 	req.Header = http.Header{
-		"api_key":      {os.Getenv("CS_API_KEY")},
-		"access_token": {os.Getenv("CS_DELIVERY_TOKEN")},
-		"branch":       {os.Getenv("CS_BRANCH")},
+		"api_key": {os.Getenv("CS_API_KEY")},
+		"branch":  {os.Getenv("CS_BRANCH")},
+	}
+
+	if method == "GET" {
+		req.Header.Set("access_token", os.Getenv("CS_DELIVERY_TOKEN"))
+	} else {
+		req.Header.Set("authorization", os.Getenv("CS_MANAGEMENT_TOKEN"))
+	}
+
+	if body != nil {
+		req.Header.Set("Content-Type", "application/json")
 	}
 
 	res, err := client.Do(req)
@@ -33,14 +49,18 @@ func RequestRaw(path string, method string) (*http.Response, error) {
 	return res, nil
 }
 
-func Request(path string, method string) (map[string]interface{}, error) {
-	res, err := RequestRaw(path, method)
+func Request(path string, method string, body map[string]interface{}) (map[string]interface{}, error) {
+	resp, err := RequestRaw(path, method, body)
 
 	if err != nil {
 		return nil, err
 	}
 
-	body, err := io.ReadAll(res.Body)
+	if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusCreated {
+		return nil, fmt.Errorf("Could not connect to Contentstack: %s", resp.Status)
+	}
+
+	respBody, err := io.ReadAll(resp.Body)
 
 	if err != nil {
 		return nil, err
@@ -48,7 +68,7 @@ func Request(path string, method string) (map[string]interface{}, error) {
 
 	var data map[string]interface{}
 
-	err = json.Unmarshal(body, &data)
+	err = json.Unmarshal(respBody, &data)
 
 	if err != nil {
 		return nil, err

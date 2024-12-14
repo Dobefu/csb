@@ -15,7 +15,7 @@ func GetEntry(route structs.Route) (interface{}, error) {
 		route.Locale,
 	)
 
-	res, err := cs_sdk.Request(path, "GET")
+	res, err := cs_sdk.Request(path, "GET", nil)
 
 	if err != nil {
 		return nil, err

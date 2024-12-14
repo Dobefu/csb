@@ -2,7 +2,6 @@ package check_health
 
 import (
 	"fmt"
-	"net/http"
 
 	"github.com/Dobefu/csb/cmd/cs_sdk"
 	"github.com/Dobefu/csb/cmd/database"
@@ -31,17 +30,33 @@ func checkDatabase() error {
 }
 
 func checkCsSdk() error {
-	var resp *http.Response
+	var resp map[string]interface{}
 	var err error
 
-	resp, err = cs_sdk.RequestRaw("content_types", "GET")
+	// Create a temporary label in Contentstack, to test the management token.
+	resp, err = cs_sdk.Request(
+		"labels",
+		"POST",
+		map[string]interface{}{
+			"label": map[string]interface{}{
+				"name": "__csb_healthcheck",
+			},
+		},
+	)
 
 	if err != nil {
 		return err
 	}
 
-	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("Could not connect to Contentstack: %s", resp.Status)
+	// Delete the temporary label in Contentstack.
+	_, err = cs_sdk.Request(
+		fmt.Sprintf("labels/%s", resp["label"].(map[string]interface{})["uid"]),
+		"DELETE",
+		nil,
+	)
+
+	if err != nil {
+		return err
 	}
 
 	return err
