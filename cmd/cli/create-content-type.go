@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/Dobefu/csb/cmd/cli/utils"
+	"github.com/Dobefu/csb/cmd/cs_sdk/api"
 )
 
 func CreateContentType(name string, machineName string) error {
@@ -26,6 +27,12 @@ func CreateContentType(name string, machineName string) error {
 
 	if ctMachineName == "" {
 		return errors.New("no machine name provided")
+	}
+
+	err = api.CreateContentType(ctName, ctMachineName)
+
+	if err != nil {
+		return err
 	}
 
 	return nil

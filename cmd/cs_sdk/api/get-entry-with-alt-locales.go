@@ -1,4 +1,4 @@
-package utils
+package api
 
 import (
 	api_structs "github.com/Dobefu/csb/cmd/api/structs"
