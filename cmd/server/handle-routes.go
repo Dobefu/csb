@@ -16,6 +16,7 @@ func HandleRoutes(mux *http.ServeMux, apiPath string) {
 
 	apiRoute(mux, apiPath, "/get-entry-by-url", "GET", v1.GetEntryByUrl)
 	apiRoute(mux, apiPath, "/get-entry-by-uid", "GET", v1.GetEntryByUid)
+	apiRoute(mux, apiPath, "/content-types", "GET", v1.GetContentTypes)
 }
 
 func apiRoute(
