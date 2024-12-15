@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/Dobefu/csb/cmd/check_health"
+	"github.com/Dobefu/csb/cmd/cli"
 	"github.com/Dobefu/csb/cmd/database"
 	"github.com/Dobefu/csb/cmd/init_env"
 	"github.com/Dobefu/csb/cmd/logger"
@@ -109,6 +110,18 @@ func runSubCommand(args []string) error {
 		applyGlobalFlags()
 		err = server.Start(*port)
 
+	case "create:content-type":
+		name := flag.String("name", "", "The name of the content type to create")
+		registerGlobalFlags(flag)
+		err = flag.Parse(args[1:])
+
+		if err != nil {
+			break
+		}
+
+		applyGlobalFlags()
+		err = cli.CreateContentType(*name)
+
 	default:
 		listSubCommands()
 	}
@@ -148,6 +161,9 @@ func listSubCommands() {
 		},
 		"server": {
 			desc: "Run a webserver with API endpoints",
+		},
+		"create:content-type": {
+			desc: "Create a new content type",
 		},
 	}
 
