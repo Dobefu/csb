@@ -29,6 +29,12 @@ archives:
       - goos: windows
         format: zip
 
+sboms:
+  id: default
+  artifacts: archive
+  documents:
+    - "${artifact}.spdx.sbom.json"
+
 changelog:
   use: github
   format: "{{.SHA}}: {{.Message}} (@{{.AuthorUsername}})"
