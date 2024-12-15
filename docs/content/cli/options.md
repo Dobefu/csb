@@ -52,3 +52,14 @@ Run a webserver with a REST API. More information about the webserver can be fou
 
 - `--port`
   - The port to run the server on. Defaults to `4000`
+
+### create:content-type
+
+Create a new content type, with some standard fields.
+
+#### Flags
+
+- `--name`
+  - The title of the content type to create
+- `--machine-name`
+  - The machine name of the content type to create
