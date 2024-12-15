@@ -7,7 +7,7 @@ import (
 	"github.com/Dobefu/csb/cmd/cli/utils"
 )
 
-func CreateContentType(name string) error {
+func CreateContentType(name string, machineName string) error {
 	ctName, err := confirmName(name)
 
 	if err != nil {
@@ -18,13 +18,13 @@ func CreateContentType(name string) error {
 		return errors.New("no name provided")
 	}
 
-	machineName, err := confirmMachineName(name)
+	ctMachineName, err := confirmMachineName(machineName)
 
 	if err != nil {
 		return err
 	}
 
-	if machineName == "" {
+	if ctMachineName == "" {
 		return errors.New("no machine name provided")
 	}
 

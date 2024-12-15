@@ -112,6 +112,7 @@ func runSubCommand(args []string) error {
 
 	case "create:content-type":
 		name := flag.String("name", "", "The name of the content type to create")
+		machineName := flag.String("machine-name", "", "The machine name of the content type to create")
 		registerGlobalFlags(flag)
 		err = flag.Parse(args[1:])
 
@@ -120,7 +121,7 @@ func runSubCommand(args []string) error {
 		}
 
 		applyGlobalFlags()
-		err = cli.CreateContentType(*name)
+		err = cli.CreateContentType(*name, *machineName)
 
 	default:
 		listSubCommands()
