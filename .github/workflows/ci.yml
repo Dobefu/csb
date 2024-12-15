@@ -64,6 +64,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Install "syft"
+        run: |
+          /bin/bash -c "curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh -s -- -b /usr/local/bin"
+
       - name: "Run GoReleaser"
         uses: goreleaser/goreleaser-action@v5
         with:
