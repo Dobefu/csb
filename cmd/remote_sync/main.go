@@ -1,7 +1,9 @@
 package remote_sync
 
-import "github.com/Dobefu/csb/cmd/cs_sdk"
+import (
+	"github.com/Dobefu/csb/cmd/cs_sdk/functions"
+)
 
 func Sync(reset bool) error {
-	return cs_sdk.Sync(reset)
+	return functions.Sync(reset)
 }
