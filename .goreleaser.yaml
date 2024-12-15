@@ -37,7 +37,6 @@ sboms:
       - "${artifact}.spdx.sbom.json"
 
 changelog:
-  use: github
   format: "{{.SHA}}: {{.Message}} (@{{.AuthorUsername}})"
   sort: asc
   groups:
