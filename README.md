@@ -9,38 +9,42 @@
 Adds a layer between your application and Contentstack,
 to provide some much-needed conveniences.
 
+> [!TIP]
+> The complete documentation can be found at [https://dobefu.github.io/csb/](https://dobefu.github.io/csb/)
+
 ## Table Of Contents
 
 <!-- toc -->
 
 - [Building](#building)
 - [Configuration](#configuration)
-    * [Setting up the .env file](#setting-up-the-env-file)
-    * [Contentstack credentials](#contentstack-credentials)
-    * [Database credentials](#database-credentials)
+  - [Setting up the .env file](#setting-up-the-env-file)
+  - [Contentstack credentials](#contentstack-credentials)
+  - [Database credentials](#database-credentials)
 - [Usage](#usage)
-    * [Database migration](#database-migration)
-    * [Remote sync](#remote-sync)
+  - [Database migration](#database-migration)
+  - [Remote sync](#remote-sync)
 
 <!-- tocstop -->
 
 ## Building
 
 To build the application, simply run
-``` bash
+
+```bash
 go build
 ```
 
 This will create a new file, called `csb`. Running it now will throw an error,
 since there is no configuration yet.
 
-
 ## Configuration
 
 ### Setting up the .env file
 
 Configuration is done with a `.env` file. To start, copy the `.env.example`:
-``` bash
+
+```bash
 cp .env.example .env
 ```
 
@@ -65,14 +69,15 @@ This will create a file called `db.sqlite3`. This can be handy for local testing
 
 Alternatively, databases like MySQL are supported as well.
 A MariaDB database can quickly be spun up locally:
+
 ```bash
 docker compose up -d
 ```
 
-
 ## Usage
 
 ### Database migration
+
 When first starting the application, the database will be completely empty.
 To add all necessary tables and rows to the database, run the following command:
 
@@ -85,6 +90,7 @@ This will create the necessary tables and rows in order for the application to w
 ### Remote sync
 
 To synchronise all data from Contentstack, the following command can be used:
+
 ```bash
 ./csb remote:sync
 ```
@@ -96,6 +102,7 @@ Every subsequent time that the command is run, the sync will only process
 changes that have occured since the last sync.
 
 If the sync needs to be restarted from scratch, the following command can be used:
+
 ```bash
 ./csb remote:sync --reset
 ```
