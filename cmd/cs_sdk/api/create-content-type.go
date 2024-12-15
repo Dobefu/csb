@@ -1,17 +1,26 @@
 package api
 
 import (
+	"errors"
+
 	"github.com/Dobefu/csb/cmd/cs_sdk"
+	"github.com/Dobefu/csb/cmd/logger"
 )
 
-func CreateContentType(name string, machineName string) error {
+func CreateContentType(name string, id string) error {
+	contentType := GetContentType(id)
+
+	if contentType != nil {
+		return errors.New("The content type already exists")
+	}
+
 	_, err := cs_sdk.Request(
 		"content_types",
 		"POST",
 		map[string]interface{}{
 			"content_type": map[string]interface{}{
 				"title": name,
-				"uid":   machineName,
+				"uid":   id,
 				"schema": []map[string]interface{}{
 					{
 						"display_name": "Title",
@@ -53,6 +62,8 @@ func CreateContentType(name string, machineName string) error {
 	if err != nil {
 		return err
 	}
+
+	logger.Info("The content type has been created")
 
 	return nil
 }
