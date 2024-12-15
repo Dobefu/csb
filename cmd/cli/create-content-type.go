@@ -1,11 +1,10 @@
 package cli
 
 import (
-	"bufio"
 	"errors"
-	"fmt"
-	"os"
 	"strings"
+
+	"github.com/Dobefu/csb/cmd/cli/utils"
 )
 
 func CreateContentType(name string) error {
@@ -36,16 +35,13 @@ func confirmName(name string) (string, error) {
 	ctName := name
 
 	if ctName == "" {
-		reader := bufio.NewReader(os.Stdin)
-		fmt.Println("Please enter the name of your new content type:")
-
-		key, err := reader.ReadString('\n')
+		val, err := utils.ReadLine("Please enter the name of your new content type")
 
 		if err != nil {
 			return "", err
 		}
 
-		ctName = strings.ReplaceAll(key, "\n", "")
+		ctName = strings.ReplaceAll(val, "\n", "")
 	}
 
 	return ctName, nil
@@ -55,16 +51,13 @@ func confirmMachineName(name string) (string, error) {
 	ctName := name
 
 	if ctName == "" {
-		reader := bufio.NewReader(os.Stdin)
-		fmt.Println("Please enter the machine name of your new content type:")
-
-		key, err := reader.ReadString('\n')
+		val, err := utils.ReadLine("Please enter the machine name of your new content type")
 
 		if err != nil {
 			return "", err
 		}
 
-		ctName = strings.ReplaceAll(key, "\n", "")
+		ctName = strings.ReplaceAll(val, "\n", "")
 	}
 
 	return ctName, nil
