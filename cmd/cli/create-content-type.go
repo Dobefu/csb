@@ -2,7 +2,6 @@ package cli
 
 import (
 	"errors"
-	"strings"
 
 	"github.com/Dobefu/csb/cmd/cli/utils"
 	"github.com/Dobefu/csb/cmd/cs_sdk/api"
@@ -48,7 +47,7 @@ func confirmName(name string) (string, error) {
 			return "", err
 		}
 
-		ctName = strings.ReplaceAll(val, "\n", "")
+		ctName = val
 	}
 
 	return ctName, nil
@@ -64,7 +63,7 @@ func confirmMachineName(name string) (string, error) {
 			return "", err
 		}
 
-		ctName = strings.ReplaceAll(val, "\n", "")
+		ctName = val
 	}
 
 	return ctName, nil
