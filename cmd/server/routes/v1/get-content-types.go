@@ -10,14 +10,17 @@ import (
 )
 
 func GetContentTypes(w http.ResponseWriter, r *http.Request) {
-	output, err := api.GetContentTypes()
+	contentTypes, err := api.GetContentTypes()
 
 	if err != nil {
 		utils.PrintError(w, err, false)
 		return
 	}
 
-	json, err := json.Marshal(output["content_types"])
+	output := utils.ConstructOutput()
+	output["data"] = contentTypes
+
+	json, err := json.Marshal(output)
 
 	if err != nil {
 		utils.PrintError(w, err, true)
