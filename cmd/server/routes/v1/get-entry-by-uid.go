@@ -19,7 +19,7 @@ func GetEntryByUid(w http.ResponseWriter, r *http.Request) {
 	)
 
 	if err != nil {
-		fmt.Fprintf(w, `{"error": "%s"}`, err.Error())
+		utils.PrintError(w, err, false)
 		return
 	}
 
