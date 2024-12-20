@@ -6,6 +6,9 @@ import (
 )
 
 func TestMain(t *testing.T) {
+	setArgs("")
+	main()
+
 	setArgs("migrate:db", "--reset", "--verbose", "--env-file=.env.test")
 	main()
 
