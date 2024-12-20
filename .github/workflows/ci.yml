@@ -57,6 +57,19 @@ jobs:
       - name: Delete the .env.test file after tests are completed
         run: rm .env.test
 
+  sonar-scan:
+    name: "SonarQube Scan"
+    needs: [build, test]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@v4
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
   deploy:
     name: "Release"
     needs: [test]
