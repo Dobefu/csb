@@ -42,6 +42,7 @@ func TestHandleRoutes(t *testing.T) {
 	body, err = request(
 		"GET",
 		fmt.Sprintf("%s/%s", server.URL, "/"),
+		true,
 	)
 	assert.Equal(t, nil, err)
 	assert.NotEqual(t, nil, body["data"])
@@ -49,7 +50,16 @@ func TestHandleRoutes(t *testing.T) {
 
 	body, err = request(
 		"GET",
+		fmt.Sprintf("%s/%s", server.URL, "/bogus"),
+		true,
+	)
+	assert.NotEqual(t, nil, err)
+	assert.NotEqual(t, nil, body)
+
+	body, err = request(
+		"GET",
 		fmt.Sprintf("%s/%s", server.URL, "/get-entry-by-url"),
+		true,
 	)
 	assert.Equal(t, nil, err)
 	assert.Equal(t, nil, body["data"])
@@ -58,6 +68,7 @@ func TestHandleRoutes(t *testing.T) {
 	body, err = request(
 		"GET",
 		fmt.Sprintf("%s/%s", server.URL, "/get-entry-by-url?url=/&locale=en"),
+		true,
 	)
 	assert.Equal(t, nil, err)
 	assert.NotEqual(t, nil, body["data"])
@@ -66,6 +77,7 @@ func TestHandleRoutes(t *testing.T) {
 	body, err = request(
 		"GET",
 		fmt.Sprintf("%s/%s", server.URL, "/get-entry-by-url?url=/bogus&locale=en"),
+		true,
 	)
 	assert.Equal(t, nil, err)
 	assert.Equal(t, nil, body["data"])
@@ -74,6 +86,7 @@ func TestHandleRoutes(t *testing.T) {
 	body, err = request(
 		"GET",
 		fmt.Sprintf("%s/%s", server.URL, "/get-entry-by-uid"),
+		true,
 	)
 	assert.Equal(t, nil, err)
 	assert.Equal(t, nil, body["data"])
@@ -82,6 +95,7 @@ func TestHandleRoutes(t *testing.T) {
 	body, err = request(
 		"GET",
 		fmt.Sprintf("%s/%s", server.URL, "/get-entry-by-uid?uid=blt0617c28651fb44bf&locale=en"),
+		true,
 	)
 	assert.Equal(t, nil, err)
 	assert.NotEqual(t, nil, body["data"])
@@ -90,6 +104,7 @@ func TestHandleRoutes(t *testing.T) {
 	body, err = request(
 		"GET",
 		fmt.Sprintf("%s/%s", server.URL, "/get-entry-by-uid?uid=/bogus&locale=en"),
+		true,
 	)
 	assert.Equal(t, nil, err)
 	assert.Equal(t, nil, body["data"])
@@ -98,13 +113,34 @@ func TestHandleRoutes(t *testing.T) {
 	body, err = request(
 		"GET",
 		fmt.Sprintf("%s/%s", server.URL, "/content-types"),
+		true,
+	)
+	assert.Equal(t, nil, err)
+	assert.NotEqual(t, nil, body["data"])
+	assert.Equal(t, nil, body["error"])
+
+	body, err = request(
+		"GET",
+		fmt.Sprintf("%s/%s", server.URL, "/content-types"),
+		false,
+	)
+	assert.Equal(t, nil, err)
+	assert.Equal(t, nil, body["data"])
+	assert.NotEqual(t, nil, body["error"])
+
+	os.Setenv("DEBUG_AUTH_BYPASS", "1")
+
+	body, err = request(
+		"GET",
+		fmt.Sprintf("%s/%s", server.URL, "/content-types"),
+		false,
 	)
 	assert.Equal(t, nil, err)
 	assert.NotEqual(t, nil, body["data"])
 	assert.Equal(t, nil, body["error"])
 }
 
-func request(method string, path string) (body map[string]interface{}, err error) {
+func request(method string, path string, withAuthToken bool) (body map[string]interface{}, err error) {
 	req, err := http.NewRequest(
 		method,
 		path,
@@ -115,8 +151,10 @@ func request(method string, path string) (body map[string]interface{}, err error
 		return nil, err
 	}
 
-	req.Header = http.Header{
-		"Authorization": {os.Getenv("CS_DELIVERY_TOKEN")},
+	if withAuthToken {
+		req.Header = http.Header{
+			"Authorization": {os.Getenv("CS_DELIVERY_TOKEN")},
+		}
 	}
 
 	client := http.Client{}
