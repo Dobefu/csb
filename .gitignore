@@ -12,8 +12,9 @@ csb
 # Test binaries.
 *.test
 
-# Go coverage output.
+# Go test and coverage output.
 *.out
+test-report.json
 
 # env file.
 .env

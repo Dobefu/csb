@@ -52,7 +52,8 @@ jobs:
           echo "DB_TYPE=\"sqlite3\"" >> .env.test
 
       - name: Run tests
-        run: go test ./... -v -coverpkg=./... -coverprofile=coverage.out
+        run: |
+          go test "./..." -coverprofile="coverage.out" -covermode=count -json > test-report.json
 
       - name: Delete the .env.test file after tests are completed
         run: rm .env.test
