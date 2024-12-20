@@ -14,7 +14,6 @@ csb
 
 # Go test and coverage output.
 *.out
-test-report.json
 
 # env file.
 .env
