@@ -6,6 +6,7 @@ import (
 	"io"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"testing"
 
 	"github.com/Dobefu/csb/cmd/database"
@@ -112,6 +113,10 @@ func request(method string, path string) (body map[string]interface{}, err error
 
 	if err != nil {
 		return nil, err
+	}
+
+	req.Header = http.Header{
+		"Authorization": {os.Getenv("CS_DELIVERY_TOKEN")},
 	}
 
 	client := http.Client{}
