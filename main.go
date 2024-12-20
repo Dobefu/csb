@@ -74,6 +74,7 @@ func runSubCommand(args []string) error {
 
 	case "migrate:db":
 		reset := flag.Bool("reset", false, "Migrate from a clean database. Warning: this will delete existing data")
+
 		registerGlobalFlags(flag)
 		err = flag.Parse(args[1:])
 
@@ -87,6 +88,7 @@ func runSubCommand(args []string) error {
 
 	case "remote:sync":
 		reset := flag.Bool("reset", false, "Synchronise all data, instead of starting from the last sync token")
+
 		registerGlobalFlags(flag)
 		err = flag.Parse(args[1:])
 
@@ -100,6 +102,7 @@ func runSubCommand(args []string) error {
 
 	case "server":
 		port := flag.Uint("port", 4000, "The port to use for the web server")
+
 		registerGlobalFlags(flag)
 		err = flag.Parse(args[1:])
 
@@ -113,6 +116,8 @@ func runSubCommand(args []string) error {
 	case "create:content-type":
 		name := flag.String("name", "", "The name of the content type to create")
 		machineName := flag.String("machine-name", "", "The machine name of the content type to create")
+		isDryRun := flag.Bool("dry-run", false, "Log the actions instead of actually running them")
+
 		registerGlobalFlags(flag)
 		err = flag.Parse(args[1:])
 
@@ -121,7 +126,7 @@ func runSubCommand(args []string) error {
 		}
 
 		applyGlobalFlags()
-		err = cli.CreateContentType(*name, *machineName)
+		err = cli.CreateContentType(*isDryRun, *name, *machineName)
 
 	default:
 		listSubCommands()

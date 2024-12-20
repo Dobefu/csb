@@ -7,7 +7,7 @@ import (
 	"github.com/Dobefu/csb/cmd/cs_sdk/api"
 )
 
-func CreateContentType(name string, id string) error {
+func CreateContentType(isDryRun bool, name string, id string) error {
 	ctName, err := confirmName(name)
 
 	if err != nil {
@@ -26,6 +26,10 @@ func CreateContentType(name string, id string) error {
 
 	if ctId == "" {
 		return errors.New("no machine name provided")
+	}
+
+	if isDryRun {
+		return nil
 	}
 
 	err = api.CreateContentType(ctName, ctId)
