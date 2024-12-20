@@ -1,6 +1,7 @@
 package server
 
 import (
+	"flag"
 	"fmt"
 	"net/http"
 
@@ -14,11 +15,13 @@ func Start(port uint) error {
 
 	HandleRoutes(mux, apiPath)
 
-	logger.Info("Starting server on %s", url)
-	err := http.ListenAndServe(url, mux)
+	if flag.Lookup("test.v") == nil {
+		logger.Info("Starting server on %s", url)
+		err := http.ListenAndServe(url, mux)
 
-	if err != nil {
-		return err
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil

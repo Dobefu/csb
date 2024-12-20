@@ -10,5 +10,5 @@ SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &> /dev/null && pwd)
 cd "$SCRIPT_DIR/.."
 
 # Run the tests.
-go test "./..." -cover -covermode=count
+go test "./..." -coverprofile="coverage.out" -covermode=count
 go tool cover -func coverage.out

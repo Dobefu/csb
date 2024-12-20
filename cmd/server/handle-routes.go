@@ -27,6 +27,7 @@ func apiRoute(
 	handler func(w http.ResponseWriter, r *http.Request),
 ) {
 	fullPath := fmt.Sprintf("%s %s%s", method, apiPath, path)
+
 	mux.Handle(
 		fullPath,
 		middleware.RequireDeliveryToken(http.HandlerFunc(handler)),
