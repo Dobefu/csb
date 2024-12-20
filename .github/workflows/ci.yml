@@ -58,12 +58,21 @@ jobs:
       - name: Delete the .env.test file after tests are completed
         run: rm .env.test
 
+      - uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: |
+            coverage.out
+            test-report.out
+
   sonar-scan:
     name: "SonarQube Scan"
-    needs: [build, test]
+    needs: [test]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
 
       - name: SonarQube Scan
         uses: SonarSource/sonarqube-scan-action@v4
@@ -73,7 +82,7 @@ jobs:
 
   deploy:
     name: "Release"
-    needs: [test]
+    needs: [build, test]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
