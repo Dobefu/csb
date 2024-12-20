@@ -9,6 +9,9 @@ func TestMain(t *testing.T) {
 	setArgs("")
 	main()
 
+	setArgs("check:health", "--env-file=.env.test")
+	main()
+
 	setArgs("migrate:db", "--reset", "--verbose", "--env-file=.env.test")
 	main()
 
