@@ -63,3 +63,5 @@ Create a new content type, with some standard fields.
   - The title of the content type to create
 - `--machine-name`
   - The machine name of the content type to create
+- `--dry-run`
+  - Log the actions instead of actually running them
