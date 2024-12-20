@@ -4,6 +4,7 @@
 
 [![CI Status](https://github.com/Dobefu/csb/actions/workflows/ci.yml/badge.svg)](https://github.com/Dobefu/csb/actions/workflows/ci.yml)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=Dobefu_contentstack-bridge&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=Dobefu_contentstack-bridge)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=Dobefu_contentstack-bridge&metric=coverage)](https://sonarcloud.io/summary/new_code?id=Dobefu_contentstack-bridge)
 [![Go Report Card](https://goreportcard.com/badge/github.com/Dobefu/csb)](https://goreportcard.com/report/github.com/Dobefu/csb)
 
 Adds a layer between your application and Contentstack,
