@@ -51,9 +51,12 @@ jobs:
           echo "DB_CONN=\"file:db_test.sqlite3\"" >> .env.test
           echo "DB_TYPE=\"sqlite3\"" >> .env.test
 
+      - name: Create a test results directory
+        run: mkdir test-results
+
       - name: Run tests
         run: |
-          go test "./..." -coverprofile="coverage.out" -covermode=count -json > test-report.out
+          go test "./..." -coverprofile="test-results/coverage.out" -covermode=count -json > test-results/test-report.out
 
       - name: Delete the .env.test file after tests are completed
         run: rm .env.test
@@ -61,9 +64,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: test-results
-          path: |
-            coverage.out
-            test-report.out
+          path: test-results/
 
   sonar-scan:
     name: "SonarQube Scan"
