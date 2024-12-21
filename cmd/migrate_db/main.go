@@ -48,6 +48,11 @@ func down() error {
 	}
 
 	files, err := content.ReadDir("migrations")
+
+	if err != nil {
+		return err
+	}
+
 	migrationIndex := version + 1
 
 	for i := len(files) - 1; i >= 0; i-- {
@@ -72,10 +77,6 @@ func down() error {
 		}
 	}
 
-	if err != nil {
-		return err
-	}
-
 	err = setMigrationState(migrationIndex, false)
 
 	if err != nil {
@@ -93,6 +94,11 @@ func up() error {
 	}
 
 	files, err := content.ReadDir("migrations")
+
+	if err != nil {
+		return err
+	}
+
 	migrationIndex := 0
 
 	for _, file := range files {
@@ -114,10 +120,6 @@ func up() error {
 		if err != nil {
 			return err
 		}
-	}
-
-	if err != nil {
-		return err
 	}
 
 	err = setMigrationState(migrationIndex, false)
@@ -175,13 +177,7 @@ func setMigrationState(version int, dirty bool) error {
 		return err
 	}
 
-	err = query.DropTable("migrations")
-
-	if err != nil {
-		return err
-	}
-
-	err = createMigrationsTable()
+	err = query.Truncate("migrations")
 
 	if err != nil {
 		return err
