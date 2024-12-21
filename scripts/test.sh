@@ -12,3 +12,4 @@ cd "$SCRIPT_DIR/.."
 # Run the tests.
 go test "./..." -coverprofile="coverage.out" -covermode=count
 go tool cover -func coverage.out
+go tool cover -html=coverage.out
