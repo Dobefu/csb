@@ -36,6 +36,9 @@ func TestMain(t *testing.T) {
 	err = Main(true)
 	assert.NotEqual(t, nil, err)
 
+	err = Main(false)
+	assert.NotEqual(t, nil, err)
+
 	os.Setenv("DB_CONN", oldDb)
 	err = database.Connect()
 	assert.Equal(t, nil, err)
