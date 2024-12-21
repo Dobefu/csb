@@ -15,8 +15,9 @@ func Start(port uint) error {
 
 	HandleRoutes(mux, apiPath)
 
+	logger.Info("Starting server on %s", url)
+
 	if flag.Lookup("test.v") == nil {
-		logger.Info("Starting server on %s", url)
 		err := http.ListenAndServe(url, mux)
 
 		if err != nil {
