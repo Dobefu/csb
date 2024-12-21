@@ -20,12 +20,6 @@ func TestCreateContentType(t *testing.T) {
 
 	os.Stdin = tmpfile
 
-	_, err = tmpfile.WriteAt([]byte("\n"), 0)
-	assert.Equal(t, nil, err)
-
-	_, err = tmpfile.Seek(0, 0)
-	assert.Equal(t, nil, err)
-
 	err = CreateContentType(true, "Content Type", "content_type")
 	assert.Equal(t, nil, err)
 
