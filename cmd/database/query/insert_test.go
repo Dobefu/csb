@@ -18,14 +18,7 @@ func TestInsert(t *testing.T) {
 	err = database.Connect()
 	assert.Equal(t, nil, err)
 
-	_, err = QueryRaw("DROP TABLE IF EXISTS state;")
-	assert.Equal(t, nil, err)
-
-	_, err = QueryRaw(`CREATE TABLE IF NOT EXISTS state(
-  name varchar(255) NOT NULL PRIMARY KEY UNIQUE,
-  value varchar(255) NOT NULL
-);
-  `)
+	err = resetDb()
 	assert.Equal(t, nil, err)
 
 	err = Insert("state", []structs.QueryValue{
@@ -41,11 +34,33 @@ func TestInsert(t *testing.T) {
 	assert.Equal(t, nil, err)
 
 	dbType := os.Getenv("DB_TYPE")
-	os.Setenv("DB_TYPE", "")
+	os.Setenv("DB_TYPE", "bogus")
 	logger.SetExitOnFatal(false)
 
 	err = Insert("state", []structs.QueryValue{})
 	assert.Equal(t, nil, err)
 
 	os.Setenv("DB_TYPE", dbType)
+}
+
+func resetDb() error {
+	var err error
+
+	_, err = QueryRaw("DROP TABLE IF EXISTS state;")
+
+	if err != nil {
+		return err
+	}
+
+	_, err = QueryRaw(`CREATE TABLE IF NOT EXISTS state(
+  name varchar(255) NOT NULL PRIMARY KEY UNIQUE,
+  value varchar(255) NOT NULL
+);
+  `)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
