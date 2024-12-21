@@ -46,4 +46,19 @@ func TestCreateContentType(t *testing.T) {
 
 	err = CreateContentType(true, "Content Type", "")
 	assert.Equal(t, nil, err)
+
+	_, err = tmpfile.WriteAt([]byte("\n"), 0)
+	assert.Equal(t, nil, err)
+
+	_, err = tmpfile.Seek(0, 0)
+	assert.Equal(t, nil, err)
+
+	err = CreateContentType(true, "Content Type", "")
+	assert.NotEqual(t, nil, err)
+
+	_, err = tmpfile.Seek(0, 0)
+	assert.Equal(t, nil, err)
+
+	err = CreateContentType(true, "", "content_type")
+	assert.NotEqual(t, nil, err)
 }
