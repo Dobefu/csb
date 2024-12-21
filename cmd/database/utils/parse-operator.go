@@ -2,9 +2,11 @@ package utils
 
 import (
 	"errors"
+	"fmt"
 	"os"
 
 	db_structs "github.com/Dobefu/csb/cmd/database/structs"
+	"github.com/Dobefu/csb/cmd/logger"
 )
 
 func ParseOperator(op db_structs.Operator) (string, error) {
@@ -18,7 +20,13 @@ func ParseOperator(op db_structs.Operator) (string, error) {
 	case "postgres":
 		return parseOperatorPostgres(op)
 	default:
-		return "", errors.New("the used operator is unsupported")
+		msg := fmt.Sprintf(
+			"The database type %s has no corresponding QueryRows function",
+			dbType,
+		)
+
+		logger.Fatal(msg)
+		return "", errors.New(msg)
 	}
 }
 
