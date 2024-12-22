@@ -24,10 +24,10 @@ func TestHandleRoutes(t *testing.T) {
 	err = database.Connect()
 	assert.Equal(t, nil, err)
 
-	err = migrate_db.Main(false)
+	err = migrate_db.Main(true)
 	assert.Equal(t, nil, err)
 
-	err = remote_sync.Sync(false)
+	err = remote_sync.Sync(true)
 	assert.Equal(t, nil, err)
 
 	mux := http.NewServeMux()
