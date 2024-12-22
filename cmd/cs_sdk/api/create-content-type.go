@@ -55,7 +55,8 @@ func CreateContentType(name string, id string) error {
 						"data_type":    "global_field",
 						"reference_to": "seo",
 						"field_metadata": map[string]interface{}{
-							"_default": true,
+							"_default":    true,
+							"instruction": "Additional SEO (Search Engine Optimization) fields for the page.",
 						},
 						"unique":   false,
 						"multiple": false,
