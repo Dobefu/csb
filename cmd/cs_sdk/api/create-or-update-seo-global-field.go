@@ -52,6 +52,30 @@ func getSeoGlobalFieldBody() map[string]interface{} {
 					"mandatory": false,
 					"multiple":  false,
 				},
+				{
+					"display_name": "OG Title",
+					"uid":          "og_title",
+					"data_type":    "text",
+					"field_metadata": map[string]interface{}{
+						"_default":    true,
+						"instruction": "The page title that will be displayed when sharing the page to social media. For the best results, please keep the title between 55 to 60 characters in length.",
+					},
+					"unique":    false,
+					"mandatory": false,
+					"multiple":  false,
+				},
+				{
+					"display_name": "OG Description",
+					"uid":          "og_description",
+					"data_type":    "text",
+					"field_metadata": map[string]interface{}{
+						"instruction": "A short description that will be displayed when sharing the page to social media. For the best results, please keep the description between 150 to 160 characters in length.",
+						"multiline":   true,
+					},
+					"unique":    false,
+					"mandatory": false,
+					"multiple":  false,
+				},
 			},
 		},
 	}
