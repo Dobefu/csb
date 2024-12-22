@@ -157,3 +157,42 @@ description = "A list of possible response types"
   error?: string // Will be null unless there's an error
 }
 ```
+
+## GlobalFieldsResponse
+
+```typescript
+{
+  data: { // Will be null if there's an error
+    global_fields: {
+      _version: number,
+      created_at: string, // Timestamp string
+      description: string,
+      inbuilt_class: boolean,
+      last_activity: unknown,
+      maintain_revisions: boolean,
+      schema: {
+        data_type: string,
+        display_name: string,
+        error_messages: {
+          format: string,
+        },
+        field_metadata: {
+          default_value: string,
+          description: string,
+          version: number,
+        },
+        format: string,
+        mandatory: boolean,
+        multiple: boolean,
+        non_localizable: boolean,
+        uid: string,
+        unique: boolean,
+      }[],
+      title: string,
+      uid: string,
+      updated_at: string, // Timestamp string
+    }[],
+  }
+  error?: string // Will be null unless there's an error
+}
+```
