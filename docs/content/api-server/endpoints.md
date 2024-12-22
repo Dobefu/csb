@@ -58,3 +58,15 @@ description = "An overview of all the API endpoints"
 ### Response type
 
 [++ContentTypeResponse++](response-types#contenttyperesponse)
+
+## Get all global fields
+
+`/api/v1/global-fields`
+
+### Parameters
+
+--
+
+### Response type
+
+[++GlobalFieldsResponse++](response-types#globalfieldsresponse)
