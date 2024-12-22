@@ -18,6 +18,7 @@ func HandleRoutes(mux *http.ServeMux, apiPath string) {
 	apiRoute(mux, apiPath, "/get-entry-by-uid", "GET", v1.GetEntryByUid)
 	apiRoute(mux, apiPath, "/content-types", "GET", v1.GetContentTypes)
 	apiRoute(mux, apiPath, "/content-type", "GET", v1.GetContentType)
+	apiRoute(mux, apiPath, "/global-fields", "GET", v1.GetGlobalFields)
 }
 
 func apiRoute(

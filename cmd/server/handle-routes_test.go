@@ -17,9 +17,9 @@ import (
 )
 
 func TestHandleRoutes(t *testing.T) {
-	init_env.Main("../../.env.test")
-
 	var err error
+
+	init_env.Main("../../.env.test")
 
 	err = database.Connect()
 	assert.Equal(t, nil, err)
@@ -83,6 +83,20 @@ func TestHandleRoutes(t *testing.T) {
 	assert.Equal(t, nil, body["data"])
 	assert.NotEqual(t, nil, body["error"])
 
+	oldApiKey := os.Getenv("CS_API_KEY")
+	os.Setenv("CS_API_KEY", "bogus")
+
+	body, err = request(
+		"GET",
+		fmt.Sprintf("%s/%s", server.URL, "/get-entry-by-url?url=/&locale=en"),
+		true,
+	)
+	assert.Equal(t, nil, err)
+	assert.Equal(t, nil, body["data"])
+	assert.NotEqual(t, nil, body["error"])
+
+	os.Setenv("CS_API_KEY", oldApiKey)
+
 	body, err = request(
 		"GET",
 		fmt.Sprintf("%s/%s", server.URL, "/get-entry-by-uid"),
@@ -100,6 +114,20 @@ func TestHandleRoutes(t *testing.T) {
 	assert.Equal(t, nil, err)
 	assert.NotEqual(t, nil, body["data"])
 	assert.Equal(t, nil, body["error"])
+
+	oldApiKey = os.Getenv("CS_API_KEY")
+	os.Setenv("CS_API_KEY", "bogus")
+
+	body, err = request(
+		"GET",
+		fmt.Sprintf("%s/%s", server.URL, "/get-entry-by-uid?uid=blt0617c28651fb44bf&locale=en"),
+		true,
+	)
+	assert.Equal(t, nil, err)
+	assert.Equal(t, nil, body["data"])
+	assert.NotEqual(t, nil, body["error"])
+
+	os.Setenv("CS_API_KEY", oldApiKey)
 
 	body, err = request(
 		"GET",
@@ -139,6 +167,22 @@ func TestHandleRoutes(t *testing.T) {
 	assert.NotEqual(t, nil, body["data"])
 	assert.Equal(t, nil, body["error"])
 
+	os.Setenv("DEBUG_AUTH_BYPASS", "")
+
+	oldApiKey = os.Getenv("CS_API_KEY")
+	os.Setenv("CS_API_KEY", "bogus")
+
+	body, err = request(
+		"GET",
+		fmt.Sprintf("%s/%s", server.URL, "/content-types"),
+		true,
+	)
+	assert.Equal(t, nil, err)
+	assert.Equal(t, nil, body["data"])
+	assert.NotEqual(t, nil, body["error"])
+
+	os.Setenv("CS_API_KEY", oldApiKey)
+
 	body, err = request(
 		"GET",
 		fmt.Sprintf("%s/%s", server.URL, "/content-type"),
@@ -165,6 +209,51 @@ func TestHandleRoutes(t *testing.T) {
 	assert.Equal(t, nil, err)
 	assert.Equal(t, nil, body["data"])
 	assert.NotEqual(t, nil, body["error"])
+
+	body, err = request(
+		"GET",
+		fmt.Sprintf("%s/%s", server.URL, "/global-fields"),
+		true,
+	)
+	assert.Equal(t, nil, err)
+	assert.NotEqual(t, nil, body["data"])
+	assert.Equal(t, nil, body["error"])
+
+	body, err = request(
+		"GET",
+		fmt.Sprintf("%s/%s", server.URL, "/global-fields"),
+		false,
+	)
+	assert.Equal(t, nil, err)
+	assert.Equal(t, nil, body["data"])
+	assert.NotEqual(t, nil, body["error"])
+
+	os.Setenv("DEBUG_AUTH_BYPASS", "1")
+
+	body, err = request(
+		"GET",
+		fmt.Sprintf("%s/%s", server.URL, "/global-fields"),
+		false,
+	)
+	assert.Equal(t, nil, err)
+	assert.NotEqual(t, nil, body["data"])
+	assert.Equal(t, nil, body["error"])
+
+	os.Setenv("DEBUG_AUTH_BYPASS", "")
+
+	oldApiKey = os.Getenv("CS_API_KEY")
+	os.Setenv("CS_API_KEY", "bogus")
+
+	body, err = request(
+		"GET",
+		fmt.Sprintf("%s/%s", server.URL, "/global-fields"),
+		true,
+	)
+	assert.Equal(t, nil, err)
+	assert.Equal(t, nil, body["data"])
+	assert.NotEqual(t, nil, body["error"])
+
+	os.Setenv("CS_API_KEY", oldApiKey)
 }
 
 func request(method string, path string, withAuthToken bool) (body map[string]interface{}, err error) {
