@@ -34,13 +34,26 @@ description = "An overview of all the API endpoints"
 
 [++RoutableEntryResponse++](response-types#routableentryresponse)
 
-## Get entry by UID
+## Get all content types
 
 `/api/v1/content-types`
 
 ### Parameters
 
 --
+
+### Response type
+
+[++ContentTypesResponse++](response-types#contenttypesresponse)
+
+## Get single content type
+
+`/api/v1/content-type`
+
+### Parameters
+
+- `content_type` ^(required)^
+  - The UID of the content type
 
 ### Response type
 

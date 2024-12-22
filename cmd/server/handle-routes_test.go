@@ -138,6 +138,33 @@ func TestHandleRoutes(t *testing.T) {
 	assert.Equal(t, nil, err)
 	assert.NotEqual(t, nil, body["data"])
 	assert.Equal(t, nil, body["error"])
+
+	body, err = request(
+		"GET",
+		fmt.Sprintf("%s/%s", server.URL, "/content-type"),
+		true,
+	)
+	assert.Equal(t, nil, err)
+	assert.Equal(t, nil, body["data"])
+	assert.Contains(t, body["error"], "missing required query params")
+
+	body, err = request(
+		"GET",
+		fmt.Sprintf("%s/%s", server.URL, "/content-type?content_type=basic_page"),
+		true,
+	)
+	assert.Equal(t, nil, err)
+	assert.NotEqual(t, nil, body["data"])
+	assert.Equal(t, nil, body["error"])
+
+	body, err = request(
+		"GET",
+		fmt.Sprintf("%s/%s", server.URL, "/content-type?content_type=bogus"),
+		true,
+	)
+	assert.Equal(t, nil, err)
+	assert.Equal(t, nil, body["data"])
+	assert.NotEqual(t, nil, body["error"])
 }
 
 func request(method string, path string, withAuthToken bool) (body map[string]interface{}, err error) {
