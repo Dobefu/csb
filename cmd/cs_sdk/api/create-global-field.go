@@ -7,7 +7,7 @@ import (
 	"github.com/Dobefu/csb/cmd/logger"
 )
 
-func CreateGlobalField(name string, id string, data map[string]interface{}) error {
+func CreateGlobalField(id string, data map[string]interface{}) error {
 	globalField := GetGlobalField(id)
 
 	if globalField != nil {
