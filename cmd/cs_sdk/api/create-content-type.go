@@ -49,6 +49,17 @@ func CreateContentType(name string, id string) error {
 						"unique":   false,
 						"multiple": false,
 					},
+					{
+						"display_name": "SEO",
+						"uid":          "seo",
+						"data_type":    "global_field",
+						"reference_to": "seo",
+						"field_metadata": map[string]interface{}{
+							"_default": true,
+						},
+						"unique":   false,
+						"multiple": false,
+					},
 				},
 				"options": map[string]interface{}{
 					"title":       "title",
