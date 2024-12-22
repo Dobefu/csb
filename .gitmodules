@@ -1,0 +1,3 @@
+[submodule "examples/nextjs"]
+	path = examples/nextjs
+	url = git@github.com:Dobefu/csb-example-nextjs.git
