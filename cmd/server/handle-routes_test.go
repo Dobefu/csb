@@ -17,9 +17,9 @@ import (
 )
 
 func TestHandleRoutes(t *testing.T) {
-	init_env.Main("../../.env.test")
-
 	var err error
+
+	init_env.Main("../../.env.test")
 
 	err = database.Connect()
 	assert.Equal(t, nil, err)
