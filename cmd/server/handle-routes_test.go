@@ -139,6 +139,8 @@ func TestHandleRoutes(t *testing.T) {
 	assert.NotEqual(t, nil, body["data"])
 	assert.Equal(t, nil, body["error"])
 
+	os.Setenv("DEBUG_AUTH_BYPASS", "")
+
 	body, err = request(
 		"GET",
 		fmt.Sprintf("%s/%s", server.URL, "/content-type"),
@@ -165,6 +167,37 @@ func TestHandleRoutes(t *testing.T) {
 	assert.Equal(t, nil, err)
 	assert.Equal(t, nil, body["data"])
 	assert.NotEqual(t, nil, body["error"])
+
+	body, err = request(
+		"GET",
+		fmt.Sprintf("%s/%s", server.URL, "/global-fields"),
+		true,
+	)
+	assert.Equal(t, nil, err)
+	assert.NotEqual(t, nil, body["data"])
+	assert.Equal(t, nil, body["error"])
+
+	body, err = request(
+		"GET",
+		fmt.Sprintf("%s/%s", server.URL, "/global-fields"),
+		false,
+	)
+	assert.Equal(t, nil, err)
+	assert.Equal(t, nil, body["data"])
+	assert.NotEqual(t, nil, body["error"])
+
+	os.Setenv("DEBUG_AUTH_BYPASS", "1")
+
+	body, err = request(
+		"GET",
+		fmt.Sprintf("%s/%s", server.URL, "/global-fields"),
+		false,
+	)
+	assert.Equal(t, nil, err)
+	assert.NotEqual(t, nil, body["data"])
+	assert.Equal(t, nil, body["error"])
+
+	os.Setenv("DEBUG_AUTH_BYPASS", "")
 }
 
 func request(method string, path string, withAuthToken bool) (body map[string]interface{}, err error) {
