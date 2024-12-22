@@ -33,8 +33,8 @@ func getSeoGlobalFieldBody() map[string]interface{} {
 					"uid":          "title",
 					"data_type":    "text",
 					"field_metadata": map[string]interface{}{
-						"_default":      true,
-						"default_value": "",
+						"_default":    true,
+						"instruction": "The page title that will be displayed in the browser tab.",
 					},
 					"unique":    false,
 					"mandatory": false,
@@ -45,8 +45,8 @@ func getSeoGlobalFieldBody() map[string]interface{} {
 					"uid":          "description",
 					"data_type":    "text",
 					"field_metadata": map[string]interface{}{
-						"default_value": "",
-						"multiline":     true,
+						"instruction": "A short description that search engines will see. For the best results, please keep the description between 150 to 160 characters in length.",
+						"multiline":   true,
 					},
 					"unique":    false,
 					"mandatory": false,
