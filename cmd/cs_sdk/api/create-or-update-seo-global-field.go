@@ -33,7 +33,20 @@ func getSeoGlobalFieldBody() map[string]interface{} {
 					"uid":          "title",
 					"data_type":    "text",
 					"field_metadata": map[string]interface{}{
-						"_default": true,
+						"_default":      true,
+						"default_value": "",
+					},
+					"unique":    false,
+					"mandatory": false,
+					"multiple":  false,
+				},
+				{
+					"display_name": "Description",
+					"uid":          "description",
+					"data_type":    "text",
+					"field_metadata": map[string]interface{}{
+						"default_value": "",
+						"multiline":     true,
 					},
 					"unique":    false,
 					"mandatory": false,
