@@ -1,0 +1,45 @@
+package api
+
+import "github.com/Dobefu/csb/cmd/cs_sdk"
+
+func CreateOrUpdateSeoGlobalField() error {
+	body := getSeoGlobalFieldBody()
+	err := CreateGlobalField("seo", body)
+
+	if err != nil {
+		_, err := cs_sdk.Request(
+			"global_fields/seo",
+			"PUT",
+			body,
+		)
+
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func getSeoGlobalFieldBody() map[string]interface{} {
+	return map[string]interface{}{
+		"global_field": map[string]interface{}{
+			"title":       "SEO",
+			"uid":         "seo",
+			"description": "SEO metadata for a routable page",
+			"schema": []map[string]interface{}{
+				{
+					"display_name": "Page Title",
+					"uid":          "title",
+					"data_type":    "text",
+					"field_metadata": map[string]interface{}{
+						"_default": true,
+					},
+					"unique":    false,
+					"mandatory": false,
+					"multiple":  false,
+				},
+			},
+		},
+	}
+}

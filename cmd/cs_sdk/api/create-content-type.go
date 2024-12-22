@@ -14,7 +14,13 @@ func CreateContentType(name string, id string) error {
 		return errors.New("The content type already exists")
 	}
 
-	_, err := cs_sdk.Request(
+	err := CreateOrUpdateSeoGlobalField()
+
+	if err != nil {
+		return err
+	}
+
+	_, err = cs_sdk.Request(
 		"content_types",
 		"POST",
 		map[string]interface{}{
