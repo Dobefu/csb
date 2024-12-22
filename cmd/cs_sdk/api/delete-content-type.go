@@ -8,7 +8,7 @@ import (
 	"github.com/Dobefu/csb/cmd/logger"
 )
 
-func DeleteContentType(uid string) error {
+func DeleteContentType(uid string, isForced bool) error {
 	contentType := GetContentType(uid)
 
 	if contentType == nil {
@@ -16,7 +16,7 @@ func DeleteContentType(uid string) error {
 	}
 
 	_, err := cs_sdk.Request(
-		fmt.Sprintf("content_types/%s", uid),
+		fmt.Sprintf("content_types/%s?force=%t", uid, isForced),
 		"DELETE",
 		nil,
 	)
