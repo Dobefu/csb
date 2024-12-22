@@ -10,11 +10,11 @@ import (
 func TestGetGlobalField(t *testing.T) {
 	init_env.Main("../../../.env.test")
 
-	var contentType interface{}
+	var globalField interface{}
 
-	contentType = GetGlobalField("global_field")
-	assert.NotEqual(t, nil, contentType)
+	globalField = GetGlobalField("global_field")
+	assert.NotEqual(t, nil, globalField)
 
-	contentType = GetGlobalField("bogus")
-	assert.Equal(t, nil, contentType)
+	globalField = GetGlobalField("bogus")
+	assert.Equal(t, nil, globalField)
 }
