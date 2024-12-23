@@ -70,3 +70,15 @@ description = "An overview of all the API endpoints"
 ### Response type
 
 [++GlobalFieldsResponse++](response-types#globalfieldsresponse)
+
+## Get all locales
+
+`/api/v1/locales`
+
+### Parameters
+
+--
+
+### Response type
+
+[++LocalesResponse++](response-types#localesresponse)

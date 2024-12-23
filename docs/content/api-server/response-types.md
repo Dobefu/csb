@@ -196,3 +196,25 @@ description = "A list of possible response types"
   error?: string // Will be null unless there's an error
 }
 ```
+
+## LocalesResponse
+
+```typescript
+{
+  data: { // Will be null if there's an error
+    locales: {
+      ACL: unknown[],
+      _version: number,
+      code: string,
+      created_at: string, // Timestamp string
+      created_by: string, // UID of the creator
+      fallback_locale: string,
+      name: string,
+      uid: string,
+      updated_at: string, // Timestamp string
+      updated_by: string, // UID of the creator
+    }[],
+  }
+  error?: string // Will be null unless there's an error
+}
+```
