@@ -4,7 +4,7 @@ import (
 	"github.com/Dobefu/csb/cmd/cs_sdk"
 )
 
-func GetLocales() interface{} {
+func GetLocales() (map[string]interface{}, error) {
 	locales, err := cs_sdk.Request(
 		"locales",
 		"GET",
@@ -13,8 +13,8 @@ func GetLocales() interface{} {
 	)
 
 	if err != nil {
-		return nil
+		return nil, err
 	}
 
-	return locales
+	return locales, nil
 }
