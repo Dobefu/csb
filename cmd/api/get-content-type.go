@@ -11,6 +11,7 @@ func GetContentType(contentType string) (map[string]interface{}, error) {
 		fmt.Sprintf("content_types/%s", contentType),
 		"GET",
 		nil,
+		false,
 	)
 
 	if err != nil {

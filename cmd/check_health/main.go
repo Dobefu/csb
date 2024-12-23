@@ -42,6 +42,7 @@ func checkCsSdk() error {
 				"name": "__csb_healthcheck",
 			},
 		},
+		true,
 	)
 
 	if err != nil {
@@ -53,6 +54,7 @@ func checkCsSdk() error {
 		fmt.Sprintf("labels/%s", resp["label"].(map[string]interface{})["uid"]),
 		"DELETE",
 		nil,
+		true,
 	)
 
 	if err != nil {

@@ -19,6 +19,7 @@ func DeleteContentType(uid string, isForced bool) error {
 		fmt.Sprintf("content_types/%s?force=%t", uid, isForced),
 		"DELETE",
 		nil,
+		true,
 	)
 
 	if err != nil {

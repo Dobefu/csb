@@ -11,6 +11,7 @@ func CreateOrUpdateSeoGlobalField() error {
 			"global_fields/seo",
 			"PUT",
 			body,
+			true,
 		)
 
 		if err != nil {

@@ -9,7 +9,7 @@ import (
 	"os"
 )
 
-func RequestRaw(path string, method string, body map[string]interface{}) (*http.Response, error) {
+func RequestRaw(path string, method string, body map[string]interface{}, useManagementToken bool) (*http.Response, error) {
 	url := fmt.Sprintf("%s/%s/%s", GetUrl(method), VERSION, path)
 
 	bodyJson, err := json.Marshal(body)
@@ -30,10 +30,10 @@ func RequestRaw(path string, method string, body map[string]interface{}) (*http.
 		"branch":  {os.Getenv("CS_BRANCH")},
 	}
 
-	if method == "GET" {
-		req.Header.Set("access_token", os.Getenv("CS_DELIVERY_TOKEN"))
-	} else {
+	if useManagementToken {
 		req.Header.Set("authorization", os.Getenv("CS_MANAGEMENT_TOKEN"))
+	} else {
+		req.Header.Set("access_token", os.Getenv("CS_DELIVERY_TOKEN"))
 	}
 
 	if body != nil {
@@ -49,8 +49,8 @@ func RequestRaw(path string, method string, body map[string]interface{}) (*http.
 	return res, nil
 }
 
-func Request(path string, method string, body map[string]interface{}) (map[string]interface{}, error) {
-	resp, err := RequestRaw(path, method, body)
+func Request(path string, method string, body map[string]interface{}, useManagementToken bool) (map[string]interface{}, error) {
+	resp, err := RequestRaw(path, method, body, useManagementToken)
 
 	if err != nil {
 		return nil, err

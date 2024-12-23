@@ -11,6 +11,7 @@ func GetGlobalField(id string) interface{} {
 		fmt.Sprintf("global_fields/%s", id),
 		"GET",
 		nil,
+		false,
 	)
 
 	if err != nil {

@@ -18,6 +18,7 @@ func CreateGlobalField(id string, data map[string]interface{}) error {
 		"global_fields",
 		"POST",
 		data,
+		true,
 	)
 
 	if err != nil {

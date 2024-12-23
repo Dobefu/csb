@@ -119,15 +119,15 @@ func getSyncData(paginationToken string, reset bool, syncToken string) (map[stri
 	if paginationToken != "" {
 		logger.Info("Getting a new sync page")
 		path := fmt.Sprintf("stacks/sync?pagination_token=%s", paginationToken)
-		data, err = cs_sdk.Request(path, "GET", nil)
+		data, err = cs_sdk.Request(path, "GET", nil, false)
 	} else if err != nil || reset {
 		logger.Info("Initialising a fresh sync")
 		path := "stacks/sync?init=true&type=entry_published,entry_unpublished,entry_deleted"
-		data, err = cs_sdk.Request(path, "GET", nil)
+		data, err = cs_sdk.Request(path, "GET", nil, false)
 	} else {
 		logger.Info("Syncing data using an existing sync token")
 		path := fmt.Sprintf("stacks/sync?sync_token=%s", syncToken)
-		data, err = cs_sdk.Request(path, "GET", nil)
+		data, err = cs_sdk.Request(path, "GET", nil, false)
 	}
 
 	if err != nil {

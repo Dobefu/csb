@@ -19,6 +19,7 @@ func DeleteGlobalField(uid string, isForced bool) error {
 		fmt.Sprintf("global_fields/%s?force=%t", uid, isForced),
 		"DELETE",
 		nil,
+		true,
 	)
 
 	if err != nil {

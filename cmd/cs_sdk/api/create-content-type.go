@@ -75,6 +75,7 @@ func CreateContentType(name string, id string) error {
 				},
 			},
 		},
+		true,
 	)
 
 	if err != nil {

@@ -5,7 +5,7 @@ import (
 )
 
 func GetContentTypes() (map[string]interface{}, error) {
-	data, err := cs_sdk.Request("content_types", "GET", nil)
+	data, err := cs_sdk.Request("content_types", "GET", nil, false)
 
 	if err != nil {
 		return nil, err
