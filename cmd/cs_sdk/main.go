@@ -10,7 +10,7 @@ import (
 )
 
 func RequestRaw(path string, method string, body map[string]interface{}, useManagementToken bool) (*http.Response, error) {
-	url := fmt.Sprintf("%s/%s/%s", GetUrl(method), VERSION, path)
+	url := fmt.Sprintf("%s/%s/%s", GetUrl(useManagementToken), VERSION, path)
 
 	bodyJson, err := json.Marshal(body)
 

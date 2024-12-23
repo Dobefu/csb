@@ -7,7 +7,7 @@ import (
 
 var VERSION = "v3"
 
-func GetUrl(method string) string {
+func GetUrl(useManagementToken bool) string {
 	region := os.Getenv("CS_REGION")
 	endpoint := "cdn"
 	extension := "com"
@@ -19,7 +19,7 @@ func GetUrl(method string) string {
 		extension = "io"
 	}
 
-	if method != "GET" {
+	if useManagementToken {
 		endpoint = "api"
 	}
 
