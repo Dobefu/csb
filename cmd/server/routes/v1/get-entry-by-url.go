@@ -33,7 +33,7 @@ func GetEntryByUrl(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	csEntry, altLocales, err := cs_api.GetEntryWithAltLocales(entry)
+	csEntry, altLocales, err := cs_api.GetEntryWithMetadata(entry)
 
 	if err != nil {
 		utils.PrintError(w, err, false)

@@ -13,7 +13,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestGetEntryWithAltLocales(t *testing.T) {
+func TestGetEntryWithMetadata(t *testing.T) {
 	var entry interface{}
 	var altLocales []api_structs.AltLocale
 	var err error
@@ -30,7 +30,7 @@ func TestGetEntryWithAltLocales(t *testing.T) {
 	err = remote_sync.Sync(true)
 	assert.Equal(t, nil, err)
 
-	entry, altLocales, err = GetEntryWithAltLocales(structs.Route{
+	entry, altLocales, err = GetEntryWithMetadata(structs.Route{
 		Uid:         "blt0617c28651fb44bf",
 		ContentType: "basic_page",
 		Locale:      "en",
@@ -39,7 +39,7 @@ func TestGetEntryWithAltLocales(t *testing.T) {
 	assert.NotEqual(t, nil, entry)
 	assert.NotEqual(t, nil, altLocales)
 
-	entry, altLocales, err = GetEntryWithAltLocales(structs.Route{
+	entry, altLocales, err = GetEntryWithMetadata(structs.Route{
 		Uid:         "bogus",
 		ContentType: "basic_page",
 		Locale:      "en",
@@ -53,7 +53,7 @@ func TestGetEntryWithAltLocales(t *testing.T) {
 	err = database.Connect()
 	assert.Equal(t, nil, err)
 
-	entry, altLocales, err = GetEntryWithAltLocales(structs.Route{
+	entry, altLocales, err = GetEntryWithMetadata(structs.Route{
 		Uid:         "blt0617c28651fb44bf",
 		ContentType: "basic_page",
 		Locale:      "en",

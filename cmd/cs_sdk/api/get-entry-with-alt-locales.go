@@ -6,7 +6,7 @@ import (
 	"github.com/Dobefu/csb/cmd/cs_sdk/structs"
 )
 
-func GetEntryWithAltLocales(route structs.Route) (interface{}, []api_structs.AltLocale, error) {
+func GetEntryWithMetadata(route structs.Route) (interface{}, []api_structs.AltLocale, error) {
 	entry, err := GetEntry(route)
 
 	if err != nil {
