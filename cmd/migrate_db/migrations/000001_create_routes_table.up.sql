@@ -6,6 +6,7 @@ CREATE TABLE IF NOT EXISTS routes(
   slug varchar(255) NOT NULL,
   url varchar(255) NOT NULL,
   parent varchar(64),
+  ancestor varchar(64),
   exclude_sitemap boolean NOT NULL DEFAULT false,
   published boolean NOT NULL DEFAULT false
 );
