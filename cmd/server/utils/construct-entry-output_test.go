@@ -3,12 +3,15 @@ package utils
 import (
 	"testing"
 
-	"github.com/Dobefu/csb/cmd/api/structs"
+	api_structs "github.com/Dobefu/csb/cmd/api/structs"
+	"github.com/Dobefu/csb/cmd/cs_sdk/structs"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestConstructEntryOutput(t *testing.T) {
-	output := ConstructEntryOutput("test", []structs.AltLocale{})
+	var breadcrumbs []structs.Route
+
+	output := ConstructEntryOutput("test", []api_structs.AltLocale{}, breadcrumbs)
 	assert.Equal(t, "test", output["data"]["entry"])
-	assert.Equal(t, []structs.AltLocale{}, output["data"]["alt_locales"])
+	assert.Equal(t, []api_structs.AltLocale{}, output["data"]["alt_locales"])
 }
