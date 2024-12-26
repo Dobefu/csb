@@ -34,6 +34,10 @@ func apiRoute(
 
 	mux.Handle(
 		fullPath,
-		middleware.RequireDeliveryToken(http.HandlerFunc(handler)),
+		middleware.RequireDeliveryToken(
+			middleware.AddResponseHeaders(
+				http.HandlerFunc(handler),
+			),
+		),
 	)
 }
