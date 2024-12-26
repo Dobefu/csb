@@ -53,6 +53,10 @@ func insertPage(id string, uid string, parent string) error {
 			Value: uid,
 		},
 		{
+			Name:  "title",
+			Value: "Title",
+		},
+		{
 			Name:  "content_type",
 			Value: "basic_page",
 		},

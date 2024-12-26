@@ -14,6 +14,7 @@ func GetEntryByFields(where []db_structs.QueryWhere) (structs.Route, error) {
 	err := row.Scan(
 		&result.Id,
 		&result.Uid,
+		&result.Title,
 		&result.ContentType,
 		&result.Locale,
 		&result.Slug,
