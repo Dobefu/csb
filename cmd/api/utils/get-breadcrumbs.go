@@ -5,8 +5,8 @@ import (
 	"github.com/Dobefu/csb/cmd/cs_sdk/structs"
 )
 
-func GetBreadcrumbs(entry structs.Route) ([]interface{}, error) {
-	results := []interface{}{entry}
+func GetBreadcrumbs(entry structs.Route) ([]structs.Route, error) {
+	results := []structs.Route{entry}
 	currentEntry := entry
 
 	var err error
