@@ -18,7 +18,7 @@ func GetBreadcrumbs(entry structs.Route) ([]structs.Route, error) {
 			continue
 		}
 
-		results = append(results, currentEntry)
+		results = append([]structs.Route{currentEntry}, results...)
 	}
 
 	return results, nil
