@@ -22,6 +22,7 @@ description = "A list of possible response types"
     breadcrumbs: {
         id: string
         uid: string
+        title: string
         content_type: string
         locale: string
         slug: string
