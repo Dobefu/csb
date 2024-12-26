@@ -20,6 +20,7 @@ func TestGetEntryWithMetadata(t *testing.T) {
 	var err error
 
 	var altLocalesEmpty []api_structs.AltLocale
+	var breadcrumbsEmpty []structs.Route
 
 	init_env.Main("../../../.env.test")
 	err = database.Connect()
@@ -49,6 +50,7 @@ func TestGetEntryWithMetadata(t *testing.T) {
 	assert.NotEqual(t, nil, err)
 	assert.Equal(t, nil, entry)
 	assert.Equal(t, altLocalesEmpty, altLocales)
+	assert.Equal(t, breadcrumbsEmpty, breadcrumbs)
 
 	oldDb := os.Getenv("DB_CONN")
 	os.Setenv("DB_CONN", "file:/")
@@ -63,6 +65,7 @@ func TestGetEntryWithMetadata(t *testing.T) {
 	assert.NotEqual(t, nil, err)
 	assert.Equal(t, nil, entry)
 	assert.Equal(t, altLocalesEmpty, altLocales)
+	assert.Equal(t, breadcrumbsEmpty, breadcrumbs)
 
 	os.Setenv("DB_CONN", oldDb)
 	err = database.Connect()
