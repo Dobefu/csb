@@ -36,7 +36,7 @@ func GetSitemapData(w http.ResponseWriter, r *http.Request) {
 
 func getEntries() (map[string]interface{}, error) {
 	rows, err := query.QueryRows("routes",
-		[]string{"*"},
+		[]string{"uid", "locale", "url"},
 		[]db_structs.QueryWhere{
 			{
 				Name:  "locale",
@@ -55,16 +55,9 @@ func getEntries() (map[string]interface{}, error) {
 		var result structs.Route
 
 		err = rows.Scan(
-			&result.Id,
 			&result.Uid,
-			&result.Title,
-			&result.ContentType,
 			&result.Locale,
-			&result.Slug,
 			&result.Url,
-			&result.Parent,
-			&result.ExcludeSitemap,
-			&result.Published,
 		)
 
 		if err != nil {
