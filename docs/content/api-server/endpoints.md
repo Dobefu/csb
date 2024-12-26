@@ -8,6 +8,10 @@ description = "An overview of all the API endpoints"
 
 `/api/v1/get-entry-by-url`
 
+## Methods
+
+- `GET`
+
 ### Parameters
 
 - `url` ^(required)^
@@ -22,6 +26,10 @@ description = "An overview of all the API endpoints"
 ## Get entry by UID
 
 `/api/v1/get-entry-by-uid`
+
+## Methods
+
+- `GET`
 
 ### Parameters
 
@@ -38,6 +46,10 @@ description = "An overview of all the API endpoints"
 
 `/api/v1/content-types`
 
+## Methods
+
+- `GET`
+
 ### Parameters
 
 --
@@ -49,6 +61,10 @@ description = "An overview of all the API endpoints"
 ## Get single content type
 
 `/api/v1/content-type`
+
+## Methods
+
+- `GET`
 
 ### Parameters
 
@@ -63,6 +79,10 @@ description = "An overview of all the API endpoints"
 
 `/api/v1/global-fields`
 
+## Methods
+
+- `GET`
+
 ### Parameters
 
 --
@@ -74,6 +94,10 @@ description = "An overview of all the API endpoints"
 ## Get all locales
 
 `/api/v1/locales`
+
+## Methods
+
+- `GET`
 
 ### Parameters
 
