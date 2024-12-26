@@ -41,7 +41,7 @@ func TestHandleRoutes(t *testing.T) {
 
 	body, err = request(
 		"GET",
-		fmt.Sprintf("%s/%s", server.URL, "/"),
+		fmt.Sprintf("%s/%s", server.URL, ""),
 		true,
 	)
 	assert.Equal(t, nil, err)
@@ -50,7 +50,7 @@ func TestHandleRoutes(t *testing.T) {
 
 	body, err = request(
 		"GET",
-		fmt.Sprintf("%s/%s", server.URL, "/bogus"),
+		fmt.Sprintf("%s/%s", server.URL, "bogus"),
 		true,
 	)
 	assert.NotEqual(t, nil, err)
@@ -58,7 +58,7 @@ func TestHandleRoutes(t *testing.T) {
 
 	body, err = request(
 		"GET",
-		fmt.Sprintf("%s/%s", server.URL, "/get-entry-by-url"),
+		fmt.Sprintf("%s/%s", server.URL, "get-entry-by-url"),
 		true,
 	)
 	assert.Equal(t, nil, err)
@@ -67,7 +67,7 @@ func TestHandleRoutes(t *testing.T) {
 
 	body, err = request(
 		"GET",
-		fmt.Sprintf("%s/%s", server.URL, "/get-entry-by-url?url=/&locale=en"),
+		fmt.Sprintf("%s/%s", server.URL, "get-entry-by-url?url=/&locale=en"),
 		true,
 	)
 	assert.Equal(t, nil, err)
@@ -76,7 +76,7 @@ func TestHandleRoutes(t *testing.T) {
 
 	body, err = request(
 		"GET",
-		fmt.Sprintf("%s/%s", server.URL, "/get-entry-by-url?url=/bogus&locale=en"),
+		fmt.Sprintf("%s/%s", server.URL, "get-entry-by-url?url=/bogus&locale=en"),
 		true,
 	)
 	assert.Equal(t, nil, err)
@@ -88,7 +88,7 @@ func TestHandleRoutes(t *testing.T) {
 
 	body, err = request(
 		"GET",
-		fmt.Sprintf("%s/%s", server.URL, "/get-entry-by-url?url=/&locale=en"),
+		fmt.Sprintf("%s/%s", server.URL, "get-entry-by-url?url=/&locale=en"),
 		true,
 	)
 	assert.Equal(t, nil, err)
@@ -99,7 +99,7 @@ func TestHandleRoutes(t *testing.T) {
 
 	body, err = request(
 		"GET",
-		fmt.Sprintf("%s/%s", server.URL, "/get-entry-by-uid"),
+		fmt.Sprintf("%s/%s", server.URL, "get-entry-by-uid"),
 		true,
 	)
 	assert.Equal(t, nil, err)
@@ -108,7 +108,7 @@ func TestHandleRoutes(t *testing.T) {
 
 	body, err = request(
 		"GET",
-		fmt.Sprintf("%s/%s", server.URL, "/get-entry-by-uid?uid=blt0617c28651fb44bf&locale=en"),
+		fmt.Sprintf("%s/%s", server.URL, "get-entry-by-uid?uid=blt0617c28651fb44bf&locale=en"),
 		true,
 	)
 	assert.Equal(t, nil, err)
@@ -120,7 +120,7 @@ func TestHandleRoutes(t *testing.T) {
 
 	body, err = request(
 		"GET",
-		fmt.Sprintf("%s/%s", server.URL, "/get-entry-by-uid?uid=blt0617c28651fb44bf&locale=en"),
+		fmt.Sprintf("%s/%s", server.URL, "get-entry-by-uid?uid=blt0617c28651fb44bf&locale=en"),
 		true,
 	)
 	assert.Equal(t, nil, err)
@@ -131,7 +131,7 @@ func TestHandleRoutes(t *testing.T) {
 
 	body, err = request(
 		"GET",
-		fmt.Sprintf("%s/%s", server.URL, "/get-entry-by-uid?uid=/bogus&locale=en"),
+		fmt.Sprintf("%s/%s", server.URL, "get-entry-by-uid?uid=/bogus&locale=en"),
 		true,
 	)
 	assert.Equal(t, nil, err)
@@ -140,7 +140,7 @@ func TestHandleRoutes(t *testing.T) {
 
 	body, err = request(
 		"GET",
-		fmt.Sprintf("%s/%s", server.URL, "/content-types"),
+		fmt.Sprintf("%s/%s", server.URL, "content-types"),
 		true,
 	)
 	assert.Equal(t, nil, err)
@@ -149,7 +149,7 @@ func TestHandleRoutes(t *testing.T) {
 
 	body, err = request(
 		"GET",
-		fmt.Sprintf("%s/%s", server.URL, "/content-types"),
+		fmt.Sprintf("%s/%s", server.URL, "content-types"),
 		false,
 	)
 	assert.Equal(t, nil, err)
@@ -160,7 +160,7 @@ func TestHandleRoutes(t *testing.T) {
 
 	body, err = request(
 		"GET",
-		fmt.Sprintf("%s/%s", server.URL, "/content-types"),
+		fmt.Sprintf("%s/%s", server.URL, "content-types"),
 		false,
 	)
 	assert.Equal(t, nil, err)
@@ -174,7 +174,7 @@ func TestHandleRoutes(t *testing.T) {
 
 	body, err = request(
 		"GET",
-		fmt.Sprintf("%s/%s", server.URL, "/content-types"),
+		fmt.Sprintf("%s/%s", server.URL, "content-types"),
 		true,
 	)
 	assert.Equal(t, nil, err)
@@ -185,7 +185,7 @@ func TestHandleRoutes(t *testing.T) {
 
 	body, err = request(
 		"GET",
-		fmt.Sprintf("%s/%s", server.URL, "/content-type"),
+		fmt.Sprintf("%s/%s", server.URL, "content-type"),
 		true,
 	)
 	assert.Equal(t, nil, err)
@@ -194,7 +194,7 @@ func TestHandleRoutes(t *testing.T) {
 
 	body, err = request(
 		"GET",
-		fmt.Sprintf("%s/%s", server.URL, "/content-type?content_type=basic_page"),
+		fmt.Sprintf("%s/%s", server.URL, "content-type?content_type=basic_page"),
 		true,
 	)
 	assert.Equal(t, nil, err)
@@ -203,7 +203,7 @@ func TestHandleRoutes(t *testing.T) {
 
 	body, err = request(
 		"GET",
-		fmt.Sprintf("%s/%s", server.URL, "/content-type?content_type=bogus"),
+		fmt.Sprintf("%s/%s", server.URL, "content-type?content_type=bogus"),
 		true,
 	)
 	assert.Equal(t, nil, err)
@@ -212,7 +212,7 @@ func TestHandleRoutes(t *testing.T) {
 
 	body, err = request(
 		"GET",
-		fmt.Sprintf("%s/%s", server.URL, "/global-fields"),
+		fmt.Sprintf("%s/%s", server.URL, "global-fields"),
 		true,
 	)
 	assert.Equal(t, nil, err)
@@ -221,7 +221,7 @@ func TestHandleRoutes(t *testing.T) {
 
 	body, err = request(
 		"GET",
-		fmt.Sprintf("%s/%s", server.URL, "/global-fields"),
+		fmt.Sprintf("%s/%s", server.URL, "global-fields"),
 		false,
 	)
 	assert.Equal(t, nil, err)
@@ -232,7 +232,7 @@ func TestHandleRoutes(t *testing.T) {
 
 	body, err = request(
 		"GET",
-		fmt.Sprintf("%s/%s", server.URL, "/global-fields"),
+		fmt.Sprintf("%s/%s", server.URL, "global-fields"),
 		false,
 	)
 	assert.Equal(t, nil, err)
@@ -246,7 +246,7 @@ func TestHandleRoutes(t *testing.T) {
 
 	body, err = request(
 		"GET",
-		fmt.Sprintf("%s/%s", server.URL, "/global-fields"),
+		fmt.Sprintf("%s/%s", server.URL, "global-fields"),
 		true,
 	)
 	assert.Equal(t, nil, err)
@@ -257,7 +257,7 @@ func TestHandleRoutes(t *testing.T) {
 
 	body, err = request(
 		"GET",
-		fmt.Sprintf("%s/%s", server.URL, "/locales"),
+		fmt.Sprintf("%s/%s", server.URL, "locales"),
 		true,
 	)
 	assert.Equal(t, nil, err)
@@ -266,7 +266,7 @@ func TestHandleRoutes(t *testing.T) {
 
 	body, err = request(
 		"GET",
-		fmt.Sprintf("%s/%s", server.URL, "/locales"),
+		fmt.Sprintf("%s/%s", server.URL, "locales"),
 		false,
 	)
 	assert.Equal(t, nil, err)
@@ -277,7 +277,7 @@ func TestHandleRoutes(t *testing.T) {
 
 	body, err = request(
 		"GET",
-		fmt.Sprintf("%s/%s", server.URL, "/locales"),
+		fmt.Sprintf("%s/%s", server.URL, "locales"),
 		false,
 	)
 	assert.Equal(t, nil, err)
@@ -291,11 +291,32 @@ func TestHandleRoutes(t *testing.T) {
 
 	body, err = request(
 		"GET",
-		fmt.Sprintf("%s/%s", server.URL, "/locales"),
+		fmt.Sprintf("%s/%s", server.URL, "locales"),
 		true,
 	)
 	assert.Equal(t, nil, err)
 	assert.Equal(t, nil, body["data"])
+	assert.NotEqual(t, nil, body["error"])
+
+	os.Setenv("CS_API_KEY", oldApiKey)
+
+	body, err = request(
+		"POST",
+		fmt.Sprintf("%s/%s", server.URL, "sync"),
+		true,
+	)
+	assert.Equal(t, nil, err)
+	assert.Equal(t, nil, body["error"])
+
+	oldApiKey = os.Getenv("CS_API_KEY")
+	os.Setenv("CS_API_KEY", "bogus")
+
+	body, err = request(
+		"POST",
+		fmt.Sprintf("%s/%s", server.URL, "sync"),
+		true,
+	)
+	assert.Equal(t, nil, err)
 	assert.NotEqual(t, nil, body["error"])
 
 	os.Setenv("CS_API_KEY", oldApiKey)
