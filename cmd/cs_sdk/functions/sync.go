@@ -214,7 +214,9 @@ func addParentRoutes(routes *map[string]structs.Route) error {
 }
 
 func addRouteChildren(route structs.Route, routes *map[string]structs.Route, depth uint8) error {
-	if depth > 10 {
+	var maxDepth uint8 = 10
+
+	if depth > maxDepth {
 		return errors.New("potential infinite loop detected")
 	}
 
@@ -244,7 +246,9 @@ func addRouteChildren(route structs.Route, routes *map[string]structs.Route, dep
 }
 
 func addRouteParents(route structs.Route, routes *map[string]structs.Route, depth uint8) error {
-	if depth > 10 {
+	var maxDepth uint8 = 10
+
+	if depth > maxDepth {
 		return errors.New("potential infinite loop detected")
 	}
 
@@ -332,9 +336,11 @@ func processSyncData(routes map[string]structs.Route) error {
 
 func constructRouteUrl(route structs.Route, routes map[string]structs.Route) string {
 	url := ""
+
 	currentRoute := route
-	depth := 0
-	maxDepth := 10
+
+	var depth uint8 = 0
+	var maxDepth uint8 = 10
 
 	for {
 		if depth > maxDepth {
