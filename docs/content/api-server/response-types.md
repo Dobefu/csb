@@ -9,14 +9,26 @@ description = "A list of possible response types"
 ```typescript
 {
   data: { // Will be null if there's an error
-    // An array of alternative locales will always
-    // be returned alongside the entry itself.
+    // An array of alternative locales.
     alt_locales: {
       uid: string
       content_type: string
       locale: string
       slug: string
       url: string
+    }[]
+
+    // An array of parent entries, to be used when constructing breadcrumbs.
+    breadcrumbs: {
+        id: string
+        uid: string
+        content_type: string
+        locale: string
+        slug: string
+        url: string
+        parent: string // UID of the parent. Will be empty if there's no parent.
+        exclude_sitemap: boolean
+        published: boolean // Will always be true, since unpublished entries are excluded in the API.
     }[]
 
     // The entry is directly queried from Contentstack.
