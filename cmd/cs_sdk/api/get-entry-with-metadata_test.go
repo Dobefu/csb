@@ -33,9 +33,10 @@ func TestGetEntryWithMetadata(t *testing.T) {
 	assert.Equal(t, nil, err)
 
 	entry, altLocales, breadcrumbs, err = GetEntryWithMetadata(structs.Route{
-		Uid:         "blt0617c28651fb44bf",
+		Uid:         "bltcfabf0a73d38cbcf",
 		ContentType: "basic_page",
 		Locale:      "en",
+		Parent:      "bltcfabf0a73d38cbcf",
 	})
 	assert.Equal(t, nil, err)
 	assert.NotEqual(t, nil, entry)
@@ -58,9 +59,10 @@ func TestGetEntryWithMetadata(t *testing.T) {
 	assert.Equal(t, nil, err)
 
 	entry, altLocales, breadcrumbs, err = GetEntryWithMetadata(structs.Route{
-		Uid:         "blt0617c28651fb44bf",
+		Uid:         "bltcfabf0a73d38cbcf",
 		ContentType: "basic_page",
 		Locale:      "en",
+		Parent:      "bltcfabf0a73d38cbcf",
 	})
 	assert.NotEqual(t, nil, err)
 	assert.Equal(t, nil, entry)
