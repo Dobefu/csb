@@ -240,3 +240,11 @@ description = "A list of possible response types"
   error: string | null // Will be null unless there's an error
 }
 ```
+
+## SyncResponse
+
+```typescript
+{
+  error: string | null // Will be null unless there's an error
+}
+```

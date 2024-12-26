@@ -106,3 +106,17 @@ description = "An overview of all the API endpoints"
 ### Response type
 
 [++LocalesResponse++](response-types#localesresponse)
+
+`/api/v1/sync`
+
+### Methods
+
+- `POST`
+
+### Parameters
+
+--
+
+### Response type
+
+[++SyncResponse++](response-types#syncresponse)
