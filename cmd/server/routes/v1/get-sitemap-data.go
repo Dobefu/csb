@@ -47,6 +47,11 @@ func getEntries() (map[string]interface{}, error) {
 				Value:    true,
 				Operator: db_structs.NOT_EQUALS,
 			},
+			{
+				Name:     "url",
+				Value:    "",
+				Operator: db_structs.NOT_EQUALS,
+			},
 		},
 	)
 
