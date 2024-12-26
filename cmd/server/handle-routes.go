@@ -20,6 +20,7 @@ func HandleRoutes(mux *http.ServeMux, apiPath string) {
 	apiRoute(mux, apiPath, "/content-type", "GET", v1.GetContentType)
 	apiRoute(mux, apiPath, "/global-fields", "GET", v1.GetGlobalFields)
 	apiRoute(mux, apiPath, "/locales", "GET", v1.GetLocales)
+	apiRoute(mux, apiPath, "/sync", "POST", v1.Sync)
 }
 
 func apiRoute(
