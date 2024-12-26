@@ -160,15 +160,10 @@ func addSyncRoutes(data map[string]interface{}, routes *map[string]structs.Route
 			}
 		}
 
-		slug, hasSlug := data["url"].(string)
-
-		if !hasSlug {
-			slug = ""
-		}
-
-		locale := publishDetails["locale"].(string)
 		uid := data["uid"].(string)
 		contentType := item["content_type_uid"].(string)
+		locale := publishDetails["locale"].(string)
+		slug := getSlug(data)
 		parent := getParentUid(data)
 		isPublished := hasPublishDetails
 		id := utils.GenerateId(structs.Route{Uid: uid, Locale: locale})
@@ -187,6 +182,16 @@ func addSyncRoutes(data map[string]interface{}, routes *map[string]structs.Route
 	}
 
 	return nil
+}
+
+func getSlug(data map[string]interface{}) string {
+	slug, hasSlug := data["url"].(string)
+
+	if !hasSlug {
+		slug = ""
+	}
+
+	return slug
 }
 
 func addChildRoutes(routes *map[string]structs.Route) error {
