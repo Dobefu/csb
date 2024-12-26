@@ -13,7 +13,7 @@ func GetEntryWithMetadata(route structs.Route) (interface{}, []api_structs.AltLo
 		return nil, nil, nil, err
 	}
 
-	altLocales, err := utils.GetAltLocales(route)
+	altLocales, err := utils.GetAltLocales(route, true)
 
 	if err != nil {
 		return nil, nil, nil, err

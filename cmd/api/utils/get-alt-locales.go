@@ -8,25 +8,35 @@ import (
 	"github.com/Dobefu/csb/cmd/logger"
 )
 
-func GetAltLocales(entry structs.Route) ([]api_structs.AltLocale, error) {
+func GetAltLocales(entry structs.Route, includeSitemapExcluded bool) ([]api_structs.AltLocale, error) {
+	where := []db_structs.QueryWhere{
+		{
+			Name:  "uid",
+			Value: entry.Uid,
+		},
+		{
+			Name:  "published",
+			Value: true,
+		},
+		{
+			Name:     "locale",
+			Value:    entry.Locale,
+			Operator: db_structs.NOT_EQUALS,
+		},
+	}
+
+	if !includeSitemapExcluded {
+		where = append(where, db_structs.QueryWhere{
+			Name:     "exclude_sitemap",
+			Value:    true,
+			Operator: db_structs.NOT_EQUALS,
+		})
+	}
+
 	rows, err := query.QueryRows(
 		"routes",
 		[]string{"uid", "content_type", "locale", "slug", "url"},
-		[]db_structs.QueryWhere{
-			{
-				Name:  "uid",
-				Value: entry.Uid,
-			},
-			{
-				Name:  "published",
-				Value: true,
-			},
-			{
-				Name:     "locale",
-				Value:    entry.Locale,
-				Operator: db_structs.NOT_EQUALS,
-			},
-		},
+		where,
 	)
 
 	if err != nil {

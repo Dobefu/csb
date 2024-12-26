@@ -42,6 +42,11 @@ func getEntries() (map[string]interface{}, error) {
 				Name:  "locale",
 				Value: "en",
 			},
+			{
+				Name:     "exclude_sitemap",
+				Value:    true,
+				Operator: db_structs.NOT_EQUALS,
+			},
 		},
 	)
 
@@ -64,7 +69,7 @@ func getEntries() (map[string]interface{}, error) {
 			return entries, err
 		}
 
-		altLocales, err := api_utils.GetAltLocales(result)
+		altLocales, err := api_utils.GetAltLocales(result, false)
 
 		if err != nil {
 			return entries, err
