@@ -77,6 +77,18 @@ func getSeoGlobalFieldBody() map[string]interface{} {
 					"mandatory": false,
 					"multiple":  false,
 				},
+				{
+					"display_name": "Exclude from the sitemap",
+					"uid":          "exclude_sitemap",
+					"data_type":    "boolean",
+					"field_metadata": map[string]interface{}{
+						"instruction":   "Whether or not to exclude this page from the sitemap. When checked, the page will not show up in the sitemap.",
+						"default_value": false,
+					},
+					"unique":    false,
+					"mandatory": false,
+					"multiple":  false,
+				},
 			},
 		},
 	}
