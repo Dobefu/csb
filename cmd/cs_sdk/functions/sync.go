@@ -166,20 +166,22 @@ func addSyncRoutes(data map[string]interface{}, routes *map[string]structs.Route
 		locale := publishDetails["locale"].(string)
 		slug := getSlug(data)
 		parent := getParentUid(data)
+		excludeSitemap := getExcludeSitemap(data)
 		isPublished := hasPublishDetails
 		id := utils.GenerateId(structs.Route{Uid: uid, Locale: locale})
 
 		logger.Verbose("Found entry: %s", uid)
 
 		(*routes)[id] = structs.Route{
-			Uid:         uid,
-			Title:       title,
-			ContentType: contentType,
-			Locale:      locale,
-			Slug:        slug,
-			Url:         slug,
-			Parent:      parent,
-			Published:   isPublished,
+			Uid:            uid,
+			Title:          title,
+			ContentType:    contentType,
+			Locale:         locale,
+			Slug:           slug,
+			Url:            slug,
+			Parent:         parent,
+			ExcludeSitemap: excludeSitemap,
+			Published:      isPublished,
 		}
 	}
 
@@ -337,6 +339,22 @@ func getParentUid(data map[string]interface{}) string {
 	return parentUid
 }
 
+func getExcludeSitemap(data map[string]interface{}) bool {
+	seo, hasSeo := data["seo"].(map[string]interface{})
+
+	if !hasSeo {
+		return false
+	}
+
+	excludeSitemap, hasExcludeSitemap := seo["exclude_sitemap"]
+
+	if !hasExcludeSitemap {
+		return false
+	}
+
+	return excludeSitemap.(bool)
+}
+
 func processSyncData(routes map[string]structs.Route) error {
 	routeCount := len(routes)
 	idx := 0
@@ -346,14 +364,15 @@ func processSyncData(routes map[string]structs.Route) error {
 		url := constructRouteUrl(route, routes)
 
 		routes[uid] = structs.Route{
-			Uid:         route.Uid,
-			Title:       route.Title,
-			ContentType: route.ContentType,
-			Locale:      route.Locale,
-			Slug:        route.Slug,
-			Url:         url,
-			Parent:      route.Parent,
-			Published:   route.Published,
+			Uid:            route.Uid,
+			Title:          route.Title,
+			ContentType:    route.ContentType,
+			Locale:         route.Locale,
+			Slug:           route.Slug,
+			Url:            url,
+			Parent:         route.Parent,
+			ExcludeSitemap: route.ExcludeSitemap,
+			Published:      route.Published,
 		}
 
 		err := db_routes.SetRoute(routes[uid])

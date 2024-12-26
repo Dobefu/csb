@@ -54,6 +54,10 @@ func getRouteValues(route structs.Route) []db_structs.QueryValue {
 			Value: route.Parent,
 		},
 		{
+			Name:  "exclude_sitemap",
+			Value: route.ExcludeSitemap,
+		},
+		{
 			Name:  "published",
 			Value: route.Published,
 		},
