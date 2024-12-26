@@ -33,14 +33,14 @@ func GetEntryByUid(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	csEntry, altLocales, err := cs_api.GetEntryWithMetadata(entry)
+	csEntry, altLocales, breadcrumbs, err := cs_api.GetEntryWithMetadata(entry)
 
 	if err != nil {
 		utils.PrintError(w, err, false)
 		return
 	}
 
-	output := utils.ConstructEntryOutput(csEntry, altLocales)
+	output := utils.ConstructEntryOutput(csEntry, altLocales, breadcrumbs)
 	json, err := json.Marshal(output)
 
 	if err != nil {

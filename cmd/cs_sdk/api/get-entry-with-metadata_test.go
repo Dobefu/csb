@@ -16,6 +16,7 @@ import (
 func TestGetEntryWithMetadata(t *testing.T) {
 	var entry interface{}
 	var altLocales []api_structs.AltLocale
+	var breadcrumbs interface{}
 	var err error
 
 	var altLocalesEmpty []api_structs.AltLocale
@@ -30,7 +31,7 @@ func TestGetEntryWithMetadata(t *testing.T) {
 	err = remote_sync.Sync(true)
 	assert.Equal(t, nil, err)
 
-	entry, altLocales, err = GetEntryWithMetadata(structs.Route{
+	entry, altLocales, breadcrumbs, err = GetEntryWithMetadata(structs.Route{
 		Uid:         "blt0617c28651fb44bf",
 		ContentType: "basic_page",
 		Locale:      "en",
@@ -38,8 +39,9 @@ func TestGetEntryWithMetadata(t *testing.T) {
 	assert.Equal(t, nil, err)
 	assert.NotEqual(t, nil, entry)
 	assert.NotEqual(t, nil, altLocales)
+	assert.NotEqual(t, nil, breadcrumbs)
 
-	entry, altLocales, err = GetEntryWithMetadata(structs.Route{
+	entry, altLocales, breadcrumbs, err = GetEntryWithMetadata(structs.Route{
 		Uid:         "bogus",
 		ContentType: "basic_page",
 		Locale:      "en",
@@ -53,7 +55,7 @@ func TestGetEntryWithMetadata(t *testing.T) {
 	err = database.Connect()
 	assert.Equal(t, nil, err)
 
-	entry, altLocales, err = GetEntryWithMetadata(structs.Route{
+	entry, altLocales, breadcrumbs, err = GetEntryWithMetadata(structs.Route{
 		Uid:         "blt0617c28651fb44bf",
 		ContentType: "basic_page",
 		Locale:      "en",
