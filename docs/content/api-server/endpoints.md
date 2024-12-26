@@ -107,6 +107,8 @@ description = "An overview of all the API endpoints"
 
 [++LocalesResponse++](response-types#localesresponse)
 
+## Sync Contentstack data
+
 `/api/v1/sync`
 
 ### Methods
