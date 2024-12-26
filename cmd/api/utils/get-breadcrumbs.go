@@ -21,5 +21,13 @@ func GetBreadcrumbs(entry structs.Route) ([]structs.Route, error) {
 		results = append([]structs.Route{currentEntry}, results...)
 	}
 
+	if entry.Url != "/" {
+		homeEntry, err := api.GetEntryByUrl("/", entry.Locale, false)
+
+		if err == nil {
+			results = append([]structs.Route{homeEntry}, results...)
+		}
+	}
+
 	return results, nil
 }
