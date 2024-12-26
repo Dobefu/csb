@@ -161,6 +161,7 @@ func addSyncRoutes(data map[string]interface{}, routes *map[string]structs.Route
 		}
 
 		uid := data["uid"].(string)
+		title := getTitle(data)
 		contentType := item["content_type_uid"].(string)
 		locale := publishDetails["locale"].(string)
 		slug := getSlug(data)
@@ -172,6 +173,7 @@ func addSyncRoutes(data map[string]interface{}, routes *map[string]structs.Route
 
 		(*routes)[id] = structs.Route{
 			Uid:         uid,
+			Title:       title,
 			ContentType: contentType,
 			Locale:      locale,
 			Slug:        slug,
@@ -182,6 +184,32 @@ func addSyncRoutes(data map[string]interface{}, routes *map[string]structs.Route
 	}
 
 	return nil
+}
+
+func getTitle(data map[string]interface{}) string {
+	title, hasTitle := data["title"].(string)
+
+	seo, hasSeo := data["seo"].(map[string]interface{})
+
+	if !hasSeo {
+		if hasTitle {
+			return title
+		}
+
+		return ""
+	}
+
+	seoTitle, hasSeoTitle := seo["title"]
+
+	if !hasSeoTitle || seoTitle == "" {
+		if hasTitle {
+			return title
+		}
+
+		return ""
+	}
+
+	return seoTitle.(string)
 }
 
 func getSlug(data map[string]interface{}) string {
@@ -319,6 +347,7 @@ func processSyncData(routes map[string]structs.Route) error {
 
 		routes[uid] = structs.Route{
 			Uid:         route.Uid,
+			Title:       route.Title,
 			ContentType: route.ContentType,
 			Locale:      route.Locale,
 			Slug:        route.Slug,
