@@ -48,6 +48,7 @@ func GetChildEntriesByUid(uid string, locale string, includeUnpublished bool) ([
 			&result.Slug,
 			&result.Url,
 			&result.Parent,
+			&result.UpdatedAt,
 			&result.ExcludeSitemap,
 			&result.Published,
 		)

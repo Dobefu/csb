@@ -20,6 +20,7 @@ func GetEntryByFields(where []db_structs.QueryWhere) (structs.Route, error) {
 		&result.Slug,
 		&result.Url,
 		&result.Parent,
+		&result.UpdatedAt,
 		&result.ExcludeSitemap,
 		&result.Published,
 	)
