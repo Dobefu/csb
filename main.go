@@ -11,6 +11,7 @@ import (
 	"github.com/Dobefu/csb/cmd/init_env"
 	"github.com/Dobefu/csb/cmd/logger"
 	"github.com/Dobefu/csb/cmd/migrate_db"
+	"github.com/Dobefu/csb/cmd/remote_setup"
 	"github.com/Dobefu/csb/cmd/remote_sync"
 	"github.com/Dobefu/csb/cmd/server"
 )
@@ -85,6 +86,18 @@ func runSubCommand(args []string) error {
 		applyGlobalFlags()
 
 		err = migrate_db.Main(*reset)
+
+	case "remote:setup":
+		registerGlobalFlags(flag)
+		err = flag.Parse(args[1:])
+
+		if err != nil {
+			break
+		}
+
+		applyGlobalFlags()
+
+		err = remote_setup.Main()
 
 	case "remote:sync":
 		reset := flag.Bool("reset", false, "Synchronise all data, instead of starting from the last sync token")
@@ -161,6 +174,9 @@ func listSubCommands() {
 		},
 		"migrate:db": {
 			desc: "Migrate or initialise the database",
+		},
+		"remote:setup": {
+			desc: "Set up or update necessary content in Contentstack",
 		},
 		"remote:sync": {
 			desc: "Synchronise all Contentstack entries into the database",

@@ -1,6 +1,9 @@
 package api
 
-import "github.com/Dobefu/csb/cmd/cs_sdk"
+import (
+	"github.com/Dobefu/csb/cmd/cs_sdk"
+	"github.com/Dobefu/csb/cmd/logger"
+)
 
 func CreateOrUpdateSeoGlobalField() error {
 	body := getSeoGlobalFieldBody()
@@ -17,6 +20,8 @@ func CreateOrUpdateSeoGlobalField() error {
 		if err != nil {
 			return err
 		}
+
+		logger.Info("The global field has been updated")
 	}
 
 	return nil
