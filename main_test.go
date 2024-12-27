@@ -15,6 +15,9 @@ func TestMain(t *testing.T) {
 	setArgs("migrate:db", "--reset", "--verbose", "--env-file=.env.test")
 	main()
 
+	setArgs("remote:setup", "--quiet", "--env-file=.env.test")
+	main()
+
 	setArgs("remote:sync", "--reset", "--quiet", "--env-file=.env.test")
 	main()
 
