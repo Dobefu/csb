@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS routes(
   slug varchar(255) NOT NULL,
   url varchar(255) NOT NULL,
   parent varchar(64),
-  updated_at datetime NOT NULL,
+  updated_at timestamp NOT NULL,
   exclude_sitemap boolean NOT NULL DEFAULT false,
   published boolean NOT NULL DEFAULT false
 );
