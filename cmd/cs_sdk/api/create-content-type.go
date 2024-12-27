@@ -28,7 +28,6 @@ func CreateContentType(name string, id string, withFields bool) error {
 					},
 					"unique":    true,
 					"mandatory": true,
-					"multiple":  false,
 				},
 			},
 			"options": map[string]interface{}{
@@ -92,16 +91,17 @@ func CreateContentType(name string, id string, withFields bool) error {
 			"url_prefix":  "/",
 		}
 
-		_, err = cs_sdk.Request(
-			"content_types",
-			"POST",
-			body,
-			true,
-		)
+	}
 
-		if err != nil {
-			return err
-		}
+	_, err := cs_sdk.Request(
+		"content_types",
+		"POST",
+		body,
+		true,
+	)
+
+	if err != nil {
+		return err
 	}
 
 	logger.Info("The content type has been created")
