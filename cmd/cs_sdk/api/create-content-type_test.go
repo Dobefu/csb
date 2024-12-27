@@ -24,7 +24,7 @@ func TestCreateContentType(t *testing.T) {
 	assert.Equal(t, nil, err)
 	time.Sleep(time.Second / 2)
 
-	err = CreateContentType(ctName, ctName, true)
+	err = CreateContentType(ctName, ctName, false)
 	assert.NotEqual(t, nil, err)
 
 	oldApiKey := os.Getenv("CS_API_KEY")
