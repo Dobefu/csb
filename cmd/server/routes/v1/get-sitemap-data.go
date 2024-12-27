@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"time"
 
 	api_structs "github.com/Dobefu/csb/cmd/api/structs"
 	api_utils "github.com/Dobefu/csb/cmd/api/utils"
@@ -36,7 +37,7 @@ func GetSitemapData(w http.ResponseWriter, r *http.Request) {
 
 func getEntries() (map[string]interface{}, error) {
 	rows, err := query.QueryRows("routes",
-		[]string{"uid", "locale", "url"},
+		[]string{"uid", "locale", "url", "updated_at"},
 		[]db_structs.QueryWhere{
 			{
 				Name:  "locale",
@@ -68,6 +69,7 @@ func getEntries() (map[string]interface{}, error) {
 			&result.Uid,
 			&result.Locale,
 			&result.Url,
+			&result.UpdatedAt,
 		)
 
 		if err != nil {
@@ -84,11 +86,13 @@ func getEntries() (map[string]interface{}, error) {
 			Uid        string                  `json:"uid"`
 			Locale     string                  `json:"locale"`
 			Url        string                  `json:"url"`
+			UpdatedAt  time.Time               `json:"updated_at"`
 			AltLocales []api_structs.AltLocale `json:"alt_locales"`
 		}{
 			Uid:        result.Uid,
 			Locale:     result.Locale,
 			Url:        result.Url,
+			UpdatedAt:  result.UpdatedAt,
 			AltLocales: altLocales,
 		}
 	}
