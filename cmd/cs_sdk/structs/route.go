@@ -9,6 +9,7 @@ type Route struct {
 	Slug           string `json:"slug"`
 	Url            string `json:"url"`
 	Parent         string `json:"parent"`
+	UpdatedAt      string `json:"updated_at"`
 	ExcludeSitemap bool   `json:"exclude_sitemap"`
 	Published      bool   `json:"published"`
 }
