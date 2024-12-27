@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/Dobefu/csb/cmd/api"
 	"github.com/Dobefu/csb/cmd/cs_sdk"
@@ -166,6 +167,7 @@ func addSyncRoutes(data map[string]interface{}, routes *map[string]structs.Route
 		locale := publishDetails["locale"].(string)
 		slug := getSlug(data)
 		parent := getParentUid(data)
+		updatedAt := getUpdatedAt(data)
 		excludeSitemap := getExcludeSitemap(data)
 		isPublished := hasPublishDetails
 		id := utils.GenerateId(structs.Route{Uid: uid, Locale: locale})
@@ -180,6 +182,7 @@ func addSyncRoutes(data map[string]interface{}, routes *map[string]structs.Route
 			Slug:           slug,
 			Url:            slug,
 			Parent:         parent,
+			UpdatedAt:      updatedAt,
 			ExcludeSitemap: excludeSitemap,
 			Published:      isPublished,
 		}
@@ -339,6 +342,23 @@ func getParentUid(data map[string]interface{}) string {
 	return parentUid
 }
 
+func getUpdatedAt(data map[string]interface{}) time.Time {
+	updatedAt, hasUpdatedAt := data["updated_at"]
+
+	if !hasUpdatedAt {
+		return time.Now()
+	}
+
+	datetime, err := time.Parse(time.RFC3339, updatedAt.(string))
+
+	if err != nil {
+		fmt.Println(updatedAt)
+		return time.Now()
+	}
+
+	return datetime
+}
+
 func getExcludeSitemap(data map[string]interface{}) bool {
 	seo, hasSeo := data["seo"].(map[string]interface{})
 
@@ -371,6 +391,7 @@ func processSyncData(routes map[string]structs.Route) error {
 			Slug:           route.Slug,
 			Url:            url,
 			Parent:         route.Parent,
+			UpdatedAt:      route.UpdatedAt,
 			ExcludeSitemap: route.ExcludeSitemap,
 			Published:      route.Published,
 		}

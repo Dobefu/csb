@@ -3,6 +3,7 @@ package api
 import (
 	"os"
 	"testing"
+	"time"
 
 	"github.com/Dobefu/csb/cmd/database"
 	"github.com/Dobefu/csb/cmd/database/query"
@@ -75,6 +76,10 @@ func insertPage(id string, uid string, parent string) error {
 		{
 			Name:  "parent",
 			Value: parent,
+		},
+		{
+			Name:  "updated_at",
+			Value: time.Now(),
 		},
 	})
 }
