@@ -34,6 +34,16 @@ as well as during future updates.
 - `--reset`
   - Revert any previously done database migrations before applying the migrations. WARNING: This will delete any existing data in affected database tables.
 
+### remote:setup
+
+Set up or update necessary config in Contentstack.
+This command is idempotent, so running it multiple times will not break anything.
+
+#### Flags
+
+- `--reset`
+  - Revert any previously done database migrations before applying the migrations. WARNING: This will delete any existing data in affected database tables.
+
 ### remote:sync
 
 Synchronise all Contentstack entries into the database.

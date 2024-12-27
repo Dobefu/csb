@@ -176,7 +176,7 @@ func listSubCommands() {
 			desc: "Migrate or initialise the database",
 		},
 		"remote:setup": {
-			desc: "Set up or update necessary content in Contentstack",
+			desc: "Set up or update necessary config in Contentstack",
 		},
 		"remote:sync": {
 			desc: "Synchronise all Contentstack entries into the database",

@@ -11,6 +11,7 @@ The Contentstack Bridge has a powerful CLI. It will allow you to:
 
 - Index all Contentstack entries for easier querying
 - Spin up an API server
+- Set up necessary configuration in Contentstack
 - Run actions in Contentstack (Coming soon!)
 - And much more
 
