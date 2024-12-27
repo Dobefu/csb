@@ -41,7 +41,48 @@ func getTranslationsContentTypeBody() map[string]interface{} {
 					},
 					"unique":    true,
 					"mandatory": true,
-					"multiple":  false,
+				},
+				{
+					"display_name": "Category",
+					"uid":          "category",
+					"data_type":    "text",
+					"field_metadata": map[string]interface{}{
+						"default_value": "",
+					},
+					"unique":          true,
+					"mandatory":       true,
+					"non_localizable": true,
+				},
+				{
+					"display_name": "Translations",
+					"uid":          "translations",
+					"data_type":    "group",
+					"field_metadata": map[string]interface{}{
+						"description": "",
+					},
+					"multiple": true,
+					"schema": []map[string]interface{}{
+						{
+							"display_name": "Source",
+							"uid":          "source",
+							"data_type":    "text",
+							"field_metadata": map[string]interface{}{
+								"description": "",
+								"isTitle":     true,
+							},
+							"unique":    true,
+							"mandatory": true,
+						},
+						{
+							"display_name": "Translation",
+							"uid":          "translation",
+							"data_type":    "text",
+							"field_metadata": map[string]interface{}{
+								"description": "",
+							},
+							"mandatory": true,
+						},
+					},
 				},
 			},
 			"options": map[string]interface{}{
@@ -49,6 +90,7 @@ func getTranslationsContentTypeBody() map[string]interface{} {
 				"is_page":     false,
 				"publishable": true,
 				"singleton":   false,
+				"sub_title":   []string{"category"},
 			},
 		},
 	}

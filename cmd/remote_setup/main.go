@@ -11,5 +11,11 @@ func Main() error {
 		return err
 	}
 
+	err = api.CreateOrUpdateTranslationsContentType()
+
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
