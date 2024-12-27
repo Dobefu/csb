@@ -30,7 +30,7 @@ func TestCreateContentType(t *testing.T) {
 	oldApiKey := os.Getenv("CS_API_KEY")
 	os.Setenv("CS_API_KEY", "bogus")
 
-	err = CreateContentType(ctName, ctName, false)
+	err = CreateContentType(ctName, ctName, true)
 	assert.NotEqual(t, nil, err)
 
 	os.Setenv("CS_API_KEY", oldApiKey)
