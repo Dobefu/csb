@@ -139,7 +139,7 @@ func runSubCommand(args []string) error {
 		}
 
 		applyGlobalFlags()
-		err = cli.CreateContentType(*isDryRun, *name, *machineName)
+		err = cli.CreateContentType(*isDryRun, *name, *machineName, true)
 
 	default:
 		listSubCommands()

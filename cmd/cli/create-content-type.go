@@ -7,7 +7,7 @@ import (
 	"github.com/Dobefu/csb/cmd/cs_sdk/api"
 )
 
-func CreateContentType(isDryRun bool, name string, id string) error {
+func CreateContentType(isDryRun bool, name string, id string, withFields bool) error {
 	ctName, err := confirmName(name)
 
 	if err != nil {
@@ -32,7 +32,7 @@ func CreateContentType(isDryRun bool, name string, id string) error {
 		return nil
 	}
 
-	err = api.CreateContentType(ctName, ctId)
+	err = api.CreateContentType(ctName, ctId, withFields)
 
 	if err != nil {
 		return err

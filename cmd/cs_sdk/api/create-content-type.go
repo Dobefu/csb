@@ -7,7 +7,7 @@ import (
 	"github.com/Dobefu/csb/cmd/logger"
 )
 
-func CreateContentType(name string, id string) error {
+func CreateContentType(name string, id string, withFields bool) error {
 	contentType := GetContentType(id)
 
 	if contentType != nil {
@@ -20,10 +20,10 @@ func CreateContentType(name string, id string) error {
 		return err
 	}
 
-	_, err = cs_sdk.Request(
-		"content_types",
-		"POST",
-		map[string]interface{}{
+	var body map[string]interface{}
+
+	if withFields {
+		body = map[string]interface{}{
 			"content_type": map[string]interface{}{
 				"title": name,
 				"uid":   id,
@@ -74,7 +74,13 @@ func CreateContentType(name string, id string) error {
 					"url_prefix":  "/",
 				},
 			},
-		},
+		}
+	}
+
+	_, err = cs_sdk.Request(
+		"content_types",
+		"POST",
+		body,
 		true,
 	)
 

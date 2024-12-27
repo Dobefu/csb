@@ -20,13 +20,13 @@ func TestCreateContentType(t *testing.T) {
 
 	os.Stdin = tmpfile
 
-	err = CreateContentType(true, "Content Type", "content_type")
+	err = CreateContentType(true, "Content Type", "content_type", true)
 	assert.Equal(t, nil, err)
 
-	err = CreateContentType(true, "", "content_type")
+	err = CreateContentType(true, "", "content_type", true)
 	assert.NotEqual(t, nil, err)
 
-	err = CreateContentType(true, "Content Type", "")
+	err = CreateContentType(true, "Content Type", "", true)
 	assert.NotEqual(t, nil, err)
 
 	_, err = tmpfile.WriteAt([]byte("Content Type\n"), 0)
@@ -35,7 +35,7 @@ func TestCreateContentType(t *testing.T) {
 	_, err = tmpfile.Seek(0, 0)
 	assert.Equal(t, nil, err)
 
-	err = CreateContentType(true, "", "content_type")
+	err = CreateContentType(true, "", "content_type", true)
 	assert.Equal(t, nil, err)
 
 	_, err = tmpfile.WriteAt([]byte("content_type\n"), 0)
@@ -44,7 +44,7 @@ func TestCreateContentType(t *testing.T) {
 	_, err = tmpfile.Seek(0, 0)
 	assert.Equal(t, nil, err)
 
-	err = CreateContentType(true, "Content Type", "")
+	err = CreateContentType(true, "Content Type", "", true)
 	assert.Equal(t, nil, err)
 
 	_, err = tmpfile.WriteAt([]byte("\n"), 0)
@@ -53,12 +53,12 @@ func TestCreateContentType(t *testing.T) {
 	_, err = tmpfile.Seek(0, 0)
 	assert.Equal(t, nil, err)
 
-	err = CreateContentType(true, "Content Type", "")
+	err = CreateContentType(true, "Content Type", "", false)
 	assert.NotEqual(t, nil, err)
 
 	_, err = tmpfile.Seek(0, 0)
 	assert.Equal(t, nil, err)
 
-	err = CreateContentType(true, "", "content_type")
+	err = CreateContentType(true, "", "content_type", true)
 	assert.NotEqual(t, nil, err)
 }

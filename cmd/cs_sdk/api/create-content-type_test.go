@@ -20,17 +20,17 @@ func TestCreateContentType(t *testing.T) {
 	_ = DeleteContentType(ctName, true)
 	time.Sleep(time.Second / 2)
 
-	err = CreateContentType(ctName, ctName)
+	err = CreateContentType(ctName, ctName, true)
 	assert.Equal(t, nil, err)
 	time.Sleep(time.Second / 2)
 
-	err = CreateContentType(ctName, ctName)
+	err = CreateContentType(ctName, ctName, true)
 	assert.NotEqual(t, nil, err)
 
 	oldApiKey := os.Getenv("CS_API_KEY")
 	os.Setenv("CS_API_KEY", "bogus")
 
-	err = CreateContentType(ctName, ctName)
+	err = CreateContentType(ctName, ctName, false)
 	assert.NotEqual(t, nil, err)
 
 	os.Setenv("CS_API_KEY", oldApiKey)
