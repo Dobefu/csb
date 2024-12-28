@@ -426,9 +426,15 @@ func processTranslations(route structs.Route) {
 		route.Locale,
 	)
 
-	entry, err := cs_sdk.Request(path, "GET", nil, false)
+	resp, err := cs_sdk.Request(path, "GET", nil, false)
 
 	if err != nil {
+		return
+	}
+
+	entry, hasEntry := resp["entry"].(map[string]interface{})
+
+	if !hasEntry {
 		return
 	}
 
@@ -445,7 +451,15 @@ func processTranslations(route structs.Route) {
 	}
 
 	for _, translation := range translations.([]interface{}) {
-		_ = query.Upsert("translations", []db_structs.QueryValue{
+		err = query.Upsert("translations", []db_structs.QueryValue{
+			{
+				Name:  "id",
+				Value: utils.GenerateId(route),
+			},
+			{
+				Name:  "uid",
+				Value: route.Uid,
+			},
 			{
 				Name:  "source",
 				Value: translation.(map[string]interface{})["source"],
@@ -459,10 +473,14 @@ func processTranslations(route structs.Route) {
 				Value: category,
 			},
 			{
-				Name:  "uid",
-				Value: route.Uid,
+				Name:  "locale",
+				Value: route.Locale,
 			},
 		})
+
+		if err != nil {
+			logger.Warning(err.Error())
+		}
 	}
 }
 
