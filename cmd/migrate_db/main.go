@@ -53,7 +53,7 @@ func down() error {
 		return err
 	}
 
-	migrationIndex := version + 1
+	migrationIndex := len(files) / 2
 
 	for i := len(files) - 1; i >= 0; i-- {
 		file := files[i]
@@ -63,9 +63,9 @@ func down() error {
 			continue
 		}
 
-		migrationIndex = i
+		migrationIndex = migrationIndex - 1
 
-		if migrationIndex > version {
+		if migrationIndex >= version {
 			continue
 		}
 
