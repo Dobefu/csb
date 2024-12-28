@@ -383,6 +383,10 @@ func processSyncData(routes map[string]structs.Route) error {
 		logger.Info("Processing entry %s (%d/%d)", route.Uid, (idx + 1), routeCount)
 		url := constructRouteUrl(route, routes)
 
+		if url == "" {
+			continue
+		}
+
 		routes[uid] = structs.Route{
 			Uid:            route.Uid,
 			Title:          route.Title,
