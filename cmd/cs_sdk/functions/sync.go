@@ -8,11 +8,13 @@ import (
 
 	"github.com/Dobefu/csb/cmd/api"
 	"github.com/Dobefu/csb/cmd/cs_sdk"
+	sdk_api "github.com/Dobefu/csb/cmd/cs_sdk/api"
 	"github.com/Dobefu/csb/cmd/cs_sdk/structs"
 	"github.com/Dobefu/csb/cmd/cs_sdk/utils"
 	"github.com/Dobefu/csb/cmd/database/query"
 	db_routes "github.com/Dobefu/csb/cmd/database/routes"
 	"github.com/Dobefu/csb/cmd/database/state"
+	db_structs "github.com/Dobefu/csb/cmd/database/structs"
 	"github.com/Dobefu/csb/cmd/logger"
 )
 
@@ -384,6 +386,11 @@ func processSyncData(routes map[string]structs.Route) error {
 		url := constructRouteUrl(route, routes)
 
 		if url == "" {
+			if route.ContentType == "translations" {
+				processTranslations(route)
+			}
+
+			idx += 1
 			continue
 		}
 
@@ -410,6 +417,47 @@ func processSyncData(routes map[string]structs.Route) error {
 	}
 
 	return nil
+}
+
+func processTranslations(route structs.Route) {
+	entry, err := sdk_api.GetEntry(route)
+
+	if err != nil {
+		return
+	}
+
+	translations, hasTranslations := entry["translations"]
+
+	if !hasTranslations {
+		return
+	}
+
+	category, hasCategory := entry["category"]
+
+	if !hasCategory {
+		return
+	}
+
+	for _, translation := range translations.([]interface{}) {
+		_ = query.Upsert("translations", []db_structs.QueryValue{
+			{
+				Name:  "source",
+				Value: translation.(map[string]interface{})["source"],
+			},
+			{
+				Name:  "translation",
+				Value: translation.(map[string]interface{})["translation"],
+			},
+			{
+				Name:  "category",
+				Value: category,
+			},
+			{
+				Name:  "uid",
+				Value: route.Uid,
+			},
+		})
+	}
 }
 
 func constructRouteUrl(route structs.Route, routes map[string]structs.Route) string {

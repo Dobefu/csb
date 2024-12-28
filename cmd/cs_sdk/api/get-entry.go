@@ -7,7 +7,7 @@ import (
 	"github.com/Dobefu/csb/cmd/cs_sdk/structs"
 )
 
-func GetEntry(route structs.Route) (interface{}, error) {
+func GetEntry(route structs.Route) (map[string]interface{}, error) {
 	path := fmt.Sprintf(
 		"content_types/%s/entries/%s?locale=%s",
 		route.ContentType,
@@ -21,5 +21,5 @@ func GetEntry(route structs.Route) (interface{}, error) {
 		return nil, err
 	}
 
-	return res["entry"], nil
+	return res["entry"].(map[string]interface{}), nil
 }
