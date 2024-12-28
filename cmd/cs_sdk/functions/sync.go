@@ -8,7 +8,6 @@ import (
 
 	"github.com/Dobefu/csb/cmd/api"
 	"github.com/Dobefu/csb/cmd/cs_sdk"
-	sdk_api "github.com/Dobefu/csb/cmd/cs_sdk/api"
 	"github.com/Dobefu/csb/cmd/cs_sdk/structs"
 	"github.com/Dobefu/csb/cmd/cs_sdk/utils"
 	"github.com/Dobefu/csb/cmd/database/query"
@@ -420,7 +419,14 @@ func processSyncData(routes map[string]structs.Route) error {
 }
 
 func processTranslations(route structs.Route) {
-	entry, err := sdk_api.GetEntry(route)
+	path := fmt.Sprintf(
+		"content_types/%s/entries/%s?locale=%s",
+		route.ContentType,
+		route.Uid,
+		route.Locale,
+	)
+
+	entry, err := cs_sdk.Request(path, "GET", nil, false)
 
 	if err != nil {
 		return

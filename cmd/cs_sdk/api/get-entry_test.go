@@ -8,7 +8,8 @@ import (
 )
 
 func TestGetEntry(t *testing.T) {
-	var entry interface{}
+	var entry map[string]interface{}
+	var emptyEntry map[string]interface{}
 	var err error
 
 	entry, err = GetEntry(structs.Route{
@@ -25,5 +26,5 @@ func TestGetEntry(t *testing.T) {
 		Locale:      "en",
 	})
 	assert.NotEqual(t, nil, err)
-	assert.Equal(t, nil, entry)
+	assert.Equal(t, emptyEntry, entry)
 }
