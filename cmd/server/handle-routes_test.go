@@ -356,6 +356,54 @@ func TestHandleRoutes(t *testing.T) {
 	assert.NotEqual(t, nil, body["error"])
 
 	os.Setenv("DB_CONN", oldDb)
+	err = database.Connect()
+	assert.Equal(t, nil, err)
+
+	body, err = request(
+		"GET",
+		fmt.Sprintf("%s/%s", server.URL, "translations"),
+		true,
+	)
+	assert.Equal(t, nil, err)
+	assert.NotEqual(t, nil, body["error"])
+
+	body, err = request(
+		"GET",
+		fmt.Sprintf("%s/%s", server.URL, "translations?locale=en"),
+		true,
+	)
+	assert.Equal(t, nil, err)
+	assert.Equal(t, nil, body["error"])
+
+	oldApiKey = os.Getenv("CS_API_KEY")
+	os.Setenv("CS_API_KEY", "bogus")
+
+	body, err = request(
+		"GET",
+		fmt.Sprintf("%s/%s", server.URL, "translations?locale=en"),
+		true,
+	)
+	assert.Equal(t, nil, err)
+	assert.Equal(t, nil, body["error"])
+
+	os.Setenv("CS_API_KEY", oldApiKey)
+
+	oldDb = os.Getenv("DB_CONN")
+	os.Setenv("DB_CONN", "file:/")
+	err = database.Connect()
+	assert.Equal(t, nil, err)
+
+	body, err = request(
+		"GET",
+		fmt.Sprintf("%s/%s", server.URL, "translations?locale=en"),
+		true,
+	)
+	assert.Equal(t, nil, err)
+	assert.NotEqual(t, nil, body["error"])
+
+	os.Setenv("DB_CONN", oldDb)
+	err = database.Connect()
+	assert.Equal(t, nil, err)
 }
 
 func request(method string, path string, withAuthToken bool) (body map[string]interface{}, err error) {
