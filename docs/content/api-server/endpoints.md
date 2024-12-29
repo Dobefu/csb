@@ -122,3 +122,20 @@ description = "An overview of all the API endpoints"
 ### Response type
 
 [++SyncResponse++](response-types#syncresponse)
+
+## Get all translations
+
+`/api/v1/translations`
+
+### Methods
+
+- `GET`
+
+### Parameters
+
+- `locale` ^(required)^
+  - The locale of the entry to fetch
+
+### Response type
+
+[++TranslationsResponse++](response-types#translationsresponse)

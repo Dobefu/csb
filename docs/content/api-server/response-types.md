@@ -248,3 +248,12 @@ description = "A list of possible response types"
   error: string | null // Will be null unless there's an error
 }
 ```
+
+## TranslationsResponse
+
+```typescript
+{
+  data: Record<string, string> | null // Will be null if there's an error
+  error: string | null // Will be null unless there's an error
+}
+```
