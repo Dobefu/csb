@@ -451,10 +451,11 @@ func processTranslations(route structs.Route) {
 	}
 
 	for _, translation := range translations.([]interface{}) {
+		source := translation.(map[string]interface{})["source"]
 		err = query.Upsert("translations", []db_structs.QueryValue{
 			{
 				Name:  "id",
-				Value: utils.GenerateId(route),
+				Value: fmt.Sprintf("%s%s", utils.GenerateId(route), source),
 			},
 			{
 				Name:  "uid",
@@ -462,7 +463,7 @@ func processTranslations(route structs.Route) {
 			},
 			{
 				Name:  "source",
-				Value: translation.(map[string]interface{})["source"],
+				Value: source,
 			},
 			{
 				Name:  "translation",
