@@ -18,6 +18,14 @@ func TestConnect(t *testing.T) {
 
 	err = Connect()
 	assert.Equal(t, nil, err)
+
+	oldDbType := os.Getenv("DB_TYPE")
+	os.Setenv("DB_TYPE", "bogus")
+
+	err = Connect()
+	assert.NotEqual(t, nil, err)
+
+	os.Setenv("DB_TYPE", oldDbType)
 }
 
 func TestGetConnectionDetails(t *testing.T) {
@@ -25,13 +33,13 @@ func TestGetConnectionDetails(t *testing.T) {
 
 	init_env.Main("../../.env.test")
 
-	dbType := os.Getenv("DB_TYPE")
+	oldDbType := os.Getenv("DB_TYPE")
 	os.Setenv("DB_TYPE", "")
 
 	_, _, err = getConnectionDetails()
 	assert.NotEqual(t, nil, err)
 
-	os.Setenv("DB_TYPE", dbType)
+	os.Setenv("DB_TYPE", oldDbType)
 	_, _, err = getConnectionDetails()
 	assert.Equal(t, nil, err)
 }
