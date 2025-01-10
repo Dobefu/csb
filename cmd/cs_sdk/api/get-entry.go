@@ -21,5 +21,7 @@ func GetEntry(route structs.Route) (map[string]interface{}, error) {
 		return nil, err
 	}
 
+	res["entry"].(map[string]interface{})["content_type"] = route.ContentType
+
 	return res["entry"].(map[string]interface{}), nil
 }
