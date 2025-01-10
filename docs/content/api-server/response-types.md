@@ -37,6 +37,7 @@ description = "A list of possible response types"
       ACL: unknown
       _in_progress: boolean
       _version: number
+      content_type: string
       created_at: string // Timestamp string
       created_by: string // UID of the creator
       locale: string
@@ -245,7 +246,7 @@ description = "A list of possible response types"
 
 ```typescript
 {
-  error: string | null // Will be null unless there's an error
+  error: string | null; // Will be null unless there's an error
 }
 ```
 
@@ -253,7 +254,7 @@ description = "A list of possible response types"
 
 ```typescript
 {
-  data: Record<string, string> | null // Will be null if there's an error
-  error: string | null // Will be null unless there's an error
+  data: Record<string, string> | null; // Will be null if there's an error
+  error: string | null; // Will be null unless there's an error
 }
 ```
