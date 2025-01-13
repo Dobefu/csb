@@ -8,7 +8,6 @@ type Asset struct {
 	Title          string    `json:"title"`
 	ContentType    string    `json:"content_type"`
 	Locale         string    `json:"locale"`
-	Slug           string    `json:"slug"`
 	Url            string    `json:"url"`
 	Parent         string    `json:"parent"`
 	UpdatedAt      time.Time `json:"updated_at"`

@@ -42,10 +42,6 @@ func getAssetValues(asset structs.Asset) []db_structs.QueryValue {
 			Value: asset.Locale,
 		},
 		{
-			Name:  "slug",
-			Value: asset.Slug,
-		},
-		{
 			Name:  "url",
 			Value: asset.Url,
 		},

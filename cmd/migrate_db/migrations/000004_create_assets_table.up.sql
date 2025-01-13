@@ -4,7 +4,6 @@ CREATE TABLE IF NOT EXISTS assets(
   title varchar(255) NOT NULL,
   content_type varchar(255) NOT NULL,
   locale varchar(16) NOT NULL,
-  slug varchar(255) NOT NULL,
   url varchar(255) NOT NULL,
   parent varchar(64),
   updated_at timestamp NOT NULL,

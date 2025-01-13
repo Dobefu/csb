@@ -127,7 +127,7 @@ func addAllAssets(data map[string]interface{}) error {
 		if !hasParentUid {
 			parentUid = ""
 		}
-		fmt.Println(assetData)
+
 		err := assets.SetAsset(structs.Asset{
 			Uid:         assetData["uid"].(string),
 			Title:       assetData["title"].(string),
