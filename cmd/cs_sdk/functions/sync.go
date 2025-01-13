@@ -128,7 +128,7 @@ func addAllAssets(data map[string]interface{}) error {
 			parentUid = ""
 		}
 		fmt.Println(assetData)
-		err := assets.SetAsset(structs.Route{
+		err := assets.SetAsset(structs.Asset{
 			Uid:         assetData["uid"].(string),
 			Title:       assetData["title"].(string),
 			ContentType: assetData["content_type"].(string),
@@ -237,7 +237,7 @@ func addSyncRoutes(data map[string]interface{}, routes *map[string]structs.Route
 		updatedAt := getUpdatedAt(data)
 		excludeSitemap := getExcludeSitemap(data)
 		isPublished := hasPublishDetails
-		id := utils.GenerateId(structs.Route{Uid: uid, Locale: locale})
+		id := utils.GenerateId(uid, locale)
 
 		logger.Verbose("Found entry: %s", uid)
 
@@ -336,7 +336,7 @@ func addRouteChildren(route structs.Route, routes *map[string]structs.Route, dep
 			continue
 		}
 
-		id := utils.GenerateId(childRoute)
+		id := utils.GenerateId(childRoute.Uid, childRoute.Locale)
 		(*routes)[id] = childRoute
 
 		err = addRouteChildren(childRoute, routes, depth+1)
@@ -357,7 +357,7 @@ func addRouteParents(route structs.Route, routes *map[string]structs.Route, dept
 		return errors.New("potential infinite loop detected")
 	}
 
-	parentId := utils.GenerateId(structs.Route{Uid: route.Parent, Locale: route.Locale})
+	parentId := utils.GenerateId(route.Parent, route.Locale)
 	parentRoute := (*routes)[parentId]
 
 	var err error
@@ -374,7 +374,7 @@ func addRouteParents(route structs.Route, routes *map[string]structs.Route, dept
 		}
 	}
 
-	id := utils.GenerateId(parentRoute)
+	id := utils.GenerateId(parentRoute.Uid, parentRoute.Locale)
 	(*routes)[id] = parentRoute
 
 	err = addRouteParents(parentRoute, routes, depth+1)
@@ -521,7 +521,7 @@ func processTranslations(route structs.Route) {
 		err = query.Upsert("translations", []db_structs.QueryValue{
 			{
 				Name:  "id",
-				Value: fmt.Sprintf("%s%s", utils.GenerateId(route), source),
+				Value: fmt.Sprintf("%s%s", utils.GenerateId(route.Uid, route.Locale), source),
 			},
 			{
 				Name:  "uid",
@@ -572,7 +572,7 @@ func constructRouteUrl(route structs.Route, routes map[string]structs.Route) str
 			break
 		}
 
-		parentId := utils.GenerateId(structs.Route{Uid: parentUid, Locale: currentRoute.Locale})
+		parentId := utils.GenerateId(parentUid, currentRoute.Locale)
 		parent, hasParent := routes[parentId]
 
 		if !hasParent {
