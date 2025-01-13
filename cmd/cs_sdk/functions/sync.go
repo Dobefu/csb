@@ -182,6 +182,11 @@ func addSyncRoutes(data map[string]interface{}, routes *map[string]structs.Route
 		logger.Info("Fetching item data (%d/%d)", (idx + 1), itemCount)
 
 		item := item.(map[string]interface{})
+
+		if item["content_type_uid"].(string) == "sys_assets" {
+			continue
+		}
+
 		data := item["data"].(map[string]interface{})
 
 		publishDetails, hasPublishDetails := data["publish_details"].(map[string]interface{})
