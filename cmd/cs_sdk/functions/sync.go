@@ -51,6 +51,12 @@ func Sync(reset bool) error {
 			return err
 		}
 
+		err = addAllAssets(data)
+
+		if err != nil {
+			return err
+		}
+
 		var hasPaginationToken bool
 
 		paginationToken, hasPaginationToken = data["pagination_token"].(string)
@@ -84,6 +90,30 @@ func getNewSyncToken(data map[string]interface{}) (string, error) {
 	}
 
 	return newSyncToken, nil
+}
+
+func addAllAssets(data map[string]interface{}) error {
+	items, hasItems := data["items"].([]interface{})
+
+	if !hasItems {
+		return errors.New("sync data has no items")
+	}
+
+	itemCount := len(items)
+
+	for idx, item := range items {
+		logger.Info("Fetching item data (%d/%d)", (idx + 1), itemCount)
+
+		item := item.(map[string]interface{})
+
+		if item["content_type_uid"].(string) != "sys_assets" {
+			continue
+		}
+
+		fmt.Println(item)
+	}
+
+	return nil
 }
 
 func addAllRoutes(data map[string]interface{}, routes *map[string]structs.Route) error {
