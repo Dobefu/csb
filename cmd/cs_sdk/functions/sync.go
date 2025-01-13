@@ -124,7 +124,7 @@ func getSyncData(paginationToken string, reset bool, syncToken string) (map[stri
 		data, err = cs_sdk.Request(path, "GET", nil, false)
 	} else if err != nil || reset {
 		logger.Info("Initialising a fresh sync")
-		path := "stacks/sync?init=true&type=entry_published,entry_unpublished,entry_deleted"
+		path := "stacks/sync?init=true&type=entry_published,entry_unpublished,entry_deleted,asset_published,asset_unpublished,asset_deleted"
 		data, err = cs_sdk.Request(path, "GET", nil, false)
 	} else {
 		logger.Info("Syncing data using an existing sync token")
