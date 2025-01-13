@@ -1,0 +1,4 @@
+CREATE TABLE IF NOT EXISTS assets(
+  id varchar(48) NOT NULL PRIMARY KEY UNIQUE,
+  uid varchar(32) NOT NULL
+);
