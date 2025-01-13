@@ -10,6 +10,7 @@ import (
 	"github.com/Dobefu/csb/cmd/cs_sdk"
 	"github.com/Dobefu/csb/cmd/cs_sdk/structs"
 	"github.com/Dobefu/csb/cmd/cs_sdk/utils"
+	"github.com/Dobefu/csb/cmd/database/assets"
 	"github.com/Dobefu/csb/cmd/database/query"
 	db_routes "github.com/Dobefu/csb/cmd/database/routes"
 	"github.com/Dobefu/csb/cmd/database/state"
@@ -111,6 +112,36 @@ func addAllAssets(data map[string]interface{}) error {
 		}
 
 		fmt.Println(item)
+		assetData := item["data"].(map[string]interface{})
+
+		publishDetails, hasPublishDetails := assetData["publish_details"].(map[string]interface{})
+
+		if !hasPublishDetails {
+			publishDetails = map[string]interface{}{
+				"locale": "",
+			}
+		}
+
+		parentUid, hasParentUid := assetData["parent_uid"].(string)
+
+		if !hasParentUid {
+			parentUid = ""
+		}
+		fmt.Println(assetData)
+		err := assets.SetAsset(structs.Route{
+			Uid:         assetData["uid"].(string),
+			Title:       assetData["title"].(string),
+			ContentType: assetData["content_type"].(string),
+			Locale:      publishDetails["locale"].(string),
+			Url:         assetData["url"].(string),
+			Parent:      parentUid,
+			UpdatedAt:   getUpdatedAt(assetData),
+			Published:   item["type"].(string) == "asset_published",
+		})
+
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
