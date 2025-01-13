@@ -10,6 +10,7 @@ import (
 	"github.com/Dobefu/csb/cmd/cs_sdk"
 	"github.com/Dobefu/csb/cmd/cs_sdk/structs"
 	"github.com/Dobefu/csb/cmd/cs_sdk/utils"
+	"github.com/Dobefu/csb/cmd/database/assets"
 	"github.com/Dobefu/csb/cmd/database/query"
 	db_routes "github.com/Dobefu/csb/cmd/database/routes"
 	"github.com/Dobefu/csb/cmd/database/state"
@@ -51,6 +52,12 @@ func Sync(reset bool) error {
 			return err
 		}
 
+		err = addAllAssets(data)
+
+		if err != nil {
+			return err
+		}
+
 		var hasPaginationToken bool
 
 		paginationToken, hasPaginationToken = data["pagination_token"].(string)
@@ -84,6 +91,60 @@ func getNewSyncToken(data map[string]interface{}) (string, error) {
 	}
 
 	return newSyncToken, nil
+}
+
+func addAllAssets(data map[string]interface{}) error {
+	items, hasItems := data["items"].([]interface{})
+
+	if !hasItems {
+		return errors.New("sync data has no items")
+	}
+
+	itemCount := len(items)
+
+	for idx, item := range items {
+		logger.Info("Fetching item data (%d/%d)", (idx + 1), itemCount)
+
+		item := item.(map[string]interface{})
+
+		if item["content_type_uid"].(string) != "sys_assets" {
+			continue
+		}
+
+		fmt.Println(item)
+		assetData := item["data"].(map[string]interface{})
+
+		publishDetails, hasPublishDetails := assetData["publish_details"].(map[string]interface{})
+
+		if !hasPublishDetails {
+			publishDetails = map[string]interface{}{
+				"locale": "",
+			}
+		}
+
+		parentUid, hasParentUid := assetData["parent_uid"].(string)
+
+		if !hasParentUid {
+			parentUid = ""
+		}
+		fmt.Println(assetData)
+		err := assets.SetAsset(structs.Route{
+			Uid:         assetData["uid"].(string),
+			Title:       assetData["title"].(string),
+			ContentType: assetData["content_type"].(string),
+			Locale:      publishDetails["locale"].(string),
+			Url:         assetData["url"].(string),
+			Parent:      parentUid,
+			UpdatedAt:   getUpdatedAt(assetData),
+			Published:   item["type"].(string) == "asset_published",
+		})
+
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 func addAllRoutes(data map[string]interface{}, routes *map[string]structs.Route) error {
@@ -124,7 +185,7 @@ func getSyncData(paginationToken string, reset bool, syncToken string) (map[stri
 		data, err = cs_sdk.Request(path, "GET", nil, false)
 	} else if err != nil || reset {
 		logger.Info("Initialising a fresh sync")
-		path := "stacks/sync?init=true&type=entry_published,entry_unpublished,entry_deleted"
+		path := "stacks/sync?init=true&type=entry_published,entry_unpublished,entry_deleted,asset_published,asset_unpublished,asset_deleted"
 		data, err = cs_sdk.Request(path, "GET", nil, false)
 	} else {
 		logger.Info("Syncing data using an existing sync token")
@@ -152,6 +213,11 @@ func addSyncRoutes(data map[string]interface{}, routes *map[string]structs.Route
 		logger.Info("Fetching item data (%d/%d)", (idx + 1), itemCount)
 
 		item := item.(map[string]interface{})
+
+		if item["content_type_uid"].(string) == "sys_assets" {
+			continue
+		}
+
 		data := item["data"].(map[string]interface{})
 
 		publishDetails, hasPublishDetails := data["publish_details"].(map[string]interface{})
