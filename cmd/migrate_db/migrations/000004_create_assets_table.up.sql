@@ -6,6 +6,8 @@ CREATE TABLE IF NOT EXISTS assets(
   locale varchar(16) NOT NULL,
   url varchar(255) NOT NULL,
   parent varchar(64),
+  height int NOT NULL,
+  width int NOT NULL,
   updated_at timestamp NOT NULL,
   published boolean NOT NULL DEFAULT false
 );

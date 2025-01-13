@@ -50,6 +50,14 @@ func getAssetValues(asset structs.Asset) []db_structs.QueryValue {
 			Value: asset.Parent,
 		},
 		{
+			Name:  "height",
+			Value: asset.Height,
+		},
+		{
+			Name:  "width",
+			Value: asset.Width,
+		},
+		{
 			Name:  "updated_at",
 			Value: asset.UpdatedAt,
 		},
