@@ -128,6 +128,8 @@ func addAllAssets(data map[string]interface{}) error {
 			parentUid = ""
 		}
 
+		assetHeight, assetWidth := getAssetDimensions(assetData)
+
 		err := assets.SetAsset(structs.Asset{
 			Uid:         assetData["uid"].(string),
 			Title:       assetData["title"].(string),
@@ -135,6 +137,8 @@ func addAllAssets(data map[string]interface{}) error {
 			Locale:      publishDetails["locale"].(string),
 			Url:         assetData["url"].(string),
 			Parent:      parentUid,
+			Height:      assetHeight,
+			Width:       assetWidth,
 			UpdatedAt:   getUpdatedAt(assetData),
 			Published:   item["type"].(string) == "asset_published",
 		})
@@ -407,6 +411,16 @@ func getParentUid(data map[string]interface{}) string {
 	}
 
 	return parentUid
+}
+
+func getAssetDimensions(asset map[string]interface{}) (int, int) {
+	dimension, hasDimension := asset["dimension"].(map[string]interface{})
+
+	if !hasDimension {
+		return 0, 0
+	}
+
+	return int(dimension["height"].(float64)), int(dimension["width"].(float64))
 }
 
 func getUpdatedAt(data map[string]interface{}) time.Time {
