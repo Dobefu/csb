@@ -23,7 +23,7 @@ func getRouteValues(route structs.Route) []db_structs.QueryValue {
 	return []db_structs.QueryValue{
 		{
 			Name:  "id",
-			Value: utils.GenerateId(route),
+			Value: utils.GenerateId(route.Uid, route.Locale),
 		},
 		{
 			Name:  "uid",

@@ -8,9 +8,9 @@ import (
 )
 
 func SetAsset(
-	route structs.Route,
+	asset structs.Asset,
 ) error {
-	err := query.Upsert("assets", getAssetValues(route))
+	err := query.Upsert("assets", getAssetValues(asset))
 
 	if err != nil {
 		return err
@@ -19,47 +19,55 @@ func SetAsset(
 	return nil
 }
 
-func getAssetValues(route structs.Route) []db_structs.QueryValue {
+func getAssetValues(asset structs.Asset) []db_structs.QueryValue {
 	return []db_structs.QueryValue{
 		{
 			Name:  "id",
-			Value: utils.GenerateId(route),
+			Value: utils.GenerateId(asset.Uid, asset.Locale),
 		},
 		{
 			Name:  "uid",
-			Value: route.Uid,
+			Value: asset.Uid,
 		},
 		{
 			Name:  "title",
-			Value: route.Title,
+			Value: asset.Title,
 		},
 		{
 			Name:  "content_type",
-			Value: route.ContentType,
+			Value: asset.ContentType,
 		},
 		{
 			Name:  "locale",
-			Value: route.Locale,
-		},
-		{
-			Name:  "slug",
-			Value: route.Slug,
+			Value: asset.Locale,
 		},
 		{
 			Name:  "url",
-			Value: route.Url,
+			Value: asset.Url,
 		},
 		{
 			Name:  "parent",
-			Value: route.Parent,
+			Value: asset.Parent,
+		},
+		{
+			Name:  "filesize",
+			Value: asset.Filesize,
+		},
+		{
+			Name:  "height",
+			Value: asset.Height,
+		},
+		{
+			Name:  "width",
+			Value: asset.Width,
 		},
 		{
 			Name:  "updated_at",
-			Value: route.UpdatedAt,
+			Value: asset.UpdatedAt,
 		},
 		{
 			Name:  "published",
-			Value: route.Published,
+			Value: asset.Published,
 		},
 	}
 }
