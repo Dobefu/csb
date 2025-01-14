@@ -112,9 +112,7 @@ func addAllAssets(data map[string]interface{}) error {
 			continue
 		}
 
-		fmt.Println(item)
 		assetData := item["data"].(map[string]interface{})
-
 		publishDetails, hasPublishDetails := assetData["publish_details"].(map[string]interface{})
 
 		if !hasPublishDetails {
@@ -130,7 +128,6 @@ func addAllAssets(data map[string]interface{}) error {
 		}
 
 		assetHeight, assetWidth := getAssetDimensions(assetData)
-
 		filesize, err := strconv.Atoi(assetData["file_size"].(string))
 
 		if err != nil {
@@ -441,7 +438,6 @@ func getUpdatedAt(data map[string]interface{}) time.Time {
 	datetime, err := time.Parse(time.RFC3339, updatedAt.(string))
 
 	if err != nil {
-		fmt.Println(updatedAt)
 		return time.Now()
 	}
 
