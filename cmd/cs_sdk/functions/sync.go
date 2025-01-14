@@ -104,13 +104,13 @@ func addAllAssets(data map[string]interface{}) error {
 	itemCount := len(items)
 
 	for idx, item := range items {
-		logger.Info("Fetching item data (%d/%d)", (idx + 1), itemCount)
-
 		item := item.(map[string]interface{})
 
 		if item["content_type_uid"].(string) != "sys_assets" {
 			continue
 		}
+
+		logger.Info("Fetching item data (%d/%d)", (idx + 1), itemCount)
 
 		assetData := item["data"].(map[string]interface{})
 		publishDetails, hasPublishDetails := assetData["publish_details"].(map[string]interface{})
@@ -219,16 +219,15 @@ func addSyncRoutes(data map[string]interface{}, routes *map[string]structs.Route
 	itemCount := len(items)
 
 	for idx, item := range items {
-		logger.Info("Fetching item data (%d/%d)", (idx + 1), itemCount)
-
 		item := item.(map[string]interface{})
 
 		if item["content_type_uid"].(string) == "sys_assets" {
 			continue
 		}
 
-		data := item["data"].(map[string]interface{})
+		logger.Info("Fetching item data (%d/%d)", (idx + 1), itemCount)
 
+		data := item["data"].(map[string]interface{})
 		publishDetails, hasPublishDetails := data["publish_details"].(map[string]interface{})
 
 		if !hasPublishDetails {
