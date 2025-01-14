@@ -3,6 +3,7 @@ package functions
 import (
 	"errors"
 	"fmt"
+	"strconv"
 	"strings"
 	"time"
 
@@ -130,13 +131,20 @@ func addAllAssets(data map[string]interface{}) error {
 
 		assetHeight, assetWidth := getAssetDimensions(assetData)
 
-		err := assets.SetAsset(structs.Asset{
+		filesize, err := strconv.Atoi(assetData["file_size"].(string))
+
+		if err != nil {
+			filesize = 0
+		}
+
+		err = assets.SetAsset(structs.Asset{
 			Uid:         assetData["uid"].(string),
 			Title:       assetData["title"].(string),
 			ContentType: assetData["content_type"].(string),
 			Locale:      publishDetails["locale"].(string),
 			Url:         assetData["url"].(string),
 			Parent:      parentUid,
+			Filesize:    filesize,
 			Height:      assetHeight,
 			Width:       assetWidth,
 			UpdatedAt:   getUpdatedAt(assetData),
