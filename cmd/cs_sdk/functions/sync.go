@@ -117,7 +117,7 @@ func addAllAssets(data map[string]interface{}) error {
 
 		if !hasPublishDetails {
 			publishDetails = map[string]interface{}{
-				"locale": "",
+				"locale": assetData["locale"],
 			}
 		}
 
