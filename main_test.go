@@ -3,6 +3,10 @@ package main
 import (
 	"os"
 	"testing"
+
+	"github.com/Dobefu/csb/cmd/database"
+	"github.com/Dobefu/csb/cmd/logger"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestMain(t *testing.T) {
@@ -40,4 +44,20 @@ func setArgs(args ...string) {
 
 func TestListSubCommands(t *testing.T) {
 	listSubCommands()
+}
+
+func TestInitDB(t *testing.T) {
+	var err error
+	logger.SetExitOnFatal(false)
+
+	oldDb := os.Getenv("DB_CONN")
+	os.Setenv("DB_CONN", "file:/")
+	err = database.Connect()
+	assert.Equal(t, nil, err)
+
+	initDB()
+
+	os.Setenv("DB_CONN", oldDb)
+	err = database.Connect()
+	assert.Equal(t, nil, err)
 }
