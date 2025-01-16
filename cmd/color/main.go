@@ -63,5 +63,5 @@ func SprintColor(fg Color, bg Color, message string) string {
 }
 
 func PrintColor(fg Color, bg Color, message string) {
-	fmt.Println(SprintColor(fg, bg, message))
+	fmt.Print(SprintColor(fg, bg, message))
 }
