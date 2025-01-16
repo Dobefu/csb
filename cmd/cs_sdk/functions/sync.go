@@ -131,18 +131,18 @@ func addAllAssets(data map[string]interface{}) error {
 		filesize := getFilesize(assetData)
 
 		err := assets.SetAsset(structs.Asset{
-			Uid:         assetData["uid"].(string),
-			Title:       getTitle(assetData),
-			ContentType: assetData["content_type"].(string),
-			Locale:      publishDetails["locale"].(string),
-			Url:         assetData["url"].(string),
-			Parent:      parentUid,
-			Version:     getVersion(assetData),
-			Filesize:    filesize,
-			Height:      assetHeight,
-			Width:       assetWidth,
-			UpdatedAt:   getUpdatedAt(assetData),
-			Published:   item["type"].(string) == "asset_published",
+			Uid:   assetData["uid"].(string),
+			Title: getTitle(assetData),
+			// ContentType: assetData["content_type"].(string),
+			Locale:    publishDetails["locale"].(string),
+			Url:       getSlug(assetData),
+			Parent:    parentUid,
+			Version:   getVersion(assetData),
+			Filesize:  filesize,
+			Height:    assetHeight,
+			Width:     assetWidth,
+			UpdatedAt: getUpdatedAt(assetData),
+			Published: item["type"].(string) == "asset_published",
 		})
 
 		if err != nil {
