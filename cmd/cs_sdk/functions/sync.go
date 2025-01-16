@@ -128,15 +128,11 @@ func addAllAssets(data map[string]interface{}) error {
 		}
 
 		assetHeight, assetWidth := getAssetDimensions(assetData)
-		filesize, err := strconv.Atoi(assetData["file_size"].(string))
+		filesize := getFilesize(assetData)
 
-		if err != nil {
-			filesize = 0
-		}
-
-		err = assets.SetAsset(structs.Asset{
+		err := assets.SetAsset(structs.Asset{
 			Uid:         assetData["uid"].(string),
-			Title:       assetData["title"].(string),
+			Title:       getTitle(assetData),
 			ContentType: assetData["content_type"].(string),
 			Locale:      publishDetails["locale"].(string),
 			Url:         assetData["url"].(string),
@@ -267,6 +263,22 @@ func addSyncRoutes(data map[string]interface{}, routes *map[string]structs.Route
 	}
 
 	return nil
+}
+
+func getFilesize(data map[string]interface{}) int {
+	filesize, hasFilesize := data["file_size"]
+
+	if !hasFilesize {
+		return 0
+	}
+
+	filesize, err := strconv.Atoi(filesize.(string))
+
+	if err != nil {
+		return 0
+	}
+
+	return filesize.(int)
 }
 
 func getTitle(data map[string]interface{}) string {
