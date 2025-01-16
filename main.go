@@ -7,6 +7,7 @@ import (
 
 	"github.com/Dobefu/csb/cmd/check_health"
 	"github.com/Dobefu/csb/cmd/cli"
+	"github.com/Dobefu/csb/cmd/color"
 	"github.com/Dobefu/csb/cmd/database"
 	"github.com/Dobefu/csb/cmd/init_env"
 	"github.com/Dobefu/csb/cmd/logger"
@@ -193,7 +194,7 @@ func listSubCommands() {
 	fmt.Fprintf(flag.CommandLine.Output(), "Usage of %s:\n", os.Args[0])
 
 	for idx, cmd := range cmds {
-		fmt.Printf("  %s:\n", idx)
+		color.PrintfColor(color.FgLightCyan, color.BgDefault, "  %s:\n", idx)
 		fmt.Printf("    %s\n", cmd.desc)
 	}
 
