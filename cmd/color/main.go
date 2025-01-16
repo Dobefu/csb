@@ -1,6 +1,9 @@
 package color
 
-import "fmt"
+import (
+	"fmt"
+	"os"
+)
 
 const escape = "\x1b"
 
@@ -59,6 +62,12 @@ const (
 )
 
 func SprintColor(fg Color, bg Color, message string) string {
+	fileInfo, _ := os.Stdout.Stat()
+
+	if (fileInfo.Mode() & os.ModeCharDevice) == 0 {
+		return fmt.Sprint(message)
+	}
+
 	return fmt.Sprintf("%s[%d;%dm%s%s[0;0m", escape, fg, bg, message, escape)
 }
 
