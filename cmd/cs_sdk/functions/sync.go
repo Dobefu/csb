@@ -141,7 +141,7 @@ func addAllAssets(data map[string]interface{}) error {
 			Locale:      publishDetails["locale"].(string),
 			Url:         assetData["url"].(string),
 			Parent:      parentUid,
-			Version:     int(assetData["_version"].(float64)),
+			Version:     getVersion(assetData),
 			Filesize:    filesize,
 			Height:      assetHeight,
 			Width:       assetWidth,
@@ -243,6 +243,7 @@ func addSyncRoutes(data map[string]interface{}, routes *map[string]structs.Route
 		locale := publishDetails["locale"].(string)
 		slug := getSlug(data)
 		parent := getParentUid(data)
+		version := getVersion(data)
 		updatedAt := getUpdatedAt(data)
 		excludeSitemap := getExcludeSitemap(data)
 		isPublished := hasPublishDetails
@@ -258,6 +259,7 @@ func addSyncRoutes(data map[string]interface{}, routes *map[string]structs.Route
 			Slug:           slug,
 			Url:            slug,
 			Parent:         parent,
+			Version:        version,
 			UpdatedAt:      updatedAt,
 			ExcludeSitemap: excludeSitemap,
 			Published:      isPublished,
@@ -418,6 +420,16 @@ func getParentUid(data map[string]interface{}) string {
 	return parentUid
 }
 
+func getVersion(data map[string]interface{}) int {
+	version, hasVersion := data["_version"]
+
+	if !hasVersion {
+		return 0
+	}
+
+	return int(version.(float64))
+}
+
 func getAssetDimensions(asset map[string]interface{}) (int, int) {
 	dimension, hasDimension := asset["dimension"].(map[string]interface{})
 
@@ -485,6 +497,7 @@ func processSyncData(routes map[string]structs.Route) error {
 			Slug:           route.Slug,
 			Url:            url,
 			Parent:         route.Parent,
+			Version:        route.Version,
 			UpdatedAt:      route.UpdatedAt,
 			ExcludeSitemap: route.ExcludeSitemap,
 			Published:      route.Published,
