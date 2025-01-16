@@ -62,10 +62,10 @@ func SprintColor(fg Color, bg Color, message string) string {
 	return fmt.Sprintf("%s[%d;%dm%s%s[0;0m", escape, fg, bg, message, escape)
 }
 
-func PrintColor(fg Color, bg Color, message string) {
-	fmt.Print(SprintColor(fg, bg, message))
-}
-
 func PrintfColor(fg Color, bg Color, format string, args ...any) {
 	fmt.Print(SprintColor(fg, bg, fmt.Sprintf(format, args...)))
+}
+
+func PrintColor(fg Color, bg Color, message string) {
+	PrintfColor(fg, bg, message, nil)
 }
