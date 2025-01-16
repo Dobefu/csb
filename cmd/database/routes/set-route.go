@@ -54,6 +54,10 @@ func getRouteValues(route structs.Route) []db_structs.QueryValue {
 			Value: route.Parent,
 		},
 		{
+			Name:  "version",
+			Value: route.Version,
+		},
+		{
 			Name:  "updated_at",
 			Value: route.UpdatedAt,
 		},

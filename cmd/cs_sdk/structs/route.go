@@ -11,6 +11,7 @@ type Route struct {
 	Slug           string    `json:"slug"`
 	Url            string    `json:"url"`
 	Parent         string    `json:"parent"`
+	Version        int       `json:"version"`
 	UpdatedAt      time.Time `json:"updated_at"`
 	ExcludeSitemap bool      `json:"exclude_sitemap"`
 	Published      bool      `json:"published"`
