@@ -141,6 +141,7 @@ func addAllAssets(data map[string]interface{}) error {
 			Locale:      publishDetails["locale"].(string),
 			Url:         assetData["url"].(string),
 			Parent:      parentUid,
+			Version:     int(assetData["_version"].(float64)),
 			Filesize:    filesize,
 			Height:      assetHeight,
 			Width:       assetWidth,
