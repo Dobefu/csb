@@ -10,6 +10,7 @@ type Asset struct {
 	Locale         string    `json:"locale"`
 	Url            string    `json:"url"`
 	Parent         string    `json:"parent"`
+	Version        int       `json:"version"`
 	Filesize       int       `json:"filesize"`
 	Height         int       `json:"height"`
 	Width          int       `json:"width"`

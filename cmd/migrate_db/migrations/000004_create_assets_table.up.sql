@@ -6,6 +6,7 @@ CREATE TABLE IF NOT EXISTS assets(
   locale varchar(16) NOT NULL,
   url varchar(255) NOT NULL,
   parent varchar(64),
+  version int NOT NULL,
   filesize int NOT NULL,
   height int NOT NULL,
   width int NOT NULL,
