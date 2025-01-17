@@ -1,75 +1,93 @@
 package api
 
 import (
-	"os"
+	"errors"
 	"testing"
+	"time"
 
 	api_structs "github.com/Dobefu/csb/cmd/api/structs"
+	"github.com/Dobefu/csb/cmd/api/utils"
 	"github.com/Dobefu/csb/cmd/cs_sdk/structs"
-	"github.com/Dobefu/csb/cmd/database"
-	"github.com/Dobefu/csb/cmd/init_env"
-	"github.com/Dobefu/csb/cmd/migrate_db"
-	"github.com/Dobefu/csb/cmd/remote_sync"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestGetEntryWithMetadata(t *testing.T) {
-	var entry interface{}
-	var altLocales []api_structs.AltLocale
-	var breadcrumbs interface{}
-	var err error
+func TestGetEntryWithMetadataSuccess(t *testing.T) {
+	getEntry = func(route structs.Route) (map[string]interface{}, error) {
+		return map[string]interface{}{"route_uid": route.Uid}, nil
+	}
 
-	var altLocalesEmpty []api_structs.AltLocale
-	var breadcrumbsEmpty []structs.Route
+	getAltLocales = func(entry structs.Route, includeSitemapExcluded bool) ([]api_structs.AltLocale, error) {
+		return []api_structs.AltLocale{{Uid: "en"}}, nil
+	}
 
-	init_env.Main("../../../.env.test")
-	err = database.Connect()
+	getBreadcrumbs = func(entry structs.Route) ([]structs.Route, error) {
+		return []structs.Route{{Uid: "uid"}}, nil
+	}
+
+	defer func() { getEntry = GetEntry }()
+	defer func() { getAltLocales = utils.GetAltLocales }()
+	defer func() { getBreadcrumbs = utils.GetBreadcrumbs }()
+
+	entry, altLocales, breadcrumbs, err := GetEntryWithMetadata(structs.Route{Uid: "test_uid"})
+	assert.Equal(t, map[string]interface{}{"route_uid": "test_uid"}, entry)
+	assert.Equal(t, []api_structs.AltLocale([]api_structs.AltLocale{{Uid: "en", ContentType: "", Locale: "", Slug: "", Url: ""}}), altLocales)
+	assert.Equal(t, []structs.Route([]structs.Route{{Id: "", Uid: "uid", Title: "", ContentType: "", Locale: "", Slug: "", Url: "", Parent: "", Version: 0, UpdatedAt: time.Date(1, time.January, 1, 0, 0, 0, 0, time.UTC), ExcludeSitemap: false, Published: false}}), breadcrumbs)
 	assert.Equal(t, nil, err)
+}
 
-	err = migrate_db.Main(true)
-	assert.Equal(t, nil, err)
+func TestGetEntryWithMetadataGetBreadcrumbsErr(t *testing.T) {
+	getEntry = func(route structs.Route) (map[string]interface{}, error) {
+		return map[string]interface{}{"route_uid": route.Uid}, nil
+	}
 
-	err = remote_sync.Sync(true)
-	assert.Equal(t, nil, err)
+	getAltLocales = func(entry structs.Route, includeSitemapExcluded bool) ([]api_structs.AltLocale, error) {
+		return []api_structs.AltLocale{{Uid: "en"}}, nil
+	}
 
-	entry, altLocales, breadcrumbs, err = GetEntryWithMetadata(structs.Route{
-		Uid:         "bltcfabf0a73d38cbcf",
-		ContentType: "basic_page",
-		Locale:      "en",
-		Parent:      "bltcfabf0a73d38cbcf",
-	})
-	assert.Equal(t, nil, err)
-	assert.NotEqual(t, nil, entry)
-	assert.NotEqual(t, nil, altLocales)
-	assert.NotEqual(t, nil, breadcrumbs)
+	getBreadcrumbs = func(entry structs.Route) ([]structs.Route, error) {
+		return nil, errors.New("")
+	}
 
-	entry, altLocales, breadcrumbs, err = GetEntryWithMetadata(structs.Route{
-		Uid:         "bogus",
-		ContentType: "basic_page",
-		Locale:      "en",
-	})
-	assert.NotEqual(t, nil, err)
+	defer func() { getEntry = GetEntry }()
+	defer func() { getAltLocales = utils.GetAltLocales }()
+	defer func() { getBreadcrumbs = utils.GetBreadcrumbs }()
+
+	entry, altLocales, breadcrumbs, err := GetEntryWithMetadata(structs.Route{Uid: "test_uid"})
 	assert.Equal(t, nil, entry)
-	assert.Equal(t, altLocalesEmpty, altLocales)
-	assert.Equal(t, breadcrumbsEmpty, breadcrumbs)
-
-	oldDb := os.Getenv("DB_CONN")
-	os.Setenv("DB_CONN", "file:/")
-	err = database.Connect()
-	assert.Equal(t, nil, err)
-
-	entry, altLocales, breadcrumbs, err = GetEntryWithMetadata(structs.Route{
-		Uid:         "bltcfabf0a73d38cbcf",
-		ContentType: "basic_page",
-		Locale:      "en",
-		Parent:      "bltcfabf0a73d38cbcf",
-	})
+	assert.Equal(t, []api_structs.AltLocale([]api_structs.AltLocale(nil)), altLocales)
+	assert.Equal(t, []structs.Route([]structs.Route(nil)), breadcrumbs)
 	assert.NotEqual(t, nil, err)
-	assert.Equal(t, nil, entry)
-	assert.Equal(t, altLocalesEmpty, altLocales)
-	assert.Equal(t, breadcrumbsEmpty, breadcrumbs)
+}
 
-	os.Setenv("DB_CONN", oldDb)
-	err = database.Connect()
-	assert.Equal(t, nil, err)
+func TestGetEntryWithMetadataGetAltLocalesErr(t *testing.T) {
+	getEntry = func(route structs.Route) (map[string]interface{}, error) {
+		return map[string]interface{}{"route_uid": route.Uid}, nil
+	}
+
+	getAltLocales = func(entry structs.Route, includeSitemapExcluded bool) ([]api_structs.AltLocale, error) {
+		return nil, errors.New("")
+	}
+
+	defer func() { getEntry = GetEntry }()
+	defer func() { getAltLocales = utils.GetAltLocales }()
+
+	entry, altLocales, breadcrumbs, err := GetEntryWithMetadata(structs.Route{Uid: "test_uid"})
+	assert.Equal(t, nil, entry)
+	assert.Equal(t, []api_structs.AltLocale([]api_structs.AltLocale(nil)), altLocales)
+	assert.Equal(t, []structs.Route([]structs.Route(nil)), breadcrumbs)
+	assert.NotEqual(t, nil, err)
+}
+
+func TestGetEntryWithMetadataGetEntryErr(t *testing.T) {
+	getEntry = func(route structs.Route) (map[string]interface{}, error) {
+		return nil, errors.New("")
+	}
+
+	defer func() { getEntry = GetEntry }()
+
+	entry, altLocales, breadcrumbs, err := GetEntryWithMetadata(structs.Route{Uid: "test_uid"})
+	assert.Equal(t, nil, entry)
+	assert.Equal(t, []api_structs.AltLocale([]api_structs.AltLocale(nil)), altLocales)
+	assert.Equal(t, []structs.Route([]structs.Route(nil)), breadcrumbs)
+	assert.NotEqual(t, nil, err)
 }

@@ -6,20 +6,24 @@ import (
 	"github.com/Dobefu/csb/cmd/cs_sdk/structs"
 )
 
+var getEntry = GetEntry
+var getAltLocales = utils.GetAltLocales
+var getBreadcrumbs = utils.GetBreadcrumbs
+
 func GetEntryWithMetadata(route structs.Route) (interface{}, []api_structs.AltLocale, []structs.Route, error) {
-	entry, err := GetEntry(route)
+	entry, err := getEntry(route)
 
 	if err != nil {
 		return nil, nil, nil, err
 	}
 
-	altLocales, err := utils.GetAltLocales(route, true)
+	altLocales, err := getAltLocales(route, true)
 
 	if err != nil {
 		return nil, nil, nil, err
 	}
 
-	breadcrumbs, err := utils.GetBreadcrumbs(route)
+	breadcrumbs, err := getBreadcrumbs(route)
 
 	if err != nil {
 		return nil, nil, nil, err
