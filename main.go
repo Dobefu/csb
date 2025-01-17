@@ -17,6 +17,8 @@ import (
 	"github.com/Dobefu/csb/cmd/server"
 )
 
+var osExit = os.Exit
+
 type subCommand struct {
 	desc string
 }
@@ -198,7 +200,5 @@ func listSubCommands() {
 		fmt.Printf("    %s\n", cmd.desc)
 	}
 
-	if flag.Lookup("test.v") == nil {
-		os.Exit(1)
-	}
+	osExit(1)
 }

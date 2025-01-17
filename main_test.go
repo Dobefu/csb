@@ -12,9 +12,6 @@ import (
 func TestMain(t *testing.T) {
 	const env = "--env-file=.env.test"
 
-	setArgs()
-	main()
-
 	setArgs("check:health", env)
 	main()
 
@@ -34,6 +31,28 @@ func TestMain(t *testing.T) {
 	main()
 }
 
+func TestMainWithMockedExit(t *testing.T) {
+	isExitCalled := false
+
+	osExit = func(code int) {
+		isExitCalled = true
+	}
+
+	defer func() { osExit = os.Exit }()
+
+	setArgs()
+	main()
+
+	assert.True(t, isExitCalled, "os.Exit should have been called")
+
+	isExitCalled = false
+
+	setArgs("bogus")
+	main()
+
+	assert.True(t, isExitCalled, "os.Exit should have been called")
+}
+
 func setArgs(args ...string) {
 	os.Args = []string{os.Args[0]}
 
@@ -43,7 +62,16 @@ func setArgs(args ...string) {
 }
 
 func TestListSubCommands(t *testing.T) {
+	isExitCalled := false
+
+	osExit = func(code int) {
+		isExitCalled = true
+	}
+
+	defer func() { osExit = os.Exit }()
+
 	listSubCommands()
+	assert.True(t, isExitCalled, "os.Exit should have been called")
 }
 
 func TestInitDB(t *testing.T) {
