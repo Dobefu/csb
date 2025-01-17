@@ -17,6 +17,18 @@ import (
 	"github.com/Dobefu/csb/cmd/server"
 )
 
+var databaseConnect = database.Connect
+var dbPing = database.DB.Ping
+var flagNewFlagSet = flag.NewFlagSet
+
+var checkHealthMain = check_health.Main
+var migrateDbMain = migrate_db.Main
+var remoteSetupMain = remote_setup.Main
+var remoteSyncSync = remote_sync.Sync
+var serverStart = server.Start
+var cliCreateContentType = cli.CreateContentType
+
+var loggerFatal = logger.Fatal
 var osExit = os.Exit
 
 type subCommand struct {
@@ -30,16 +42,16 @@ var (
 )
 
 func initDB() {
-	err := database.Connect()
+	err := databaseConnect()
 
 	if err != nil {
-		logger.Fatal("Could not connect to the database: %s", err.Error())
+		loggerFatal("Could not connect to the database: %s", err.Error())
 	}
 
-	err = database.DB.Ping()
+	err = dbPing()
 
 	if err != nil {
-		logger.Fatal("Could not connect to the database: %s", err.Error())
+		loggerFatal("Could not connect to the database: %s", err.Error())
 	}
 }
 
@@ -56,12 +68,17 @@ func main() {
 	err := runSubCommand(args)
 
 	if err != nil {
-		logger.Fatal(err.Error())
+		loggerFatal(err.Error())
 	}
 }
 
 func runSubCommand(args []string) error {
-	flag := flag.NewFlagSet(args[0], flag.ExitOnError)
+	if len(args) < 1 {
+		listSubCommands()
+		return nil
+	}
+
+	flag := flagNewFlagSet(args[0], flag.ExitOnError)
 	var err error
 
 	switch args[0] {
@@ -75,7 +92,7 @@ func runSubCommand(args []string) error {
 
 		applyGlobalFlags()
 
-		err = check_health.Main()
+		err = checkHealthMain()
 
 	case "migrate:db":
 		reset := flag.Bool("reset", false, "Migrate from a clean database. Warning: this will delete existing data")
@@ -89,7 +106,7 @@ func runSubCommand(args []string) error {
 
 		applyGlobalFlags()
 
-		err = migrate_db.Main(*reset)
+		err = migrateDbMain(*reset)
 
 	case "remote:setup":
 		registerGlobalFlags(flag)
@@ -101,7 +118,7 @@ func runSubCommand(args []string) error {
 
 		applyGlobalFlags()
 
-		err = remote_setup.Main()
+		err = remoteSetupMain()
 
 	case "remote:sync":
 		reset := flag.Bool("reset", false, "Synchronise all data, instead of starting from the last sync token")
@@ -115,7 +132,7 @@ func runSubCommand(args []string) error {
 
 		applyGlobalFlags()
 
-		err = remote_sync.Sync(*reset)
+		err = remoteSyncSync(*reset)
 
 	case "server":
 		port := flag.Uint("port", 4000, "The port to use for the web server")
@@ -128,7 +145,7 @@ func runSubCommand(args []string) error {
 		}
 
 		applyGlobalFlags()
-		err = server.Start(*port)
+		err = serverStart(*port)
 
 	case "create:content-type":
 		name := flag.String("name", "", "The name of the content type to create")
@@ -143,7 +160,7 @@ func runSubCommand(args []string) error {
 		}
 
 		applyGlobalFlags()
-		err = cli.CreateContentType(*isDryRun, *name, *machineName, true)
+		err = cliCreateContentType(*isDryRun, *name, *machineName, true)
 
 	default:
 		listSubCommands()
