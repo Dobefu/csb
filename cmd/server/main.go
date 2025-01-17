@@ -1,12 +1,13 @@
 package server
 
 import (
-	"flag"
 	"fmt"
 	"net/http"
 
 	"github.com/Dobefu/csb/cmd/logger"
 )
+
+var listenAndServe = http.ListenAndServe
 
 func Start(port uint) error {
 	url := fmt.Sprintf(":%d", port)
@@ -17,12 +18,10 @@ func Start(port uint) error {
 
 	logger.Info("Starting server on %s", url)
 
-	if flag.Lookup("test.v") == nil {
-		err := http.ListenAndServe(url, mux)
+	err := listenAndServe(url, mux)
 
-		if err != nil {
-			return err
-		}
+	if err != nil {
+		return err
 	}
 
 	return nil
