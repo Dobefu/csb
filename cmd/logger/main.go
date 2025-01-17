@@ -8,6 +8,8 @@ import (
 	"github.com/Dobefu/csb/cmd/color"
 )
 
+var osExit = os.Exit
+
 var (
 	LOG_VERBOSE byte = 0
 	LOG_INFO    byte = 1
@@ -70,7 +72,7 @@ func Fatal(format string, a ...any) string {
 	output := logMessage(LOG_FATAL, format, a...)
 
 	if EXIT_ON_FATAL {
-		os.Exit(1)
+		osExit(1)
 	}
 
 	return output

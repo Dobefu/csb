@@ -1,6 +1,7 @@
 package logger
 
 import (
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -84,4 +85,18 @@ func TestLogFatal(t *testing.T) {
 	assert.NotEmpty(t, Fatal("test"))
 	SetLogLevel(LOG_FATAL)
 	assert.NotEmpty(t, Fatal("test"))
+}
+
+func TestLogFatalWithExit(t *testing.T) {
+	SetExitOnFatal(true)
+	isExitCalled := false
+
+	osExit = func(code int) {
+		isExitCalled = true
+	}
+
+	defer func() { osExit = os.Exit }()
+
+	assert.NotEmpty(t, Fatal("test"))
+	assert.True(t, isExitCalled, "os.Exit should have been called")
 }
