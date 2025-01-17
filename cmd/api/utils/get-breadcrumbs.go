@@ -5,6 +5,9 @@ import (
 	"github.com/Dobefu/csb/cmd/cs_sdk/structs"
 )
 
+var apiGetEntryByUid = api.GetEntryByUid
+var apiGetEntryByUrl = api.GetEntryByUrl
+
 func GetBreadcrumbs(entry structs.Route) ([]structs.Route, error) {
 	results := []structs.Route{entry}
 	currentEntry := entry
@@ -12,7 +15,7 @@ func GetBreadcrumbs(entry structs.Route) ([]structs.Route, error) {
 	var err error
 
 	for currentEntry.Parent != "" {
-		currentEntry, err = api.GetEntryByUid(currentEntry.Parent, entry.Locale, false)
+		currentEntry, err = apiGetEntryByUid(currentEntry.Parent, entry.Locale, false)
 
 		if err != nil {
 			continue
@@ -22,7 +25,7 @@ func GetBreadcrumbs(entry structs.Route) ([]structs.Route, error) {
 	}
 
 	if results[0].Url != "/" {
-		homeEntry, err := api.GetEntryByUrl("/", entry.Locale, false)
+		homeEntry, err := apiGetEntryByUrl("/", entry.Locale, false)
 
 		if err == nil {
 			results = append([]structs.Route{homeEntry}, results...)
