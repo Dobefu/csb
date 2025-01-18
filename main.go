@@ -18,7 +18,7 @@ import (
 )
 
 var databaseConnect = database.Connect
-var dbPing = database.DB.Ping
+var dbPing = func() error { return database.DB.Ping() }
 var flagNewFlagSet = flag.NewFlagSet
 
 var checkHealthMain = check_health.Main
@@ -51,7 +51,7 @@ func initDB() {
 	err = dbPing()
 
 	if err != nil {
-		loggerFatal("Could not connect to the database: %s", err.Error())
+		loggerFatal("Could not ping the database: %s", err.Error())
 	}
 }
 
