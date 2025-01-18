@@ -9,6 +9,12 @@ import (
 	"os"
 )
 
+var httpClient HttpClient = &http.Client{}
+
+type HttpClient interface {
+	Do(req *http.Request) (*http.Response, error)
+}
+
 func RequestRaw(path string, method string, body map[string]interface{}, useManagementToken bool) (*http.Response, error) {
 	url := fmt.Sprintf("%s/%s/%s", GetUrl(useManagementToken), VERSION, path)
 
@@ -18,7 +24,6 @@ func RequestRaw(path string, method string, body map[string]interface{}, useMana
 		return nil, err
 	}
 
-	client := http.Client{}
 	req, err := http.NewRequest(method, url, bytes.NewBuffer(bodyJson))
 
 	if err != nil {
@@ -40,7 +45,7 @@ func RequestRaw(path string, method string, body map[string]interface{}, useMana
 		req.Header.Set("Content-Type", "application/json")
 	}
 
-	res, err := client.Do(req)
+	res, err := httpClient.Do(req)
 
 	if err != nil {
 		return nil, err

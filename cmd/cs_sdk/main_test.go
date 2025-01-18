@@ -1,42 +1,107 @@
 package cs_sdk
 
 import (
-	"os"
+	"bytes"
+	"errors"
+	"io"
+	"net/http"
 	"testing"
 
-	"github.com/Dobefu/csb/cmd/init_env"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestRequest(t *testing.T) {
-	var data map[string]interface{}
-	var emptyData map[string]interface{}
-	var err error
+type MockClient struct {
+	DoFunc func(req *http.Request) (*http.Response, error)
+}
 
-	init_env.Main("../../.env.test")
+func (m *MockClient) Do(req *http.Request) (*http.Response, error) {
+	return m.DoFunc(req)
+}
 
-	data, err = Request("content_types", "GET", nil, false)
+var mockClient = &MockClient{
+	DoFunc: func(req *http.Request) (*http.Response, error) {
+		if req.URL.Path == "/v3/test-path" {
+			return &http.Response{
+				StatusCode: http.StatusOK,
+				Body:       io.NopCloser(bytes.NewBufferString(`{"key":"value"}`)),
+			}, nil
+		}
+
+		return &http.Response{
+			StatusCode: http.StatusNotFound,
+			Body:       io.NopCloser(bytes.NewBufferString(`{}`)),
+		}, errors.New("not found")
+	},
+}
+
+func TestRequestRaw(t *testing.T) {
+	originalClient := httpClient
+	defer func() { httpClient = originalClient }()
+
+	httpClient = mockClient
+
+	response, err := RequestRaw("test-path", "GET", nil, false)
+
 	assert.Equal(t, nil, err)
-	assert.NotEqual(t, nil, data)
+	assert.Equal(t, http.StatusOK, response.StatusCode)
+}
 
-	data, err = Request("content_types", "GET", map[string]interface{}{}, false)
+func TestRequestRawWithBody(t *testing.T) {
+	originalClient := httpClient
+	defer func() { httpClient = originalClient }()
+
+	httpClient = mockClient
+
+	response, err := RequestRaw("test-path", "GET", map[string]interface{}{}, false)
+
 	assert.Equal(t, nil, err)
-	assert.NotEqual(t, nil, data)
+	assert.Equal(t, http.StatusOK, response.StatusCode)
+}
 
-	data, err = Request("content_types", "GET", nil, true)
+func TestRequestRawWithManagementToken(t *testing.T) {
+	originalClient := httpClient
+	defer func() { httpClient = originalClient }()
+
+	httpClient = mockClient
+
+	response, err := RequestRaw("test-path", "GET", nil, true)
+
 	assert.Equal(t, nil, err)
-	assert.NotEqual(t, nil, data)
+	assert.Equal(t, http.StatusOK, response.StatusCode)
+}
 
-	data, err = Request("content_types", "POST", nil, false)
+func TestRequestRawErrInvalidBody(t *testing.T) {
+	originalClient := httpClient
+	defer func() { httpClient = originalClient }()
+
+	httpClient = mockClient
+
+	response, err := RequestRaw("test-path", "GET", map[string]interface{}{"invalid": func() { /* Invalid */ }}, false)
+
 	assert.NotEqual(t, nil, err)
-	assert.Equal(t, emptyData, data)
+	assert.NotEqual(t, nil, response)
+}
 
-	oldCsRegion := os.Getenv("CS_REGION")
-	os.Setenv("CS_REGION", "bogus")
+func TestRequestRawErrInvalidRequest(t *testing.T) {
+	originalClient := httpClient
+	defer func() { httpClient = originalClient }()
 
-	data, err = Request("content_types", "GET", nil, false)
+	httpClient = mockClient
+
+	response, err := RequestRaw("test-path", "BOGUS@", nil, false)
+
 	assert.NotEqual(t, nil, err)
-	assert.Equal(t, emptyData, data)
+	assert.NotEqual(t, nil, response)
+}
 
-	os.Setenv("CS_REGION", oldCsRegion)
+func TestRequestRawErrNotFound(t *testing.T) {
+	originalClient := httpClient
+	defer func() { httpClient = originalClient }()
+
+	httpClient = mockClient
+
+	response, err := RequestRaw("bogus", "GET", nil, false)
+
+	assert.NotEqual(t, nil, err)
+	assert.NotEqual(t, nil, response)
 }
