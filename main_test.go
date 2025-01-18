@@ -18,6 +18,7 @@ import (
 )
 
 var err error
+var envFile = "--env-file=.env.test"
 
 func TestInitDB(t *testing.T) {
 	isLoggerFatalCalled := false
@@ -79,7 +80,7 @@ func TestMainWithSubCommand(t *testing.T) {
 	defer cleanupDatabaseConnectAndPing()
 	defer func() { checkHealthMain = check_health.Main }()
 
-	os.Args = []string{os.Args[0], "check:health"}
+	os.Args = []string{os.Args[0], "check:health", envFile}
 
 	main()
 	assert.False(t, isLoggerFatalCalled)
@@ -97,7 +98,7 @@ func TestMainWithSubCommandErr(t *testing.T) {
 	defer cleanupDatabaseConnectAndPing()
 	defer func() { checkHealthMain = check_health.Main }()
 
-	os.Args = []string{os.Args[0], "check:health"}
+	os.Args = []string{os.Args[0], "check:health", envFile}
 
 	main()
 	assert.True(t, isLoggerFatalCalled)
@@ -121,13 +122,13 @@ func TestRunSubCommandCheckHealth(t *testing.T) {
 	defer cleanupDatabaseConnectAndPing()
 	defer func() { checkHealthMain = check_health.Main }()
 
-	err = runSubCommand([]string{"check:health"})
+	err = runSubCommand([]string{"check:health", envFile})
 	assert.Equal(t, nil, err)
 
 	flagNewFlagSet = mockFlagNewFlagSet
 	defer func() { flagNewFlagSet = flag.NewFlagSet }()
 
-	err = runSubCommand([]string{"check:health", "--bogus"})
+	err = runSubCommand([]string{"check:health", "--bogus", envFile})
 	assert.NotEqual(t, nil, err)
 }
 
@@ -138,13 +139,13 @@ func TestRunSubCommandMigrateDb(t *testing.T) {
 	defer cleanupDatabaseConnectAndPing()
 	defer func() { migrateDbMain = migrate_db.Main }()
 
-	err = runSubCommand([]string{"migrate:db"})
+	err = runSubCommand([]string{"migrate:db", envFile})
 	assert.Equal(t, nil, err)
 
 	flagNewFlagSet = mockFlagNewFlagSet
 	defer func() { flagNewFlagSet = flag.NewFlagSet }()
 
-	err = runSubCommand([]string{"migrate:db", "--bogus"})
+	err = runSubCommand([]string{"migrate:db", "--bogus", envFile})
 	assert.NotEqual(t, nil, err)
 }
 
@@ -155,13 +156,13 @@ func TestRunSubCommandRemoteSetup(t *testing.T) {
 	defer cleanupDatabaseConnectAndPing()
 	defer func() { remoteSetupMain = remote_setup.Main }()
 
-	err = runSubCommand([]string{"remote:setup"})
+	err = runSubCommand([]string{"remote:setup", envFile})
 	assert.Equal(t, nil, err)
 
 	flagNewFlagSet = mockFlagNewFlagSet
 	defer func() { flagNewFlagSet = flag.NewFlagSet }()
 
-	err = runSubCommand([]string{"remote:setup", "--bogus"})
+	err = runSubCommand([]string{"remote:setup", "--bogus", envFile})
 	assert.NotEqual(t, nil, err)
 }
 
@@ -172,13 +173,13 @@ func TestRunSubCommandRemoteSync(t *testing.T) {
 	defer cleanupDatabaseConnectAndPing()
 	defer func() { remoteSyncSync = remote_sync.Sync }()
 
-	err = runSubCommand([]string{"remote:sync"})
+	err = runSubCommand([]string{"remote:sync", envFile})
 	assert.Equal(t, nil, err)
 
 	flagNewFlagSet = mockFlagNewFlagSet
 	defer func() { flagNewFlagSet = flag.NewFlagSet }()
 
-	err = runSubCommand([]string{"remote:sync", "--bogus"})
+	err = runSubCommand([]string{"remote:sync", "--bogus", envFile})
 	assert.NotEqual(t, nil, err)
 }
 
@@ -189,13 +190,13 @@ func TestRunSubCommandServer(t *testing.T) {
 	defer cleanupDatabaseConnectAndPing()
 	defer func() { serverStart = server.Start }()
 
-	err = runSubCommand([]string{"server"})
+	err = runSubCommand([]string{"server", envFile})
 	assert.Equal(t, nil, err)
 
 	flagNewFlagSet = mockFlagNewFlagSet
 	defer func() { flagNewFlagSet = flag.NewFlagSet }()
 
-	err = runSubCommand([]string{"server", "--bogus"})
+	err = runSubCommand([]string{"server", "--bogus", envFile})
 	assert.NotEqual(t, nil, err)
 }
 
@@ -208,13 +209,13 @@ func TestRunSubCommandCreateContentType(t *testing.T) {
 	defer cleanupDatabaseConnectAndPing()
 	defer func() { cliCreateContentType = cli.CreateContentType }()
 
-	err = runSubCommand([]string{"create:content-type"})
+	err = runSubCommand([]string{"create:content-type", envFile})
 	assert.Equal(t, nil, err)
 
 	flagNewFlagSet = mockFlagNewFlagSet
 	defer func() { flagNewFlagSet = flag.NewFlagSet }()
 
-	err = runSubCommand([]string{"create:content-type", "--bogus"})
+	err = runSubCommand([]string{"create:content-type", "--bogus", envFile})
 	assert.NotEqual(t, nil, err)
 }
 
@@ -227,7 +228,7 @@ func TestRunSubCommandFallback(t *testing.T) {
 	defer func() { osExit = os.Exit }()
 	defer cleanupDatabaseConnectAndPing()
 
-	err = runSubCommand([]string{"bogus-cmd"})
+	err = runSubCommand([]string{"bogus-cmd", envFile})
 	assert.Equal(t, nil, err)
 	assert.True(t, isExitCalled)
 }
