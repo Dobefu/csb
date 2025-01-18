@@ -1,11 +1,15 @@
 package check_health
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/Dobefu/csb/cmd/cs_sdk"
 	"github.com/Dobefu/csb/cmd/database"
 )
+
+var databaseConnect = database.Connect
+var csSdkRequest = cs_sdk.Request
 
 func Main() error {
 	var err error
@@ -26,7 +30,13 @@ func Main() error {
 }
 
 func checkDatabase() error {
-	return database.Connect()
+	err := databaseConnect()
+
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func checkCsSdk() error {
@@ -34,7 +44,7 @@ func checkCsSdk() error {
 	var err error
 
 	// Create a temporary label in Contentstack, to test the management token.
-	resp, err = cs_sdk.Request(
+	resp, err = csSdkRequest(
 		"labels",
 		"POST",
 		map[string]interface{}{
@@ -49,9 +59,15 @@ func checkCsSdk() error {
 		return err
 	}
 
+	label, hasLabel := resp["label"]
+
+	if !hasLabel {
+		return errors.New("response has no label")
+	}
+
 	// Delete the temporary label in Contentstack.
-	_, err = cs_sdk.Request(
-		fmt.Sprintf("labels/%s", resp["label"].(map[string]interface{})["uid"]),
+	_, err = csSdkRequest(
+		fmt.Sprintf("labels/%s", label.(map[string]interface{})["uid"]),
 		"DELETE",
 		nil,
 		true,
