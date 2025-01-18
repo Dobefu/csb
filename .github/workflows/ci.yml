@@ -56,6 +56,7 @@ jobs:
 
       - name: Run tests
         run: |
+          go test "./..." -coverprofile="test-results/coverage.out" -covermode=count
           go test "./..." -coverprofile="test-results/coverage.out" -covermode=count -json > test-results/test-report.out
 
       - name: Delete the .env.test file after tests are completed
