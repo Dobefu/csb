@@ -8,6 +8,15 @@ import (
 	"github.com/Dobefu/csb/cmd/logger"
 )
 
+type queryRows interface {
+	Next() bool
+	Scan(dest ...interface{}) error
+}
+
+var queryQueryRows = func(table string, columns []string, where []db_structs.QueryWhere) (queryRows, error) {
+	return query.QueryRows(table, columns, where)
+}
+
 func GetAltLocales(entry structs.Route, includeSitemapExcluded bool) ([]api_structs.AltLocale, error) {
 	where := []db_structs.QueryWhere{
 		{
@@ -33,7 +42,7 @@ func GetAltLocales(entry structs.Route, includeSitemapExcluded bool) ([]api_stru
 		})
 	}
 
-	rows, err := query.QueryRows(
+	rows, err := queryQueryRows(
 		"routes",
 		[]string{"uid", "content_type", "locale", "slug", "url"},
 		where,
