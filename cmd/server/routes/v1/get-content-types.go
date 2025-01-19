@@ -6,24 +6,27 @@ import (
 	"net/http"
 
 	"github.com/Dobefu/csb/cmd/api"
-	"github.com/Dobefu/csb/cmd/server/utils"
 )
 
+var apiGetContentTypes = api.GetContentTypes
+
 func GetContentTypes(w http.ResponseWriter, r *http.Request) {
-	contentTypes, err := api.GetContentTypes()
+	contentTypes, err := apiGetContentTypes()
 
 	if err != nil {
-		utils.PrintError(w, err, false)
+		w.WriteHeader(http.StatusInternalServerError)
+		utilsPrintError(w, err, false)
 		return
 	}
 
-	output := utils.ConstructOutput()
+	output := utilsConstructOutput()
 	output["data"] = contentTypes
 
 	json, err := json.Marshal(output)
 
 	if err != nil {
-		utils.PrintError(w, err, true)
+		w.WriteHeader(http.StatusInternalServerError)
+		utilsPrintError(w, err, true)
 		return
 	}
 

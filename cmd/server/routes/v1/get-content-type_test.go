@@ -13,7 +13,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func setupTest() (*httptest.ResponseRecorder, func()) {
+func setupGetContentTypeTest() (*httptest.ResponseRecorder, func()) {
 	validationCheckRequiredQueryParams = func(r *http.Request, params ...string) (map[string]interface{}, error) {
 		return map[string]interface{}{"content_type": "blog"}, nil
 	}
@@ -43,7 +43,7 @@ func setupTest() (*httptest.ResponseRecorder, func()) {
 }
 
 func TestGetContentTypeSuccess(t *testing.T) {
-	rr, cleanup := setupTest()
+	rr, cleanup := setupGetContentTypeTest()
 	defer cleanup()
 
 	req, _ := http.NewRequest("GET", "/content-type?content_type=blog", nil)
@@ -54,7 +54,7 @@ func TestGetContentTypeSuccess(t *testing.T) {
 }
 
 func TestGetContentTypeMissingQueryParameter(t *testing.T) {
-	rr, cleanup := setupTest()
+	rr, cleanup := setupGetContentTypeTest()
 	defer cleanup()
 
 	validationCheckRequiredQueryParams = func(r *http.Request, params ...string) (map[string]interface{}, error) {
@@ -69,7 +69,7 @@ func TestGetContentTypeMissingQueryParameter(t *testing.T) {
 }
 
 func TestGetContentTypeNoContentTypeName(t *testing.T) {
-	rr, cleanup := setupTest()
+	rr, cleanup := setupGetContentTypeTest()
 	defer cleanup()
 
 	validationCheckRequiredQueryParams = func(r *http.Request, params ...string) (map[string]interface{}, error) {
@@ -84,7 +84,7 @@ func TestGetContentTypeNoContentTypeName(t *testing.T) {
 }
 
 func TestGetContentTypeAPIError(t *testing.T) {
-	rr, cleanup := setupTest()
+	rr, cleanup := setupGetContentTypeTest()
 	defer cleanup()
 
 	apiGetContentType = func(contentTypeName string) (map[string]interface{}, error) {
@@ -99,7 +99,7 @@ func TestGetContentTypeAPIError(t *testing.T) {
 }
 
 func TestGetContentTypeJSONMarshalError(t *testing.T) {
-	rr, cleanup := setupTest()
+	rr, cleanup := setupGetContentTypeTest()
 	defer cleanup()
 
 	apiGetContentType = func(contentTypeName string) (map[string]interface{}, error) {
