@@ -21,6 +21,8 @@ import (
 
 var queryTruncate = query.Truncate
 var stateSetState = state.SetState
+var stateGetState = state.GetState
+var csSdkRequest = cs_sdk.Request
 
 func Sync(reset bool) error {
 	routes := make(map[string]structs.Route)
@@ -135,10 +137,16 @@ func addAllAssets(data map[string]interface{}) error {
 		assetHeight, assetWidth := getAssetDimensions(assetData)
 		filesize := getFilesize(assetData)
 
+		contentType, hasContentType := assetData["content_type"]
+
+		if !hasContentType {
+			contentType = ""
+		}
+
 		err := assets.SetAsset(structs.Asset{
 			Uid:         assetData["uid"].(string),
 			Title:       getTitle(assetData),
-			ContentType: assetData["content_type"].(string),
+			ContentType: contentType.(string),
 			Locale:      publishDetails["locale"].(string),
 			Url:         getSlug(assetData),
 			Parent:      parentUid,
@@ -187,21 +195,21 @@ func getSyncData(paginationToken string, reset bool, syncToken string) (map[stri
 	var err error
 
 	if !reset {
-		syncToken, err = state.GetState("sync_token")
+		syncToken, err = stateGetState("sync_token")
 	}
 
 	if paginationToken != "" {
 		logger.Info("Getting a new sync page")
 		path := fmt.Sprintf("stacks/sync?pagination_token=%s", paginationToken)
-		data, err = cs_sdk.Request(path, "GET", nil, false)
+		data, err = csSdkRequest(path, "GET", nil, false)
 	} else if err != nil || reset {
 		logger.Info("Initialising a fresh sync")
 		path := "stacks/sync?init=true&type=entry_published,entry_unpublished,entry_deleted,asset_published,asset_unpublished,asset_deleted"
-		data, err = cs_sdk.Request(path, "GET", nil, false)
+		data, err = csSdkRequest(path, "GET", nil, false)
 	} else {
 		logger.Info("Syncing data using an existing sync token")
 		path := fmt.Sprintf("stacks/sync?sync_token=%s", syncToken)
-		data, err = cs_sdk.Request(path, "GET", nil, false)
+		data, err = csSdkRequest(path, "GET", nil, false)
 	}
 
 	if err != nil {
@@ -540,7 +548,7 @@ func processTranslations(route structs.Route) {
 		route.Locale,
 	)
 
-	resp, err := cs_sdk.Request(path, "GET", nil, false)
+	resp, err := csSdkRequest(path, "GET", nil, false)
 
 	if err != nil {
 		return
