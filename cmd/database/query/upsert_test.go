@@ -18,6 +18,7 @@ func setupUpsertTest(t *testing.T, dbType string) (*sqlmock.Sqlmock, func()) {
 	os.Setenv("DB_TYPE", dbType)
 
 	db, mock, err := sqlmock.New()
+
 	if err != nil {
 		t.Fatalf("An error '%s' was not expected when opening a stub database connection", err)
 	}
@@ -25,6 +26,7 @@ func setupUpsertTest(t *testing.T, dbType string) (*sqlmock.Sqlmock, func()) {
 	database.DB = db
 
 	return &mock, func() {
+		logger.SetExitOnFatal(true)
 		db.Close()
 		os.Setenv("DB_TYPE", originalDBType)
 	}
