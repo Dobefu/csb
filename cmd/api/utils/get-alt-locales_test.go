@@ -23,6 +23,7 @@ func (m *MockRows) Scan(dest ...interface{}) error {
 	if m.scanError != nil {
 		return m.scanError
 	}
+
 	uid := dest[0].(*string)
 	contentType := dest[1].(*string)
 	locale := dest[2].(*string)
@@ -40,13 +41,11 @@ func (m *MockRows) Scan(dest ...interface{}) error {
 
 var mockQueryRows func(table string, columns []string, where []db_structs.QueryWhere) (queryRows, error)
 
-func init() {
+func TestGetAltLocales(t *testing.T) {
 	queryQueryRows = func(table string, columns []string, where []db_structs.QueryWhere) (queryRows, error) {
 		return mockQueryRows(table, columns, where)
 	}
-}
 
-func TestGetAltLocales(t *testing.T) {
 	entry := structs.Route{
 		Uid:    "test-uid",
 		Locale: "en",

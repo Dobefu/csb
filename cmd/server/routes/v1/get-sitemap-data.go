@@ -11,24 +11,36 @@ import (
 	"github.com/Dobefu/csb/cmd/cs_sdk/structs"
 	"github.com/Dobefu/csb/cmd/database/query"
 	db_structs "github.com/Dobefu/csb/cmd/database/structs"
-	"github.com/Dobefu/csb/cmd/server/utils"
 )
+
+type queryRows interface {
+	Next() bool
+	Scan(dest ...interface{}) error
+}
+
+var queryQueryRows = func(table string, columns []string, where []db_structs.QueryWhere) (queryRows, error) {
+	return query.QueryRows(table, columns, where)
+}
+
+var apiUtilsGetAltLocales = api_utils.GetAltLocales
 
 func GetSitemapData(w http.ResponseWriter, r *http.Request) {
 	sitemapData, err := getEntries()
 
 	if err != nil {
-		utils.PrintError(w, err, false)
+		w.WriteHeader(http.StatusInternalServerError)
+		utilsPrintError(w, err, true)
 		return
 	}
 
-	output := utils.ConstructOutput()
+	output := utilsConstructOutput()
 	output["data"] = sitemapData
 
 	json, err := json.Marshal(output)
 
 	if err != nil {
-		utils.PrintError(w, err, true)
+		w.WriteHeader(http.StatusInternalServerError)
+		utilsPrintError(w, err, true)
 		return
 	}
 
@@ -36,7 +48,7 @@ func GetSitemapData(w http.ResponseWriter, r *http.Request) {
 }
 
 func getEntries() (map[string]interface{}, error) {
-	rows, err := query.QueryRows("routes",
+	rows, err := queryQueryRows("routes",
 		[]string{"uid", "locale", "url", "updated_at"},
 		[]db_structs.QueryWhere{
 			{
@@ -76,7 +88,7 @@ func getEntries() (map[string]interface{}, error) {
 			return entries, err
 		}
 
-		altLocales, err := api_utils.GetAltLocales(result, false)
+		altLocales, err := apiUtilsGetAltLocales(result, false)
 
 		if err != nil {
 			return entries, err
