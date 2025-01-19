@@ -20,6 +20,7 @@ import (
 )
 
 var queryTruncate = query.Truncate
+var stateSetState = state.SetState
 
 func Sync(reset bool) error {
 	routes := make(map[string]structs.Route)
@@ -89,7 +90,7 @@ func getNewSyncToken(data map[string]interface{}) (string, error) {
 		return "", nil
 	}
 
-	err := state.SetState("sync_token", newSyncToken.(string))
+	err := stateSetState("sync_token", newSyncToken.(string))
 
 	if err != nil {
 		return "", err
@@ -135,18 +136,18 @@ func addAllAssets(data map[string]interface{}) error {
 		filesize := getFilesize(assetData)
 
 		err := assets.SetAsset(structs.Asset{
-			Uid:   assetData["uid"].(string),
-			Title: getTitle(assetData),
-			// ContentType: assetData["content_type"].(string),
-			Locale:    publishDetails["locale"].(string),
-			Url:       getSlug(assetData),
-			Parent:    parentUid,
-			Version:   getVersion(assetData),
-			Filesize:  filesize,
-			Height:    assetHeight,
-			Width:     assetWidth,
-			UpdatedAt: getUpdatedAt(assetData),
-			Published: item["type"].(string) == "asset_published",
+			Uid:         assetData["uid"].(string),
+			Title:       getTitle(assetData),
+			ContentType: assetData["content_type"].(string),
+			Locale:      publishDetails["locale"].(string),
+			Url:         getSlug(assetData),
+			Parent:      parentUid,
+			Version:     getVersion(assetData),
+			Filesize:    filesize,
+			Height:      assetHeight,
+			Width:       assetWidth,
+			UpdatedAt:   getUpdatedAt(assetData),
+			Published:   item["type"].(string) == "asset_published",
 		})
 
 		if err != nil {
