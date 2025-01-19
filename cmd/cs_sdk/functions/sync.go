@@ -20,9 +20,14 @@ import (
 )
 
 var queryTruncate = query.Truncate
+var queryUpsert = query.Upsert
 var stateSetState = state.SetState
 var stateGetState = state.GetState
 var csSdkRequest = cs_sdk.Request
+var utilsGenerateId = utils.GenerateId
+var apiGetChildEntriesByUid = api.GetChildEntriesByUid
+var apiGetEntryByUid = api.GetEntryByUid
+var dbRoutesSetRoute = db_routes.SetRoute
 
 func Sync(reset bool) error {
 	routes := make(map[string]structs.Route)
@@ -256,7 +261,7 @@ func addSyncRoutes(data map[string]interface{}, routes *map[string]structs.Route
 		updatedAt := getUpdatedAt(data)
 		excludeSitemap := getExcludeSitemap(data)
 		isPublished := hasPublishDetails
-		id := utils.GenerateId(uid, locale)
+		id := utilsGenerateId(uid, locale)
 
 		logger.Verbose("Found entry: %s", uid)
 
@@ -361,7 +366,7 @@ func addRouteChildren(route structs.Route, routes *map[string]structs.Route, dep
 		return errors.New("potential infinite loop detected")
 	}
 
-	childRoutes, err := api.GetChildEntriesByUid(route.Uid, route.Locale, true)
+	childRoutes, err := apiGetChildEntriesByUid(route.Uid, route.Locale, true)
 
 	if err != nil {
 		return err
@@ -372,7 +377,7 @@ func addRouteChildren(route structs.Route, routes *map[string]structs.Route, dep
 			continue
 		}
 
-		id := utils.GenerateId(childRoute.Uid, childRoute.Locale)
+		id := utilsGenerateId(childRoute.Uid, childRoute.Locale)
 		(*routes)[id] = childRoute
 
 		err = addRouteChildren(childRoute, routes, depth+1)
@@ -393,14 +398,14 @@ func addRouteParents(route structs.Route, routes *map[string]structs.Route, dept
 		return errors.New("potential infinite loop detected")
 	}
 
-	parentId := utils.GenerateId(route.Parent, route.Locale)
+	parentId := utilsGenerateId(route.Parent, route.Locale)
 	parentRoute := (*routes)[parentId]
 
 	var err error
 
 	// If the parent page cannot be found in the routes, check the database.
 	if parentRoute.Uid == "" {
-		parentRoute, err = api.GetEntryByUid(route.Parent, route.Locale, true)
+		parentRoute, err = apiGetEntryByUid(route.Parent, route.Locale, true)
 
 		// If there is no parent, there will be an error.
 		// This is expected, since the database will not have any results.
@@ -410,7 +415,7 @@ func addRouteParents(route structs.Route, routes *map[string]structs.Route, dept
 		}
 	}
 
-	id := utils.GenerateId(parentRoute.Uid, parentRoute.Locale)
+	id := utilsGenerateId(parentRoute.Uid, parentRoute.Locale)
 	(*routes)[id] = parentRoute
 
 	err = addRouteParents(parentRoute, routes, depth+1)
@@ -528,7 +533,7 @@ func processSyncData(routes map[string]structs.Route) error {
 			Published:      route.Published,
 		}
 
-		err := db_routes.SetRoute(routes[uid])
+		err := dbRoutesSetRoute(routes[uid])
 
 		if err != nil {
 			return err
@@ -574,10 +579,10 @@ func processTranslations(route structs.Route) {
 
 	for _, translation := range translations.([]interface{}) {
 		source := translation.(map[string]interface{})["source"]
-		err = query.Upsert("translations", []db_structs.QueryValue{
+		err = queryUpsert("translations", []db_structs.QueryValue{
 			{
 				Name:  "id",
-				Value: fmt.Sprintf("%s%s", utils.GenerateId(route.Uid, route.Locale), source),
+				Value: fmt.Sprintf("%s%s", utilsGenerateId(route.Uid, route.Locale), source),
 			},
 			{
 				Name:  "uid",
@@ -628,7 +633,7 @@ func constructRouteUrl(route structs.Route, routes map[string]structs.Route) str
 			break
 		}
 
-		parentId := utils.GenerateId(parentUid, currentRoute.Locale)
+		parentId := utilsGenerateId(parentUid, currentRoute.Locale)
 		parent, hasParent := routes[parentId]
 
 		if !hasParent {
