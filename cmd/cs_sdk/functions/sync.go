@@ -28,6 +28,7 @@ var utilsGenerateId = utils.GenerateId
 var apiGetChildEntriesByUid = api.GetChildEntriesByUid
 var apiGetEntryByUid = api.GetEntryByUid
 var dbRoutesSetRoute = db_routes.SetRoute
+var assetsSetAsset = assets.SetAsset
 
 func Sync(reset bool) error {
 	routes := make(map[string]structs.Route)
@@ -118,7 +119,9 @@ func addAllAssets(data map[string]interface{}) error {
 	for idx, item := range items {
 		item := item.(map[string]interface{})
 
-		if item["content_type_uid"].(string) != "sys_assets" {
+		contentTypeUid, hasContentTypeUid := item["content_type_uid"]
+
+		if !hasContentTypeUid || contentTypeUid.(string) != "sys_assets" {
 			continue
 		}
 
@@ -148,7 +151,7 @@ func addAllAssets(data map[string]interface{}) error {
 			contentType = ""
 		}
 
-		err := assets.SetAsset(structs.Asset{
+		err := assetsSetAsset(structs.Asset{
 			Uid:         assetData["uid"].(string),
 			Title:       getTitle(assetData),
 			ContentType: contentType.(string),
@@ -236,7 +239,9 @@ func addSyncRoutes(data map[string]interface{}, routes *map[string]structs.Route
 	for idx, item := range items {
 		item := item.(map[string]interface{})
 
-		if item["content_type_uid"].(string) == "sys_assets" {
+		contentTypeUid, hasContentTypeUid := item["content_type_uid"]
+
+		if !hasContentTypeUid || contentTypeUid.(string) == "sys_assets" {
 			continue
 		}
 
