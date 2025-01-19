@@ -32,9 +32,9 @@ func TestTruncateMysql(t *testing.T) {
 	mock, cleanup := setupTest(t, "mysql")
 	defer cleanup()
 
-	(*mock).ExpectExec("TRUNCATE users").WillReturnResult(sqlmock.NewResult(0, 0))
+	(*mock).ExpectExec("TRUNCATE routes").WillReturnResult(sqlmock.NewResult(0, 0))
 
-	err := Truncate("users")
+	err := Truncate("routes")
 	assert.NoError(t, err)
 
 	assert.NoError(t, (*mock).ExpectationsWereMet())
@@ -44,9 +44,9 @@ func TestTruncateMysqlError(t *testing.T) {
 	mock, cleanup := setupTest(t, "mysql")
 	defer cleanup()
 
-	(*mock).ExpectExec("TRUNCATE users").WillReturnError(sqlmock.ErrCancelled)
+	(*mock).ExpectExec("TRUNCATE routes").WillReturnError(sqlmock.ErrCancelled)
 
-	err := Truncate("users")
+	err := Truncate("routes")
 	assert.Error(t, err)
 
 	assert.NoError(t, (*mock).ExpectationsWereMet())
@@ -80,9 +80,9 @@ func TestTruncatePostgres(t *testing.T) {
 	mock, cleanup := setupTest(t, "postgres")
 	defer cleanup()
 
-	(*mock).ExpectExec("TRUNCATE orders").WillReturnResult(sqlmock.NewResult(0, 0))
+	(*mock).ExpectExec("TRUNCATE translations").WillReturnResult(sqlmock.NewResult(0, 0))
 
-	err := Truncate("orders")
+	err := Truncate("translations")
 	assert.NoError(t, err)
 
 	assert.NoError(t, (*mock).ExpectationsWereMet())
@@ -92,9 +92,9 @@ func TestTruncatePostgresError(t *testing.T) {
 	mock, cleanup := setupTest(t, "postgres")
 	defer cleanup()
 
-	(*mock).ExpectExec("TRUNCATE orders").WillReturnError(sqlmock.ErrCancelled)
+	(*mock).ExpectExec("TRUNCATE translations").WillReturnError(sqlmock.ErrCancelled)
 
-	err := Truncate("orders")
+	err := Truncate("translations")
 	assert.Error(t, err)
 
 	assert.NoError(t, (*mock).ExpectationsWereMet())
