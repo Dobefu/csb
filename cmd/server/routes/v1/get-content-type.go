@@ -2,6 +2,7 @@ package v1
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 
@@ -10,23 +11,31 @@ import (
 	"github.com/Dobefu/csb/cmd/server/validation"
 )
 
+var validationCheckRequiredQueryParams = validation.CheckRequiredQueryParams
+var apiGetContentType = api.GetContentType
+
 func GetContentType(w http.ResponseWriter, r *http.Request) {
-	params, err := validation.CheckRequiredQueryParams(
+	params, err := validationCheckRequiredQueryParams(
 		r,
 		"content_type",
 	)
 
 	if err != nil {
-		utils.PrintError(w, err, false)
+		utilsPrintError(w, err, false)
 		return
 	}
 
-	contentTypeName := params["content_type"].(string)
+	contentTypeName, hasContentTypeName := params["content_type"]
 
-	contentType, err := api.GetContentType(contentTypeName)
+	if !hasContentTypeName {
+		utilsPrintError(w, errors.New("no content type name found"), false)
+		return
+	}
+
+	contentType, err := apiGetContentType(contentTypeName.(string))
 
 	if err != nil {
-		utils.PrintError(w, err, false)
+		utilsPrintError(w, err, false)
 		return
 	}
 
@@ -36,7 +45,8 @@ func GetContentType(w http.ResponseWriter, r *http.Request) {
 	json, err := json.Marshal(output)
 
 	if err != nil {
-		utils.PrintError(w, err, true)
+		w.WriteHeader(http.StatusInternalServerError)
+		utilsPrintError(w, err, true)
 		return
 	}
 
