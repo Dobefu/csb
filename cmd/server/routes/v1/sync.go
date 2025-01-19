@@ -5,14 +5,16 @@ import (
 	"net/http"
 
 	"github.com/Dobefu/csb/cmd/cs_sdk/functions"
-	"github.com/Dobefu/csb/cmd/server/utils"
 )
 
+var functionsSync = functions.Sync
+
 func Sync(w http.ResponseWriter, r *http.Request) {
-	err := functions.Sync(false)
+	err := functionsSync(false)
 
 	if err != nil {
-		utils.PrintError(w, err, false)
+		w.WriteHeader(http.StatusInternalServerError)
+		utilsPrintError(w, err, true)
 		return
 	}
 
