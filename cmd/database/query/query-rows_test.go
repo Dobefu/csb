@@ -1,50 +1,218 @@
 package query
 
 import (
-	"database/sql"
 	"os"
 	"testing"
 
+	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/Dobefu/csb/cmd/database"
 	"github.com/Dobefu/csb/cmd/database/structs"
-	"github.com/Dobefu/csb/cmd/init_env"
 	"github.com/Dobefu/csb/cmd/logger"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestQueryRows(t *testing.T) {
-	var row *sql.Rows
-	var rowEmpty *sql.Rows
-	var err error
-
-	init_env.Main("../../../.env.test")
-	err = database.Connect()
-	assert.Equal(t, nil, err)
-
-	err = resetDb()
-	assert.Equal(t, nil, err)
-
-	row, err = QueryRows("state", []string{"name"}, nil)
-	assert.Equal(t, nil, err)
-	assert.NotEqual(t, rowEmpty, row)
-
-	row, err = QueryRows("state", []string{"name"}, []structs.QueryWhere{
-		{
-			Name:     "name",
-			Value:    "bogus",
-			Operator: structs.EQUALS,
-		},
-	})
-	assert.Equal(t, nil, err)
-	assert.NotEqual(t, rowEmpty, row)
-
-	dbType := os.Getenv("DB_TYPE")
-	os.Setenv("DB_TYPE", "bogus")
+func setupQueryRowsTest(t *testing.T, dbType string) (*sqlmock.Sqlmock, func()) {
 	logger.SetExitOnFatal(false)
 
-	row, err = QueryRows("state", []string{"name"}, nil)
-	assert.Equal(t, nil, err)
-	assert.Equal(t, rowEmpty, row)
-
+	originalDBType := os.Getenv("DB_TYPE")
 	os.Setenv("DB_TYPE", dbType)
+
+	db, mock, err := sqlmock.New()
+
+	if err != nil {
+		t.Fatalf("An error '%s' was not expected when opening a stub database connection", err)
+	}
+
+	database.DB = db
+
+	return &mock, func() {
+		logger.SetExitOnFatal(true)
+		db.Close()
+		os.Setenv("DB_TYPE", originalDBType)
+	}
+}
+
+func TestQueryRowsMysql(t *testing.T) {
+	mock, cleanup := setupQueryRowsTest(t, "mysql")
+	defer cleanup()
+
+	fields := []string{"id", "path"}
+	where := []structs.QueryWhere{
+		{Name: "id", Operator: structs.EQUALS, Value: 1},
+	}
+
+	expectedSQL := "SELECT id, path FROM routes WHERE id = \\?"
+	rows := sqlmock.NewRows([]string{"id", "path"}).
+		AddRow(1, "/home")
+	(*mock).ExpectQuery(expectedSQL).
+		WithArgs(1).
+		WillReturnRows(rows)
+
+	result, err := QueryRows("routes", fields, where)
+	assert.NoError(t, err)
+	assert.NotNil(t, result)
+
+	var routes []struct {
+		ID   int
+		Path string
+	}
+
+	for result.Next() {
+		var route struct {
+			ID   int
+			Path string
+		}
+		err := result.Scan(&route.ID, &route.Path)
+		assert.NoError(t, err)
+		routes = append(routes, route)
+	}
+
+	assert.Len(t, routes, 1)
+	assert.Equal(t, 1, routes[0].ID)
+	assert.Equal(t, "/home", routes[0].Path)
+
+	assert.NoError(t, (*mock).ExpectationsWereMet())
+}
+
+func TestQueryRowsSqlite3(t *testing.T) {
+	mock, cleanup := setupQueryRowsTest(t, "sqlite3")
+	defer cleanup()
+
+	fields := []string{"id", "key", "value"}
+	where := []structs.QueryWhere{
+		{Name: "id", Operator: structs.EQUALS, Value: 2},
+	}
+
+	expectedSQL := "SELECT id, key, value FROM translations WHERE id = \\?"
+	rows := sqlmock.NewRows([]string{"id", "key", "value"}).
+		AddRow(2, "goodbye", "Goodbye")
+	(*mock).ExpectQuery(expectedSQL).
+		WithArgs(2).
+		WillReturnRows(rows)
+
+	result, err := QueryRows("translations", fields, where)
+	assert.NoError(t, err)
+	assert.NotNil(t, result)
+
+	var translations []struct {
+		ID    int
+		Key   string
+		Value string
+	}
+
+	for result.Next() {
+		var translation struct {
+			ID    int
+			Key   string
+			Value string
+		}
+		err := result.Scan(&translation.ID, &translation.Key, &translation.Value)
+		assert.NoError(t, err)
+		translations = append(translations, translation)
+	}
+
+	assert.Len(t, translations, 1)
+	assert.Equal(t, 2, translations[0].ID)
+	assert.Equal(t, "goodbye", translations[0].Key)
+	assert.Equal(t, "Goodbye", translations[0].Value)
+
+	assert.NoError(t, (*mock).ExpectationsWereMet())
+}
+
+func TestQueryRowsPostgres(t *testing.T) {
+	mock, cleanup := setupQueryRowsTest(t, "postgres")
+	defer cleanup()
+
+	fields := []string{"id", "path"}
+	where := []structs.QueryWhere{
+		{Name: "id", Operator: structs.EQUALS, Value: 1},
+	}
+
+	expectedSQL := "SELECT id, path FROM routes WHERE id = \\$1"
+	rows := sqlmock.NewRows([]string{"id", "path"}).
+		AddRow(1, "/home")
+	(*mock).ExpectQuery(expectedSQL).
+		WithArgs(1).
+		WillReturnRows(rows)
+
+	result, err := QueryRows("routes", fields, where)
+	assert.NoError(t, err)
+	assert.NotNil(t, result)
+
+	var routes []struct {
+		ID   int
+		Path string
+	}
+
+	for result.Next() {
+		var route struct {
+			ID   int
+			Path string
+		}
+		err := result.Scan(&route.ID, &route.Path)
+		assert.NoError(t, err)
+		routes = append(routes, route)
+	}
+
+	assert.Len(t, routes, 1)
+	assert.Equal(t, 1, routes[0].ID)
+	assert.Equal(t, "/home", routes[0].Path)
+
+	assert.NoError(t, (*mock).ExpectationsWereMet())
+}
+
+func TestQueryRowsNoWhere(t *testing.T) {
+	mock, cleanup := setupQueryRowsTest(t, "mysql")
+	defer cleanup()
+
+	fields := []string{"id", "path"}
+	var where []structs.QueryWhere
+
+	expectedSQL := "SELECT id, path FROM routes"
+	rows := sqlmock.NewRows([]string{"id", "path"}).
+		AddRow(1, "/home").
+		AddRow(2, "/about")
+	(*mock).ExpectQuery(expectedSQL).
+		WillReturnRows(rows)
+
+	result, err := QueryRows("routes", fields, where)
+	assert.NoError(t, err)
+	assert.NotNil(t, result)
+
+	var routes []struct {
+		ID   int
+		Path string
+	}
+
+	for result.Next() {
+		var route struct {
+			ID   int
+			Path string
+		}
+		err := result.Scan(&route.ID, &route.Path)
+		assert.NoError(t, err)
+		routes = append(routes, route)
+	}
+
+	assert.Len(t, routes, 2)
+	assert.Equal(t, 1, routes[0].ID)
+	assert.Equal(t, "/home", routes[0].Path)
+	assert.Equal(t, 2, routes[1].ID)
+	assert.Equal(t, "/about", routes[1].Path)
+
+	assert.NoError(t, (*mock).ExpectationsWereMet())
+}
+
+func TestQueryRowsUnsupportedDB(t *testing.T) {
+	_, cleanup := setupQueryRowsTest(t, "bogus")
+	defer cleanup()
+
+	fields := []string{"id", "path"}
+	where := []structs.QueryWhere{
+		{Name: "id", Operator: structs.EQUALS, Value: 1},
+	}
+
+	result, err := QueryRows("routes", fields, where)
+	assert.NoError(t, err)
+	assert.Nil(t, result)
 }
