@@ -9,21 +9,25 @@ import (
 	"github.com/Dobefu/csb/cmd/server/utils"
 )
 
+var apiGetLocales = api.GetLocales
+var utilsConstructOutput = utils.ConstructOutput
+var utilsPrintError = utils.PrintError
+
 func GetLocales(w http.ResponseWriter, r *http.Request) {
-	locales, err := api.GetLocales()
+	locales, err := apiGetLocales()
 
 	if err != nil {
-		utils.PrintError(w, err, false)
+		utilsPrintError(w, err, false)
 		return
 	}
 
-	output := utils.ConstructOutput()
+	output := utilsConstructOutput()
 	output["data"] = locales
 
 	json, err := json.Marshal(output)
 
 	if err != nil {
-		utils.PrintError(w, err, true)
+		utilsPrintError(w, err, true)
 		return
 	}
 
