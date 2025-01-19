@@ -19,12 +19,14 @@ import (
 	"github.com/Dobefu/csb/cmd/logger"
 )
 
+var queryTruncate = query.Truncate
+
 func Sync(reset bool) error {
 	routes := make(map[string]structs.Route)
 
 	if reset {
 		logger.Info("Truncating the routes table")
-		err := query.Truncate("routes")
+		err := queryTruncate("routes")
 
 		if err != nil {
 			return err
@@ -81,17 +83,19 @@ func Sync(reset bool) error {
 }
 
 func getNewSyncToken(data map[string]interface{}) (string, error) {
-	newSyncToken, hasNewSyncToken := data["sync_token"].(string)
+	newSyncToken, hasNewSyncToken := data["sync_token"]
 
-	if hasNewSyncToken {
-		err := state.SetState("sync_token", newSyncToken)
-
-		if err != nil {
-			return "", err
-		}
+	if !hasNewSyncToken {
+		return "", nil
 	}
 
-	return newSyncToken, nil
+	err := state.SetState("sync_token", newSyncToken.(string))
+
+	if err != nil {
+		return "", err
+	}
+
+	return newSyncToken.(string), nil
 }
 
 func addAllAssets(data map[string]interface{}) error {
