@@ -6,24 +6,27 @@ import (
 	"net/http"
 
 	"github.com/Dobefu/csb/cmd/api"
-	"github.com/Dobefu/csb/cmd/server/utils"
 )
 
+var apiGetGlobalFields = api.GetGlobalFields
+
 func GetGlobalFields(w http.ResponseWriter, r *http.Request) {
-	globalFields, err := api.GetGlobalFields()
+	globalFields, err := apiGetGlobalFields()
 
 	if err != nil {
-		utils.PrintError(w, err, false)
+		w.WriteHeader(http.StatusInternalServerError)
+		utilsPrintError(w, err, true)
 		return
 	}
 
-	output := utils.ConstructOutput()
+	output := utilsConstructOutput()
 	output["data"] = globalFields
 
 	json, err := json.Marshal(output)
 
 	if err != nil {
-		utils.PrintError(w, err, true)
+		w.WriteHeader(http.StatusInternalServerError)
+		utilsPrintError(w, err, true)
 		return
 	}
 
