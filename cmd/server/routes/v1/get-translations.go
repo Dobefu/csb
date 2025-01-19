@@ -6,37 +6,40 @@ import (
 	"net/http"
 
 	"github.com/Dobefu/csb/cmd/api"
-	"github.com/Dobefu/csb/cmd/server/utils"
-	"github.com/Dobefu/csb/cmd/server/validation"
 )
 
+var apiGetTranslations = api.GetTranslations
+
 func GetTranslations(w http.ResponseWriter, r *http.Request) {
-	params, err := validation.CheckRequiredQueryParams(
+	params, err := validationCheckRequiredQueryParams(
 		r,
 		"locale",
 	)
 
 	if err != nil {
-		utils.PrintError(w, err, false)
+		w.WriteHeader(http.StatusBadRequest)
+		utilsPrintError(w, err, false)
 		return
 	}
 
 	locale := params["locale"].(string)
 
-	translations, err := api.GetTranslations(locale)
+	translations, err := apiGetTranslations(locale)
 
 	if err != nil {
-		utils.PrintError(w, err, false)
+		w.WriteHeader(http.StatusInternalServerError)
+		utilsPrintError(w, err, true)
 		return
 	}
 
-	output := utils.ConstructOutput()
+	output := utilsConstructOutput()
 	output["data"] = translations
 
 	json, err := json.Marshal(output)
 
 	if err != nil {
-		utils.PrintError(w, err, true)
+		w.WriteHeader(http.StatusInternalServerError)
+		utilsPrintError(w, err, true)
 		return
 	}
 
