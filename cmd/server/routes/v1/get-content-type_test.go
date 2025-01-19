@@ -28,7 +28,8 @@ func setupGetContentTypeTest() (*httptest.ResponseRecorder, func()) {
 		} else {
 			w.WriteHeader(http.StatusBadRequest)
 		}
-		json.NewEncoder(w).Encode(map[string]interface{}{"data": nil, "error": err.Error()})
+
+		_ = json.NewEncoder(w).Encode(map[string]interface{}{"data": nil, "error": err.Error()})
 	}
 
 	rr := httptest.NewRecorder()
