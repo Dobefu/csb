@@ -1,39 +1,15 @@
 package query
 
 import (
-	"os"
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
-	"github.com/Dobefu/csb/cmd/database"
 	"github.com/Dobefu/csb/cmd/database/structs"
-	"github.com/Dobefu/csb/cmd/logger"
 	"github.com/stretchr/testify/assert"
 )
 
-func setupUpsertTest(t *testing.T, dbType string) (*sqlmock.Sqlmock, func()) {
-	logger.SetExitOnFatal(false)
-
-	originalDBType := os.Getenv("DB_TYPE")
-	os.Setenv("DB_TYPE", dbType)
-
-	db, mock, err := sqlmock.New()
-
-	if err != nil {
-		t.Fatalf("An error '%s' was not expected when opening a stub database connection", err)
-	}
-
-	database.DB = db
-
-	return &mock, func() {
-		logger.SetExitOnFatal(true)
-		db.Close()
-		os.Setenv("DB_TYPE", originalDBType)
-	}
-}
-
 func TestUpsertMysql(t *testing.T) {
-	mock, cleanup := setupUpsertTest(t, "mysql")
+	mock, cleanup := setupTest(t, "mysql")
 	defer cleanup()
 
 	routeValues := []structs.QueryValue{
@@ -67,7 +43,7 @@ func TestUpsertMysql(t *testing.T) {
 }
 
 func TestUpsertMysqlError(t *testing.T) {
-	mock, cleanup := setupUpsertTest(t, "mysql")
+	mock, cleanup := setupTest(t, "mysql")
 	defer cleanup()
 
 	values := []structs.QueryValue{
@@ -87,7 +63,7 @@ func TestUpsertMysqlError(t *testing.T) {
 }
 
 func TestUpsertSqlite3(t *testing.T) {
-	mock, cleanup := setupUpsertTest(t, "sqlite3")
+	mock, cleanup := setupTest(t, "sqlite3")
 	defer cleanup()
 
 	values := []structs.QueryValue{
@@ -108,7 +84,7 @@ func TestUpsertSqlite3(t *testing.T) {
 }
 
 func TestUpsertSqlite3Error(t *testing.T) {
-	mock, cleanup := setupUpsertTest(t, "sqlite3")
+	mock, cleanup := setupTest(t, "sqlite3")
 	defer cleanup()
 
 	values := []structs.QueryValue{
@@ -129,7 +105,7 @@ func TestUpsertSqlite3Error(t *testing.T) {
 }
 
 func TestUpsertPostgres(t *testing.T) {
-	mock, cleanup := setupUpsertTest(t, "postgres")
+	mock, cleanup := setupTest(t, "postgres")
 	defer cleanup()
 
 	values := []structs.QueryValue{
@@ -149,7 +125,7 @@ func TestUpsertPostgres(t *testing.T) {
 }
 
 func TestUpsertPostgresError(t *testing.T) {
-	mock, cleanup := setupUpsertTest(t, "postgres")
+	mock, cleanup := setupTest(t, "postgres")
 	defer cleanup()
 
 	values := []structs.QueryValue{
@@ -169,7 +145,7 @@ func TestUpsertPostgresError(t *testing.T) {
 }
 
 func TestUpsertUnsupportedDB(t *testing.T) {
-	mock, cleanup := setupUpsertTest(t, "bogus")
+	mock, cleanup := setupTest(t, "bogus")
 	defer cleanup()
 
 	values := []structs.QueryValue{

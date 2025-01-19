@@ -1,39 +1,15 @@
 package query
 
 import (
-	"os"
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
-	"github.com/Dobefu/csb/cmd/database"
 	"github.com/Dobefu/csb/cmd/database/structs"
-	"github.com/Dobefu/csb/cmd/logger"
 	"github.com/stretchr/testify/assert"
 )
 
-func setupQueryRowsTest(t *testing.T, dbType string) (*sqlmock.Sqlmock, func()) {
-	logger.SetExitOnFatal(false)
-
-	originalDBType := os.Getenv("DB_TYPE")
-	os.Setenv("DB_TYPE", dbType)
-
-	db, mock, err := sqlmock.New()
-
-	if err != nil {
-		t.Fatalf("An error '%s' was not expected when opening a stub database connection", err)
-	}
-
-	database.DB = db
-
-	return &mock, func() {
-		logger.SetExitOnFatal(true)
-		db.Close()
-		os.Setenv("DB_TYPE", originalDBType)
-	}
-}
-
 func TestQueryRowsMysql(t *testing.T) {
-	mock, cleanup := setupQueryRowsTest(t, "mysql")
+	mock, cleanup := setupTest(t, "mysql")
 	defer cleanup()
 
 	fields := []string{"id", "path"}
@@ -75,7 +51,7 @@ func TestQueryRowsMysql(t *testing.T) {
 }
 
 func TestQueryRowsSqlite3(t *testing.T) {
-	mock, cleanup := setupQueryRowsTest(t, "sqlite3")
+	mock, cleanup := setupTest(t, "sqlite3")
 	defer cleanup()
 
 	fields := []string{"id", "key", "value"}
@@ -120,7 +96,7 @@ func TestQueryRowsSqlite3(t *testing.T) {
 }
 
 func TestQueryRowsPostgres(t *testing.T) {
-	mock, cleanup := setupQueryRowsTest(t, "postgres")
+	mock, cleanup := setupTest(t, "postgres")
 	defer cleanup()
 
 	fields := []string{"id", "path"}
@@ -162,7 +138,7 @@ func TestQueryRowsPostgres(t *testing.T) {
 }
 
 func TestQueryRowsNoWhere(t *testing.T) {
-	mock, cleanup := setupQueryRowsTest(t, "mysql")
+	mock, cleanup := setupTest(t, "mysql")
 	defer cleanup()
 
 	fields := []string{"id", "path"}
@@ -204,7 +180,7 @@ func TestQueryRowsNoWhere(t *testing.T) {
 }
 
 func TestQueryRowsUnsupportedDB(t *testing.T) {
-	_, cleanup := setupQueryRowsTest(t, "bogus")
+	_, cleanup := setupTest(t, "bogus")
 	defer cleanup()
 
 	fields := []string{"id", "path"}
