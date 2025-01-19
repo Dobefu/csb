@@ -7,5 +7,11 @@ import (
 )
 
 func QueryRaw(sql string) (sql.Result, error) {
-	return database.DB.Exec(sql)
+	result, err := database.DB.Exec(sql)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return result, nil
 }
