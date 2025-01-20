@@ -226,3 +226,193 @@ func TestAddAllRoutesErrAddRouteParents(t *testing.T) {
 
 	assert.EqualError(t, err, "potential infinite loop detected")
 }
+
+func TestGetSyncDataPaginationToken(t *testing.T) {
+	cleanup := setupTestSync()
+	defer cleanup()
+
+	data, err := getSyncData("test-token", false, "")
+
+	assert.NoError(t, err)
+	assert.NotNil(t, data)
+}
+
+func TestGetFilesizeSuccess(t *testing.T) {
+	cleanup := setupTestSync()
+	defer cleanup()
+
+	filesize := getFilesize(map[string]interface{}{"file_size": "100"})
+
+	assert.Equal(t, 100, filesize)
+}
+
+func TestGetFilesizeErrAtoi(t *testing.T) {
+	cleanup := setupTestSync()
+	defer cleanup()
+
+	filesize := getFilesize(map[string]interface{}{"file_size": "bogus"})
+
+	assert.Equal(t, 0, filesize)
+}
+
+func TestGetTitleSuccessTitle(t *testing.T) {
+	cleanup := setupTestSync()
+	defer cleanup()
+
+	title := getTitle(map[string]interface{}{
+		"title": "test-title",
+	})
+
+	assert.Equal(t, "test-title", title)
+}
+
+func TestGetTitleSuccessSeoTitle(t *testing.T) {
+	cleanup := setupTestSync()
+	defer cleanup()
+
+	title := getTitle(map[string]interface{}{
+		"title": "test-title",
+		"seo": map[string]interface{}{
+			"title": "test-seo-title",
+		},
+	})
+
+	assert.Equal(t, "test-seo-title", title)
+}
+
+func TestGetTitleErrSeoEmpty(t *testing.T) {
+	cleanup := setupTestSync()
+	defer cleanup()
+
+	title := getTitle(map[string]interface{}{
+		"title": "test-title",
+		"seo":   map[string]interface{}{},
+	})
+
+	assert.Equal(t, "test-title", title)
+}
+
+func TestGetTitleErrSeoEmptyNoTitle(t *testing.T) {
+	cleanup := setupTestSync()
+	defer cleanup()
+
+	title := getTitle(map[string]interface{}{
+		"seo": map[string]interface{}{},
+	})
+
+	assert.Equal(t, "", title)
+}
+
+func TestAddRouteChildrenErrMaxDepth(t *testing.T) {
+	cleanup := setupTestSync()
+	defer cleanup()
+
+	route := structs.Route{
+		Uid:    "test-uid",
+		Locale: "en",
+	}
+
+	apiGetChildEntriesByUid = func(uid string, locale string, includePages bool) ([]structs.Route, error) {
+		return []structs.Route{route}, nil
+	}
+
+	err := addRouteChildren(
+		structs.Route{},
+		&(map[string]structs.Route{}),
+		0,
+	)
+
+	assert.EqualError(t, err, "potential infinite loop detected")
+}
+
+func TestAddRouteChildrenErrNoUid(t *testing.T) {
+	cleanup := setupTestSync()
+	defer cleanup()
+
+	apiGetChildEntriesByUid = func(uid string, locale string, includePages bool) ([]structs.Route, error) {
+		return []structs.Route{{}}, nil
+	}
+
+	err := addRouteChildren(
+		structs.Route{},
+		&(map[string]structs.Route{}),
+		0,
+	)
+
+	assert.NoError(t, err)
+}
+
+func TestAddRouteParentsNoParentUid(t *testing.T) {
+	cleanup := setupTestSync()
+	defer cleanup()
+
+	apiGetEntryByUid = func(uid string, locale string, includeUnpublished bool) (structs.Route, error) {
+		return structs.Route{}, errors.New("cannot get entry by UID")
+	}
+
+	err := addRouteParents(
+		structs.Route{Parent: "test-parent-uid"},
+		&(map[string]structs.Route{}),
+		0,
+	)
+
+	assert.NoError(t, err)
+}
+
+func TestGetParentUidNoParentData(t *testing.T) {
+	cleanup := setupTestSync()
+	defer cleanup()
+
+	apiGetEntryByUid = func(uid string, locale string, includeUnpublished bool) (structs.Route, error) {
+		return structs.Route{}, errors.New("cannot get entry by UID")
+	}
+
+	parentUid := getParentUid(
+		map[string]interface{}{
+			"parent": []interface{}{[]interface{}{}},
+		},
+	)
+
+	assert.Equal(t, "", parentUid)
+}
+
+func TestGetParentUidNoParentUid(t *testing.T) {
+	cleanup := setupTestSync()
+	defer cleanup()
+
+	apiGetEntryByUid = func(uid string, locale string, includeUnpublished bool) (structs.Route, error) {
+		return structs.Route{}, errors.New("cannot get entry by UID")
+	}
+
+	parentUid := getParentUid(
+		map[string]interface{}{
+			"parent": []interface{}{map[string]interface{}{}},
+		},
+	)
+
+	assert.Equal(t, "", parentUid)
+}
+
+func TestGetVersionSuccess(t *testing.T) {
+	cleanup := setupTestSync()
+	defer cleanup()
+
+	version := getVersion(map[string]interface{}{"_version": 1.0})
+
+	assert.Equal(t, 1, version)
+}
+
+func TestGetAssetDimensionsSuccess(t *testing.T) {
+	cleanup := setupTestSync()
+	defer cleanup()
+
+	height, width := getAssetDimensions(map[string]interface{}{
+		"dimension": map[string]interface{}{
+			"height": 100.0,
+			"width":  200.0,
+		},
+	})
+
+	assert.Equal(t, 100, height)
+	assert.Equal(t, 200, width)
+}
