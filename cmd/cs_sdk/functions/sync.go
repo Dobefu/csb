@@ -345,7 +345,7 @@ func addChildRoutes(routes *map[string]structs.Route) error {
 		err := addRouteChildren(route, routes, 0)
 
 		if err != nil {
-			continue
+			return err
 		}
 	}
 
@@ -357,7 +357,7 @@ func addParentRoutes(routes *map[string]structs.Route) error {
 		err := addRouteParents(route, routes, 0)
 
 		if err != nil {
-			continue
+			return err
 		}
 	}
 
@@ -406,7 +406,7 @@ func addRouteParents(route structs.Route, routes *map[string]structs.Route, dept
 	parentId := utilsGenerateId(route.Parent, route.Locale)
 
 	if parentId == "" {
-		return errors.New("the parent UID is an empty string")
+		return nil
 	}
 
 	parentRoute := (*routes)[parentId]

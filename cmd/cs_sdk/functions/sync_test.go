@@ -2,6 +2,7 @@ package functions
 
 import (
 	"errors"
+	"fmt"
 	"testing"
 
 	"github.com/Dobefu/csb/cmd/api"
@@ -48,7 +49,9 @@ func setupTestSync() func() {
 		return data, nil
 	}
 
-	utilsGenerateId = func(uid string, locale string) string { return "" }
+	utilsGenerateId = func(uid string, locale string) string {
+		return fmt.Sprintf("%s%s", uid, locale)
+	}
 
 	apiGetChildEntriesByUid = func(uid string, locale string, includeUnpublished bool) ([]structs.Route, error) {
 		return []structs.Route{}, nil
@@ -163,4 +166,63 @@ func TestSyncNoResetErrProcessSyncData(t *testing.T) {
 
 	err := Sync(false)
 	assert.EqualError(t, err, "failed setting route")
+}
+
+func TestAddAllAssetsErrNoItems(t *testing.T) {
+	cleanup := setupTestSync()
+	defer cleanup()
+
+	err := addAllAssets(make(map[string]interface{}))
+	assert.EqualError(t, err, "sync data has no items")
+}
+
+func TestAddAllRoutesErrAddRouteChildren(t *testing.T) {
+	cleanup := setupTestSync()
+	defer cleanup()
+
+	apiGetChildEntriesByUid = func(uid string, locale string, includeUnpublished bool) ([]structs.Route, error) {
+		return nil, errors.New("cannot get child entries")
+	}
+
+	err := addAllRoutes(
+		map[string]interface{}{
+			"items": []interface{}{
+				map[string]interface{}{
+					"content_type_uid": "page",
+					"data": map[string]interface{}{
+						"uid":    "test-uid-route",
+						"locale": "en",
+					},
+				},
+			},
+		},
+		&(map[string]structs.Route{}),
+	)
+
+	assert.EqualError(t, err, "cannot get child entries")
+}
+
+func TestAddAllRoutesErrAddRouteParents(t *testing.T) {
+	cleanup := setupTestSync()
+	defer cleanup()
+
+	entries := map[string]interface{}{"items": make([]interface{}, 11)}
+
+	for i := 0; i < 11; i++ {
+		entries["items"].([]interface{})[i] = map[string]interface{}{
+			"content_type_uid": "page",
+			"data": map[string]interface{}{
+				"uid":    fmt.Sprintf("uid-%d", i),
+				"locale": "en",
+				"parent": []interface{}{map[string]interface{}{"uid": fmt.Sprintf("uid-%d", i-1)}},
+			},
+		}
+	}
+
+	err := addAllRoutes(
+		entries,
+		&(map[string]structs.Route{}),
+	)
+
+	assert.EqualError(t, err, "potential infinite loop detected")
 }
