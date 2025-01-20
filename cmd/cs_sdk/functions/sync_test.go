@@ -26,9 +26,11 @@ func setupTestSync() func() {
 		data := map[string]interface{}{
 			"items": []interface{}{
 				map[string]interface{}{
+					"content_type_uid": "page",
 					"data": map[string]interface{}{
-						"uid": "test-uid-route",
-						"url": "/",
+						"uid":    "test-uid-route",
+						"url":    "/",
+						"locale": "en",
 					},
 				},
 				map[string]interface{}{
@@ -149,4 +151,16 @@ func TestSyncNoResetErrAddAssets(t *testing.T) {
 
 	err := Sync(false)
 	assert.EqualError(t, err, "failed setting asset")
+}
+
+func TestSyncNoResetErrProcessSyncData(t *testing.T) {
+	cleanup := setupTestSync()
+	defer cleanup()
+
+	dbRoutesSetRoute = func(route structs.Route) error {
+		return errors.New("failed setting route")
+	}
+
+	err := Sync(false)
+	assert.EqualError(t, err, "failed setting route")
 }

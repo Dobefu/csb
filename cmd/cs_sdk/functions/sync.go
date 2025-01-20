@@ -248,7 +248,7 @@ func addSyncRoutes(data map[string]interface{}, routes *map[string]structs.Route
 		logger.Info("Fetching item data (%d/%d)", (idx + 1), itemCount)
 
 		data := item["data"].(map[string]interface{})
-		publishDetails, hasPublishDetails := data["publish_details"].(map[string]interface{})
+		publishDetails, hasPublishDetails := data["publish_details"]
 
 		if !hasPublishDetails {
 			publishDetails = map[string]interface{}{
@@ -259,7 +259,7 @@ func addSyncRoutes(data map[string]interface{}, routes *map[string]structs.Route
 		uid := data["uid"].(string)
 		title := getTitle(data)
 		contentType := item["content_type_uid"].(string)
-		locale := publishDetails["locale"].(string)
+		locale := publishDetails.(map[string]interface{})["locale"].(string)
 		slug := getSlug(data)
 		parent := getParentUid(data)
 		version := getVersion(data)
@@ -404,6 +404,11 @@ func addRouteParents(route structs.Route, routes *map[string]structs.Route, dept
 	}
 
 	parentId := utilsGenerateId(route.Parent, route.Locale)
+
+	if parentId == "" {
+		return errors.New("the parent UID is an empty string")
+	}
+
 	parentRoute := (*routes)[parentId]
 
 	var err error
