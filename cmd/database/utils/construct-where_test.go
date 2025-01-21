@@ -1,40 +1,55 @@
 package utils
 
 import (
+	"os"
 	"testing"
 
 	"github.com/Dobefu/csb/cmd/database/structs"
-	"github.com/Dobefu/csb/cmd/init_env"
+	"github.com/Dobefu/csb/cmd/logger"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestConstructWhere(t *testing.T) {
-	init_env.Main("../../../.env.test")
+func setupConstructWhereTest() func() {
+	env := os.Getenv("DB_TYPE")
+	os.Setenv("DB_TYPE", "mysql")
+	logger.SetExitOnFatal(false)
+
+	return func() {
+		os.Setenv("DB_TYPE", env)
+		logger.SetExitOnFatal(true)
+	}
+}
+
+func TestConstructWhereSuccess(t *testing.T) {
+	cleanup := setupConstructWhereTest()
+	defer cleanup()
 
 	where, args := ConstructWhere([]structs.QueryWhere{
 		{
-			Name:     "test",
-			Value:    "test",
-			Operator: structs.EQUALS,
-		},
-	})
-
-	assert.Equal(t, where, "WHERE test = ?")
-	assert.Equal(t, args, []interface{}{"test"})
-
-	where, args = ConstructWhere([]structs.QueryWhere{
-		{
-			Name:     "test1",
-			Value:    "test 1",
-			Operator: structs.EQUALS,
+			Name:  "name",
+			Value: "value",
 		},
 		{
-			Name:     "test2",
-			Value:    "test 2",
-			Operator: structs.NOT_EQUALS,
+			Name:  "name2",
+			Value: "value2",
 		},
 	})
+	assert.Equal(t, "WHERE name = ? AND name2 = ?", where)
+	assert.Equal(t, []interface{}{"value", "value2"}, args)
+}
 
-	assert.Equal(t, where, "WHERE test1 = ? AND test2 <> ?")
-	assert.Equal(t, args, []interface{}{"test 1", "test 2"})
+func TestConstructWhereErrParseOperator(t *testing.T) {
+	cleanup := setupConstructWhereTest()
+	defer cleanup()
+
+	os.Setenv("DB_TYPE", "bogus")
+
+	where, args := ConstructWhere([]structs.QueryWhere{
+		{
+			Name:  "name",
+			Value: "value",
+		},
+	})
+	assert.Equal(t, "WHERE ", where)
+	assert.Equal(t, []interface{}(nil), args)
 }
