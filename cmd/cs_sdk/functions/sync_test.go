@@ -618,3 +618,52 @@ func TestProcessSyncDataTranslationsErrUpsert(t *testing.T) {
 
 	assert.NoError(t, err)
 }
+
+func TestConstructRouteUrlErrMaxDepth(t *testing.T) {
+	cleanup := setupTestSync()
+	defer cleanup()
+
+	url := constructRouteUrl(
+		structs.Route{
+			Uid:    "r0en",
+			Locale: "en",
+			Parent: "p0",
+		},
+		map[string]structs.Route{
+			"r0en": {
+				Uid:    "r0en",
+				Locale: "en",
+				Parent: "p0",
+			},
+			"p0en": {
+				Uid:    "p0en",
+				Locale: "en",
+				Parent: "r0",
+			},
+		},
+	)
+
+	assert.Equal(t, "", url)
+}
+
+func TestConstructRouteUrlNoParent(t *testing.T) {
+	cleanup := setupTestSync()
+	defer cleanup()
+
+	url := constructRouteUrl(
+		structs.Route{
+			Uid:    "r0",
+			Locale: "en",
+			Parent: "p0",
+		},
+		map[string]structs.Route{
+			"r0en": {
+				Uid:    "r0en",
+				Locale: "en",
+				Parent: "p0",
+			},
+		},
+	)
+
+	assert.Equal(t, "", url)
+}
