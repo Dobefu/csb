@@ -7,10 +7,13 @@ import (
 	db_structs "github.com/Dobefu/csb/cmd/database/structs"
 )
 
+var queryUpsert = query.Upsert
+var utilsGenerateId = utils.GenerateId
+
 func SetRoute(
 	route structs.Route,
 ) error {
-	err := query.Upsert("routes", getRouteValues(route))
+	err := queryUpsert("routes", getRouteValues(route))
 
 	if err != nil {
 		return err
@@ -23,7 +26,7 @@ func getRouteValues(route structs.Route) []db_structs.QueryValue {
 	return []db_structs.QueryValue{
 		{
 			Name:  "id",
-			Value: utils.GenerateId(route.Uid, route.Locale),
+			Value: utilsGenerateId(route.Uid, route.Locale),
 		},
 		{
 			Name:  "uid",
