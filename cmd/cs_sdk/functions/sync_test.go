@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"testing"
+	"time"
 
 	"github.com/Dobefu/csb/cmd/api"
 	"github.com/Dobefu/csb/cmd/cs_sdk"
@@ -415,4 +416,205 @@ func TestGetAssetDimensionsSuccess(t *testing.T) {
 
 	assert.Equal(t, 100, height)
 	assert.Equal(t, 200, width)
+}
+
+func TestGetUpdatedAtSuccess(t *testing.T) {
+	cleanup := setupTestSync()
+	defer cleanup()
+
+	updatedAt := getUpdatedAt(map[string]interface{}{"updated_at": "2000-01-01T00:00:00+00:00"})
+
+	assert.Equal(t, int64(946684800), updatedAt.Unix())
+}
+
+func TestGetUpdatedAtErrInvalid(t *testing.T) {
+	cleanup := setupTestSync()
+	defer cleanup()
+
+	updatedAt := getUpdatedAt(map[string]interface{}{"updated_at": "bogus"})
+
+	assert.Equal(t, time.Now().Unix(), updatedAt.Unix())
+}
+
+func TestGetExcludeSitemapSuccess(t *testing.T) {
+	cleanup := setupTestSync()
+	defer cleanup()
+
+	excludeSitemap := getExcludeSitemap(map[string]interface{}{
+		"seo": map[string]interface{}{
+			"exclude_sitemap": true,
+		},
+	})
+
+	assert.Equal(t, true, excludeSitemap)
+}
+
+func TestGetExcludeSitemapEmptySeo(t *testing.T) {
+	cleanup := setupTestSync()
+	defer cleanup()
+
+	excludeSitemap := getExcludeSitemap(map[string]interface{}{
+		"seo": map[string]interface{}{},
+	})
+
+	assert.Equal(t, false, excludeSitemap)
+}
+
+func TestProcessSyncDataTranslationsSuccess(t *testing.T) {
+	cleanup := setupTestSync()
+	defer cleanup()
+
+	csSdkRequest = func(path string, method string, body map[string]interface{}, useManagementToken bool) (map[string]interface{}, error) {
+		data := map[string]interface{}{
+			"entry": map[string]interface{}{
+				"content_type_uid": "translations",
+				"category":         "category",
+				"data": map[string]interface{}{
+					"uid":    "translation-0",
+					"locale": "en",
+				},
+				"translations": []interface{}{map[string]interface{}{
+					"source":      "source",
+					"translation": "translation",
+				}},
+			},
+		}
+
+		return data, nil
+	}
+
+	err := processSyncData(map[string]structs.Route{
+		"t0": {
+			Uid:         "translation-0",
+			ContentType: "translations",
+		},
+	})
+
+	assert.NoError(t, err)
+}
+
+func TestProcessTranslationsCsSdkGet(t *testing.T) {
+	cleanup := setupTestSync()
+	defer cleanup()
+
+	csSdkRequest = func(path string, method string, body map[string]interface{}, useManagementToken bool) (map[string]interface{}, error) {
+		return nil, errors.New("cannot get entries")
+	}
+
+	processTranslations(structs.Route{
+		Uid:         "translation-0",
+		ContentType: "translations",
+	})
+
+	assert.Nil(t, nil)
+}
+
+func TestProcessTranslationsNoEntry(t *testing.T) {
+	cleanup := setupTestSync()
+	defer cleanup()
+
+	csSdkRequest = func(path string, method string, body map[string]interface{}, useManagementToken bool) (map[string]interface{}, error) {
+		return map[string]interface{}{}, nil
+	}
+
+	processTranslations(structs.Route{
+		Uid:         "translation-0",
+		ContentType: "translations",
+	})
+
+	assert.Nil(t, nil)
+}
+
+func TestProcessTranslationsNoTranslations(t *testing.T) {
+	cleanup := setupTestSync()
+	defer cleanup()
+
+	csSdkRequest = func(path string, method string, body map[string]interface{}, useManagementToken bool) (map[string]interface{}, error) {
+		data := map[string]interface{}{
+			"entry": map[string]interface{}{
+				"content_type_uid": "translations",
+				"category":         "category",
+				"data": map[string]interface{}{
+					"uid":    "translation-invalid",
+					"locale": "en",
+				},
+			},
+		}
+
+		return data, nil
+	}
+
+	processTranslations(structs.Route{
+		Uid:         "translation-0",
+		ContentType: "translations",
+	})
+
+	assert.Nil(t, nil)
+}
+
+func TestProcessTranslationsNoCategory(t *testing.T) {
+	cleanup := setupTestSync()
+	defer cleanup()
+
+	csSdkRequest = func(path string, method string, body map[string]interface{}, useManagementToken bool) (map[string]interface{}, error) {
+		data := map[string]interface{}{
+			"entry": map[string]interface{}{
+				"content_type_uid": "translations",
+				"data": map[string]interface{}{
+					"uid":    "translation-invalid",
+					"locale": "en",
+				},
+				"translations": []interface{}{map[string]interface{}{
+					"source":      "source",
+					"translation": "translation",
+				}},
+			},
+		}
+
+		return data, nil
+	}
+
+	processTranslations(structs.Route{
+		Uid:         "translation-0",
+		ContentType: "translations",
+	})
+
+	assert.Nil(t, nil)
+}
+
+func TestProcessSyncDataTranslationsErrUpsert(t *testing.T) {
+	cleanup := setupTestSync()
+	defer cleanup()
+
+	csSdkRequest = func(path string, method string, body map[string]interface{}, useManagementToken bool) (map[string]interface{}, error) {
+		data := map[string]interface{}{
+			"entry": map[string]interface{}{
+				"content_type_uid": "translations",
+				"category":         "category",
+				"data": map[string]interface{}{
+					"uid":    "translation-0",
+					"locale": "en",
+				},
+				"translations": []interface{}{map[string]interface{}{
+					"source":      "source",
+					"translation": "translation",
+				}},
+			},
+		}
+
+		return data, nil
+	}
+
+	queryUpsert = func(table string, values []db_structs.QueryValue) error {
+		return errors.New("cannot upsert translation")
+	}
+
+	err := processSyncData(map[string]structs.Route{
+		"t0": {
+			Uid:         "translation-0",
+			ContentType: "translations",
+		},
+	})
+
+	assert.NoError(t, err)
 }

@@ -589,6 +589,7 @@ func processTranslations(route structs.Route) {
 
 	for _, translation := range translations.([]interface{}) {
 		source := translation.(map[string]interface{})["source"]
+
 		err = queryUpsert("translations", []db_structs.QueryValue{
 			{
 				Name:  "id",
