@@ -9,20 +9,15 @@ import (
 	"github.com/Dobefu/csb/cmd/server/utils"
 )
 
-func init() {
-	authDebug := os.Getenv("DEBUG_AUTH_BYPASS")
-
-	if authDebug != "" {
-		logger.Warning("DEBUG_AUTH_BYPASS is set. Running without any auth token checks")
-	}
-}
+var utilsPrintError = utils.PrintError
 
 func RequireDeliveryToken(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		authDebug := os.Getenv("DEBUG_AUTH_BYPASS")
 
-		// If auth debugging is enabled, skip this middleware.
+		// If auth debugging is enabled, issue a warning and skip this middleware.
 		if authDebug != "" {
+			logger.Warning("DEBUG_AUTH_BYPASS is set. Running without any auth token checks")
 			next.ServeHTTP(w, r)
 			return
 		}
@@ -31,13 +26,15 @@ func RequireDeliveryToken(next http.Handler) http.Handler {
 
 		if token == "" {
 			logger.Error("CS_DELIVERY_TOKEN is not set")
+			http.Error(w, "", http.StatusInternalServerError)
+			return
 		}
 
 		authToken := r.Header.Get("Authorization")
 
 		if authToken != token {
 			http.Error(w, "", http.StatusForbidden)
-			utils.PrintError(w, errors.New("Invalid authorization token"), false)
+			utilsPrintError(w, errors.New("Invalid authorization token"), false)
 			return
 		}
 
