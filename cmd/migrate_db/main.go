@@ -3,6 +3,7 @@ package migrate_db
 import (
 	"embed"
 	"fmt"
+	"io/fs"
 	"strings"
 
 	"github.com/Dobefu/csb/cmd/database/query"
@@ -10,15 +11,20 @@ import (
 	"github.com/Dobefu/csb/cmd/logger"
 )
 
+type FS interface {
+	fs.FS
+	ReadDir(string) ([]fs.DirEntry, error)
+	ReadFile(string) ([]byte, error)
+}
+
 //go:embed migrations/*
 var content embed.FS
 
-var contentReadDir = content.ReadDir
 var queryQueryRaw = query.QueryRaw
 var queryQueryRow = query.QueryRow
 var queryTruncate = query.Truncate
 var queryInsert = query.Insert
-var contentReadFile = content.ReadFile
+var getFs = func() FS { return content }
 
 func Main(reset bool) error {
 	var err error
@@ -54,7 +60,7 @@ func down() error {
 		return nil
 	}
 
-	files, err := contentReadDir("migrations")
+	files, err := getFs().ReadDir("migrations")
 
 	if err != nil {
 		return err
@@ -100,7 +106,7 @@ func up() error {
 		return err
 	}
 
-	files, err := contentReadDir("migrations")
+	files, err := getFs().ReadDir("migrations")
 
 	if err != nil {
 		return err
@@ -209,7 +215,7 @@ func setMigrationState(version int, dirty bool) error {
 }
 
 func runMigration(filename string, index int) error {
-	queryBytes, err := contentReadFile(fmt.Sprintf("migrations/%s", filename))
+	queryBytes, err := getFs().ReadFile(fmt.Sprintf("migrations/%s", filename))
 
 	if err != nil {
 		_ = setMigrationState(index, true)
