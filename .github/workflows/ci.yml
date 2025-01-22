@@ -57,7 +57,9 @@ jobs:
       - name: Run tests
         run: |
           go test "./..." -coverprofile="test-results/coverage.out" -covermode=count
-          go test "./..." -coverprofile="test-results/coverage.out" -covermode=count -json > test-results/test-report.out
+          go test "./..." -coverprofile="test-results/coverage.out" -covermode=count -json > coverage.out
+          grep -v "test_utils.go" coverage.out > coverage.tmp
+          mv coverage.tmp test-results/test-report.out
 
       - name: Delete the .env.test file after tests are completed
         run: rm .env.test
