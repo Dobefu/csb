@@ -1,28 +1,41 @@
 package api
 
 import (
-	"os"
+	"errors"
 	"testing"
 
-	"github.com/Dobefu/csb/cmd/init_env"
+	"github.com/Dobefu/csb/cmd/cs_sdk"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestGetContentTypes(t *testing.T) {
-	var err error
+func setupGetContentTypesTest() func() {
+	return func() {
+		csSdkRequest = cs_sdk.Request
+	}
+}
 
-	init_env.Main("../../.env.test")
+func TestGetContentTypesSuccess(t *testing.T) {
+	cleanup := setupGetContentTypesTest()
+	defer cleanup()
 
-	oldApiKey := os.Getenv("CS_API_KEY")
-	os.Setenv("CS_API_KEY", "bogus")
-
-	_, err = GetContentTypes()
-	assert.NotEqual(t, nil, err)
-
-	os.Setenv("CS_API_KEY", oldApiKey)
+	csSdkRequest = func(path string, method string, body map[string]interface{}, useManagementToken bool) (map[string]interface{}, error) {
+		return map[string]interface{}{}, nil
+	}
 
 	contentTypes, err := GetContentTypes()
-	assert.Equal(t, nil, err)
+	assert.NoError(t, err)
+	assert.Equal(t, map[string]interface{}{}, contentTypes)
+}
 
-	assert.NotEqual(t, nil, contentTypes)
+func TestGetContentTypesErr(t *testing.T) {
+	cleanup := setupGetContentTypesTest()
+	defer cleanup()
+
+	csSdkRequest = func(path string, method string, body map[string]interface{}, useManagementToken bool) (map[string]interface{}, error) {
+		return nil, errors.New("cannot get content types")
+	}
+
+	contentTypes, err := GetContentTypes()
+	assert.EqualError(t, err, "cannot get content types")
+	assert.Equal(t, map[string]interface{}(nil), contentTypes)
 }
