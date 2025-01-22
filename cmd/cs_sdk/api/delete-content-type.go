@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/Dobefu/csb/cmd/cs_sdk"
 	"github.com/Dobefu/csb/cmd/logger"
 )
 
@@ -15,7 +14,7 @@ func DeleteContentType(uid string, isForced bool) error {
 		return errors.New("The content type does not exist")
 	}
 
-	_, err := cs_sdk.Request(
+	_, err := csSdkRequest(
 		fmt.Sprintf("content_types/%s?force=%t", uid, isForced),
 		"DELETE",
 		nil,

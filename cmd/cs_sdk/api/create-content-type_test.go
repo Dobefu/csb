@@ -1,52 +1,51 @@
 package api
 
 import (
-	"os"
+	"errors"
 	"testing"
-	"time"
 
-	"github.com/Dobefu/csb/cmd/init_env"
+	"github.com/Dobefu/csb/cmd/cs_sdk"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestCreateContentType(t *testing.T) {
-	var err error
+func setupCreateContentTypeTest() func() {
+	return func() {
+		csSdkRequest = cs_sdk.Request
+	}
+}
 
-	init_env.Main("../../../.env.test")
+func TestCreateContentTypeSuccess(t *testing.T) {
+	cleanup := setupCreateContentTypeTest()
+	defer cleanup()
 
-	ctName := "__csb_test"
+	csSdkRequest = func(path string, method string, body map[string]interface{}, useManagementToken bool) (map[string]interface{}, error) {
+		if method == "GET" {
+			return nil, errors.New("cannot find content type")
+		}
 
-	// If a test has failed before, clean up the content type now.
-	_ = DeleteContentType(ctName, true)
-	time.Sleep(time.Second / 2)
+		return map[string]interface{}{}, nil
+	}
 
-	err = CreateContentType(ctName, ctName, true)
-	assert.Equal(t, nil, err)
-	time.Sleep(time.Second / 2)
+	err := CreateContentType("Test Name", "test_id", true)
+	assert.NoError(t, err)
+}
 
-	err = CreateContentType(ctName, ctName, false)
-	assert.NotEqual(t, nil, err)
+func TestCreateContentTypeErr(t *testing.T) {
+	cleanup := setupCreateContentTypeTest()
+	defer cleanup()
 
-	oldApiKey := os.Getenv("CS_API_KEY")
-	os.Setenv("CS_API_KEY", "bogus")
+	csSdkRequest = func(path string, method string, body map[string]interface{}, useManagementToken bool) (map[string]interface{}, error) {
+		if method == "GET" {
+			return nil, errors.New("cannot find content type")
+		}
 
-	err = CreateContentType(ctName, ctName, true)
-	assert.NotEqual(t, nil, err)
+		if path == "global_fields" || path == "global_fields/seo" {
+			return nil, errors.New("cannot create or update global field")
+		}
 
-	os.Setenv("CS_API_KEY", oldApiKey)
+		return map[string]interface{}{}, nil
+	}
 
-	oldManagementToken := os.Getenv("CS_MANAGEMENT_TOKEN")
-	os.Setenv("CS_MANAGEMENT_TOKEN", "bogus")
-
-	err = DeleteContentType(ctName, false)
-	assert.NotEqual(t, nil, err)
-
-	os.Setenv("CS_MANAGEMENT_TOKEN", oldManagementToken)
-
-	err = DeleteContentType(ctName, false)
-	assert.Equal(t, nil, err)
-	time.Sleep(time.Second / 2)
-
-	err = DeleteContentType(ctName, false)
-	assert.NotEqual(t, nil, err)
+	err := CreateContentType("Test Name", "test_id", true)
+	assert.EqualError(t, err, "cannot create or update global field")
 }

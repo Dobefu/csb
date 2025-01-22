@@ -3,7 +3,6 @@ package api
 import (
 	"fmt"
 
-	"github.com/Dobefu/csb/cmd/cs_sdk"
 	"github.com/Dobefu/csb/cmd/cs_sdk/structs"
 )
 
@@ -15,7 +14,7 @@ func GetEntry(route structs.Route) (map[string]interface{}, error) {
 		route.Locale,
 	)
 
-	res, err := cs_sdk.Request(path, "GET", nil, false)
+	res, err := csSdkRequest(path, "GET", nil, false)
 
 	if err != nil {
 		return nil, err

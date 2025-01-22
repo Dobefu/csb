@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/Dobefu/csb/cmd/cs_sdk"
 	"github.com/Dobefu/csb/cmd/logger"
 )
 
@@ -15,7 +14,7 @@ func DeleteGlobalField(uid string, isForced bool) error {
 		return errors.New("The global field does not exist")
 	}
 
-	_, err := cs_sdk.Request(
+	_, err := csSdkRequest(
 		fmt.Sprintf("global_fields/%s?force=%t", uid, isForced),
 		"DELETE",
 		nil,

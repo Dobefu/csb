@@ -1,7 +1,6 @@
 package api
 
 import (
-	"github.com/Dobefu/csb/cmd/cs_sdk"
 	"github.com/Dobefu/csb/cmd/logger"
 )
 
@@ -10,7 +9,7 @@ func CreateOrUpdateSeoGlobalField() error {
 	err := CreateGlobalField("seo", body)
 
 	if err != nil {
-		_, err := cs_sdk.Request(
+		_, err := csSdkRequest(
 			"global_fields/seo",
 			"PUT",
 			body,

@@ -7,6 +7,8 @@ import (
 	"github.com/Dobefu/csb/cmd/logger"
 )
 
+var csSdkRequest = cs_sdk.Request
+
 func CreateContentType(name string, id string, withFields bool) error {
 	contentType := GetContentType(id)
 
@@ -93,7 +95,7 @@ func CreateContentType(name string, id string, withFields bool) error {
 
 	}
 
-	_, err := cs_sdk.Request(
+	_, err := csSdkRequest(
 		"content_types",
 		"POST",
 		body,

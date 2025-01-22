@@ -2,12 +2,10 @@ package api
 
 import (
 	"fmt"
-
-	"github.com/Dobefu/csb/cmd/cs_sdk"
 )
 
 func GetGlobalField(id string) interface{} {
-	globalField, err := cs_sdk.Request(
+	globalField, err := csSdkRequest(
 		fmt.Sprintf("global_fields/%s", id),
 		"GET",
 		nil,

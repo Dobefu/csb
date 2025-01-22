@@ -3,7 +3,6 @@ package api
 import (
 	"errors"
 
-	"github.com/Dobefu/csb/cmd/cs_sdk"
 	"github.com/Dobefu/csb/cmd/logger"
 )
 
@@ -14,7 +13,7 @@ func CreateGlobalField(id string, data map[string]interface{}) error {
 		return errors.New("The global field already exists")
 	}
 
-	_, err := cs_sdk.Request(
+	_, err := csSdkRequest(
 		"global_fields",
 		"POST",
 		data,

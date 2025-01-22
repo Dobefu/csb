@@ -1,7 +1,6 @@
 package api
 
 import (
-	"github.com/Dobefu/csb/cmd/cs_sdk"
 	"github.com/Dobefu/csb/cmd/logger"
 )
 
@@ -9,7 +8,7 @@ func CreateOrUpdateTranslationsContentType() error {
 	body := getTranslationsContentTypeBody()
 	_ = CreateContentType("Translations", "translations", false)
 
-	_, err := cs_sdk.Request(
+	_, err := csSdkRequest(
 		"content_types/translations",
 		"PUT",
 		body,
