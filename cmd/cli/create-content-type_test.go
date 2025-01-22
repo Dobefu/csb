@@ -55,7 +55,16 @@ func TestCreateContentTypeErrCreate(t *testing.T) {
 }
 
 func TestCreateContentTypeErrNoName(t *testing.T) {
-	err := CreateContentType(true, "", "content_type", true)
+	tmpfile, cleanup := setupTestCreateContentType(t)
+	defer cleanup()
+
+	_, err := tmpfile.WriteAt([]byte("\n"), 0)
+	assert.NoError(t, err)
+
+	_, err = tmpfile.Seek(0, 0)
+	assert.NoError(t, err)
+
+	err = CreateContentType(true, "", "content_type", true)
 	assert.Error(t, err)
 }
 
