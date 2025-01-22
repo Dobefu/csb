@@ -1,37 +1,41 @@
 package middleware
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
-	"github.com/Dobefu/csb/cmd/init_env"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestAddResponseHeaders(t *testing.T) {
-	var err error
+func setupAddResponseHeaders() *httptest.ResponseRecorder {
+	rr := httptest.NewRecorder()
 
-	init_env.Main("../../../.env.test")
+	utilsPrintError = func(w http.ResponseWriter, err error, internal bool) {
+		if internal {
+			w.WriteHeader(http.StatusInternalServerError)
+		} else {
+			w.WriteHeader(http.StatusBadRequest)
+		}
 
-	mux := http.NewServeMux()
-	AddResponseHeaders(mux)
+		_ = json.NewEncoder(w).Encode(map[string]interface{}{"data": nil, "error": err.Error()})
+	}
 
-	server := httptest.NewServer(mux)
-	assert.NotEqual(t, nil, server)
-	defer server.Close()
+	return rr
+}
 
-	mux.Handle(
-		"/",
-		AddResponseHeaders(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			fmt.Fprint(w, "")
-		})),
-	)
+func TestAddResponseHeadersSuccess(t *testing.T) {
+	rr := setupAddResponseHeaders()
+	req, _ := http.NewRequest("GET", "/", nil)
 
-	err = request(
-		fmt.Sprintf("%s/%s", server.URL, "/"),
-		false,
-	)
-	assert.Equal(t, nil, err)
+	endpoint := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprint(w, `{"error":null}`)
+	})
+
+	AddResponseHeaders(endpoint).ServeHTTP(rr, req)
+
+	assert.Equal(t, http.StatusOK, rr.Code)
+	assert.JSONEq(t, `{"error":null}`, rr.Body.String())
 }
