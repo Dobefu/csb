@@ -13,6 +13,13 @@ import (
 //go:embed migrations/*
 var content embed.FS
 
+var contentReadDir = content.ReadDir
+var queryQueryRaw = query.QueryRaw
+var queryQueryRow = query.QueryRow
+var queryTruncate = query.Truncate
+var queryInsert = query.Insert
+var contentReadFile = content.ReadFile
+
 func Main(reset bool) error {
 	var err error
 
@@ -47,7 +54,7 @@ func down() error {
 		return nil
 	}
 
-	files, err := content.ReadDir("migrations")
+	files, err := contentReadDir("migrations")
 
 	if err != nil {
 		return err
@@ -93,7 +100,7 @@ func up() error {
 		return err
 	}
 
-	files, err := content.ReadDir("migrations")
+	files, err := contentReadDir("migrations")
 
 	if err != nil {
 		return err
@@ -132,7 +139,7 @@ func up() error {
 }
 
 func createMigrationsTable() error {
-	_, err := query.QueryRaw(
+	_, err := queryQueryRaw(
 		`CREATE TABLE IF NOT EXISTS migrations(
       version bigint NOT NULL PRIMARY KEY,
       dirty boolean NOT NULL
@@ -153,7 +160,7 @@ func getMigrationState() (int, bool, error) {
 		return 0, true, err
 	}
 
-	row := query.QueryRow("migrations", []string{"version", "dirty"}, nil)
+	row := queryQueryRow("migrations", []string{"version", "dirty"}, nil)
 
 	var version int
 	var dirty bool
@@ -177,13 +184,13 @@ func setMigrationState(version int, dirty bool) error {
 		return err
 	}
 
-	err = query.Truncate("migrations")
+	err = queryTruncate("migrations")
 
 	if err != nil {
 		return err
 	}
 
-	err = query.Insert("migrations", []structs.QueryValue{
+	err = queryInsert("migrations", []structs.QueryValue{
 		{
 			Name:  "version",
 			Value: version,
@@ -202,14 +209,14 @@ func setMigrationState(version int, dirty bool) error {
 }
 
 func runMigration(filename string, index int) error {
-	queryBytes, err := content.ReadFile(fmt.Sprintf("migrations/%s", filename))
+	queryBytes, err := contentReadFile(fmt.Sprintf("migrations/%s", filename))
 
 	if err != nil {
 		_ = setMigrationState(index, true)
 		return err
 	}
 
-	_, err = query.QueryRaw(string(queryBytes))
+	_, err = queryQueryRaw(string(queryBytes))
 
 	if err != nil {
 		_ = setMigrationState(index, true)
