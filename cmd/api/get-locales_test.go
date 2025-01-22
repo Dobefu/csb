@@ -1,29 +1,41 @@
 package api
 
 import (
-	"os"
+	"errors"
 	"testing"
 
-	"github.com/Dobefu/csb/cmd/init_env"
+	"github.com/Dobefu/csb/cmd/cs_sdk"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestGetLocales(t *testing.T) {
-	init_env.Main("../../.env.test")
+func setupGetLocalesTest() func() {
+	return func() {
+		csSdkRequest = cs_sdk.Request
+	}
+}
 
-	var locales map[string]interface{}
-	var err error
+func TestGetLocalesSuccess(t *testing.T) {
+	cleanup := setupGetLocalesTest()
+	defer cleanup()
 
-	locales, err = GetLocales()
-	assert.Equal(t, nil, err)
-	assert.NotEqual(t, 0, len(locales))
+	csSdkRequest = func(path string, method string, body map[string]interface{}, useManagementToken bool) (map[string]interface{}, error) {
+		return map[string]interface{}{}, nil
+	}
 
-	oldApiKey := os.Getenv("CS_API_KEY")
-	os.Setenv("CS_API_KEY", "bogus")
+	locales, err := GetLocales()
+	assert.NoError(t, err)
+	assert.Equal(t, map[string]interface{}{}, locales)
+}
 
-	locales, err = GetLocales()
-	assert.NotEqual(t, nil, err)
-	assert.Equal(t, 0, len(locales))
+func TestGetLocalesErr(t *testing.T) {
+	cleanup := setupGetLocalesTest()
+	defer cleanup()
 
-	os.Setenv("CS_API_KEY", oldApiKey)
+	csSdkRequest = func(path string, method string, body map[string]interface{}, useManagementToken bool) (map[string]interface{}, error) {
+		return nil, errors.New("cannot get locales")
+	}
+
+	locales, err := GetLocales()
+	assert.EqualError(t, err, "cannot get locales")
+	assert.Equal(t, map[string]interface{}(nil), locales)
 }
