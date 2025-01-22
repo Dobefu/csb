@@ -28,7 +28,6 @@ func GetSitemapData(w http.ResponseWriter, r *http.Request) {
 	sitemapData, err := getEntries()
 
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
 		utilsPrintError(w, err, true)
 		return
 	}
@@ -39,7 +38,6 @@ func GetSitemapData(w http.ResponseWriter, r *http.Request) {
 	json, err := json.Marshal(output)
 
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
 		utilsPrintError(w, err, true)
 		return
 	}

@@ -27,7 +27,6 @@ func GetLocales(w http.ResponseWriter, r *http.Request) {
 	json, err := json.Marshal(output)
 
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
 		utilsPrintError(w, err, true)
 		return
 	}

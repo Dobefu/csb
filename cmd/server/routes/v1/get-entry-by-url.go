@@ -18,7 +18,6 @@ func GetEntryByUrl(w http.ResponseWriter, r *http.Request) {
 	)
 
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
 		utilsPrintError(w, err, false)
 		return
 	}
@@ -29,7 +28,6 @@ func GetEntryByUrl(w http.ResponseWriter, r *http.Request) {
 	entry, err := apiGetEntryByUrl(url, locale, false)
 
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
 		utilsPrintError(w, err, true)
 		return
 	}
@@ -37,7 +35,6 @@ func GetEntryByUrl(w http.ResponseWriter, r *http.Request) {
 	csEntry, altLocales, breadcrumbs, err := csApiGetEntryWithMetadata(entry)
 
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
 		utilsPrintError(w, err, true)
 		return
 	}
@@ -46,7 +43,6 @@ func GetEntryByUrl(w http.ResponseWriter, r *http.Request) {
 	json, err := json.Marshal(output)
 
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
 		utilsPrintError(w, err, true)
 		return
 	}

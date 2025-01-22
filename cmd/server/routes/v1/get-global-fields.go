@@ -14,7 +14,6 @@ func GetGlobalFields(w http.ResponseWriter, r *http.Request) {
 	globalFields, err := apiGetGlobalFields()
 
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
 		utilsPrintError(w, err, true)
 		return
 	}
@@ -25,7 +24,6 @@ func GetGlobalFields(w http.ResponseWriter, r *http.Request) {
 	json, err := json.Marshal(output)
 
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
 		utilsPrintError(w, err, true)
 		return
 	}

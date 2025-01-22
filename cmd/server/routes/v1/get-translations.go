@@ -17,7 +17,6 @@ func GetTranslations(w http.ResponseWriter, r *http.Request) {
 	)
 
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
 		utilsPrintError(w, err, false)
 		return
 	}
@@ -27,7 +26,6 @@ func GetTranslations(w http.ResponseWriter, r *http.Request) {
 	translations, err := apiGetTranslations(locale)
 
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
 		utilsPrintError(w, err, true)
 		return
 	}
@@ -38,7 +36,6 @@ func GetTranslations(w http.ResponseWriter, r *http.Request) {
 	json, err := json.Marshal(output)
 
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
 		utilsPrintError(w, err, true)
 		return
 	}
