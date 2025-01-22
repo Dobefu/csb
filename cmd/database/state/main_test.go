@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/Dobefu/csb/cmd/database/query"
 	"github.com/Dobefu/csb/cmd/database/structs"
 	"github.com/stretchr/testify/assert"
 )
@@ -13,9 +14,6 @@ import (
 func setupMockDB(t *testing.T) (sqlmock.Sqlmock, func()) {
 	db, mock, err := sqlmock.New()
 	assert.NoError(t, err)
-
-	originalQueryQueryRow := queryQueryRow
-	originalQueryUpsert := queryUpsert
 
 	queryQueryRow = func(table string, fields []string, where []structs.QueryWhere) *sql.Row {
 		return db.QueryRow("SELECT value FROM state WHERE name = ?", where[0].Value)
@@ -28,8 +26,8 @@ func setupMockDB(t *testing.T) (sqlmock.Sqlmock, func()) {
 
 	cleanup := func() {
 		db.Close()
-		queryQueryRow = originalQueryQueryRow
-		queryUpsert = originalQueryUpsert
+		queryQueryRow = query.QueryRow
+		queryUpsert = query.Upsert
 	}
 
 	return mock, cleanup
