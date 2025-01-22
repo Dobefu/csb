@@ -1,46 +1,69 @@
 package api
 
 import (
-	"os"
+	"database/sql"
 	"testing"
 
-	"github.com/Dobefu/csb/cmd/database"
+	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/Dobefu/csb/cmd/database/query"
-	"github.com/Dobefu/csb/cmd/init_env"
-	"github.com/Dobefu/csb/cmd/migrate_db"
+	"github.com/Dobefu/csb/cmd/database/structs"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestGetTranslations(t *testing.T) {
-	var translations map[string]interface{}
-	var err error
+func setupGetTranslationsTest(t *testing.T) (sqlmock.Sqlmock, func()) {
+	db, mock, err := sqlmock.New()
+	assert.NoError(t, err)
 
-	init_env.Main("../../.env.test")
+	queryQueryRows = func(table string, fields []string, where []structs.QueryWhere) (*sql.Rows, error) {
+		return db.Query("SELECT (.+) FROM translations", nil)
+	}
 
-	err = database.Connect()
-	assert.Equal(t, nil, err)
+	return mock, func() {
+		db.Close()
+		queryQueryRows = query.QueryRows
+	}
+}
 
-	err = migrate_db.Main(true)
-	assert.Equal(t, nil, err)
+func TestGetTranslationsSuccess(t *testing.T) {
+	mock, cleanup := setupGetTranslationsTest(t)
+	defer cleanup()
 
-	_, err = query.QueryRaw("INSERT INTO translations VALUES ('id', 'uid', 'source', 'translation', 'category', 'en')")
-	assert.Equal(t, nil, err)
+	cols := []string{"source", "translation", "category"}
+	mock.ExpectQuery("SELECT (.+) FROM translations").WillReturnRows(
+		sqlmock.NewRows(cols).AddRow("source", "translation", "category"),
+	)
 
-	translations, err = GetTranslations("en")
-	assert.Equal(t, nil, err)
-	assert.NotEqual(t, 0, len(translations))
-	assert.Equal(t, "translation", translations["category.source"])
+	translations, err := GetTranslations("en")
+	assert.NoError(t, err)
+	assert.Equal(t, map[string]interface{}{"category.source": "translation"}, translations)
+	assert.NoError(t, mock.ExpectationsWereMet())
+}
 
-	oldDb := os.Getenv("DB_CONN")
-	os.Setenv("DB_CONN", "file:/")
-	err = database.Connect()
-	assert.Equal(t, nil, err)
+func TestGetTranslationsErrQuery(t *testing.T) {
+	mock, cleanup := setupGetTranslationsTest(t)
+	defer cleanup()
 
-	translations, err = GetTranslations("en")
-	assert.NotEqual(t, nil, err)
-	assert.Equal(t, 0, len(translations))
+	mock.ExpectQuery("SELECT (.+) FROM translations").WillReturnError(
+		sql.ErrNoRows,
+	)
 
-	os.Setenv("DB_CONN", oldDb)
-	err = database.Connect()
-	assert.Equal(t, nil, err)
+	translations, err := GetTranslations("en")
+	assert.EqualError(t, err, sql.ErrNoRows.Error())
+	assert.Equal(t, map[string]interface{}(nil), translations)
+	assert.NoError(t, mock.ExpectationsWereMet())
+}
+
+func TestGetTranslationsErrScan(t *testing.T) {
+	mock, cleanup := setupGetTranslationsTest(t)
+	defer cleanup()
+
+	cols := []string{"source", "translation", "category"}
+	mock.ExpectQuery("SELECT (.+) FROM translations").WillReturnRows(
+		sqlmock.NewRows(cols).AddRow("source", "translation", nil),
+	)
+
+	translations, err := GetTranslations("en")
+	assert.NoError(t, err)
+	assert.Equal(t, map[string]interface{}{}, translations)
+	assert.NoError(t, mock.ExpectationsWereMet())
 }

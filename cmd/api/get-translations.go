@@ -8,10 +8,12 @@ import (
 	db_structs "github.com/Dobefu/csb/cmd/database/structs"
 )
 
+var queryQueryRows = query.QueryRows
+
 func GetTranslations(locale string) (map[string]interface{}, error) {
 	translations := map[string]interface{}{}
 
-	rows, err := query.QueryRows(
+	rows, err := queryQueryRows(
 		"translations",
 		[]string{"source", "translation", "category"},
 		[]db_structs.QueryWhere{
