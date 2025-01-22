@@ -11,7 +11,7 @@ func DeleteContentType(uid string, isForced bool) error {
 	contentType := GetContentType(uid)
 
 	if contentType == nil {
-		return errors.New("The content type does not exist")
+		return errors.New("the content type does not exist")
 	}
 
 	_, err := csSdkRequest(
