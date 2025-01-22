@@ -1,32 +1,42 @@
 package api
 
 import (
-	"os"
+	"errors"
 	"testing"
 
-	"github.com/Dobefu/csb/cmd/init_env"
+	"github.com/Dobefu/csb/cmd/cs_sdk"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestGetContentType(t *testing.T) {
-	var contentType map[string]interface{}
-	var err error
+func setupGetContentTypeTest() func() {
+	csSdkRequest = func(path string, method string, body map[string]interface{}, useManagementToken bool) (map[string]interface{}, error) {
+		if path == "content_types/test" {
+			return map[string]interface{}{}, nil
 
-	init_env.Main("../../.env.test")
+		}
 
-	oldApiKey := os.Getenv("CS_API_KEY")
-	os.Setenv("CS_API_KEY", "bogus")
+		return nil, errors.New("invalid content type")
+	}
 
-	_, err = GetContentType("basic_page")
-	assert.NotEqual(t, nil, err)
+	return func() {
+		csSdkRequest = cs_sdk.Request
+	}
+}
 
-	os.Setenv("CS_API_KEY", oldApiKey)
+func TestGetContentTypeSuccess(t *testing.T) {
+	cleanup := setupGetContentTypeTest()
+	defer cleanup()
 
-	contentType, err = GetContentType("basic_page")
-	assert.Equal(t, nil, err)
-	assert.NotEqual(t, nil, contentType)
+	contentType, err := GetContentType("test")
+	assert.NoError(t, err)
+	assert.Equal(t, map[string]interface{}{}, contentType)
+}
 
-	contentType, err = GetContentType("bogus")
-	assert.NotEqual(t, nil, err)
-	assert.NotEqual(t, nil, contentType)
+func TestGetContentTypeErrInvalid(t *testing.T) {
+	cleanup := setupGetContentTypeTest()
+	defer cleanup()
+
+	contentType, err := GetContentType("bogus")
+	assert.EqualError(t, err, "invalid content type")
+	assert.Equal(t, map[string]interface{}(nil), contentType)
 }
