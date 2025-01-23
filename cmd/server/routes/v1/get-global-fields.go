@@ -4,11 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-
-	"github.com/Dobefu/csb/cmd/api"
 )
-
-var apiGetGlobalFields = api.GetGlobalFields
 
 func GetGlobalFields(w http.ResponseWriter, r *http.Request) {
 	globalFields, err := apiGetGlobalFields()

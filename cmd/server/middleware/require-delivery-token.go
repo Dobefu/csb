@@ -6,10 +6,7 @@ import (
 	"os"
 
 	"github.com/Dobefu/csb/cmd/logger"
-	"github.com/Dobefu/csb/cmd/server/utils"
 )
-
-var utilsPrintError = utils.PrintError
 
 func RequireDeliveryToken(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

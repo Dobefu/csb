@@ -8,8 +8,6 @@ import (
 	"github.com/Dobefu/csb/cmd/server/utils"
 )
 
-var utilsConstructOutput = utils.ConstructOutput
-
 func Index(w http.ResponseWriter, r *http.Request, apiPath string) {
 	// If not on the homepage, return a 404.
 	if r.URL.Path != "/" {

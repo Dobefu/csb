@@ -4,11 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-
-	"github.com/Dobefu/csb/cmd/api"
 )
-
-var apiGetContentTypes = api.GetContentTypes
 
 func GetContentTypes(w http.ResponseWriter, r *http.Request) {
 	contentTypes, err := apiGetContentTypes()

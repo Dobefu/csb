@@ -4,11 +4,8 @@ import (
 	"fmt"
 
 	"github.com/Dobefu/csb/cmd/api/structs"
-	"github.com/Dobefu/csb/cmd/database/query"
 	db_structs "github.com/Dobefu/csb/cmd/database/structs"
 )
-
-var queryQueryRows = query.QueryRows
 
 func GetTranslations(locale string) (map[string]interface{}, error) {
 	translations := map[string]interface{}{}

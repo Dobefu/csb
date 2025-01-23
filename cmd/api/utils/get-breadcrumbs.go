@@ -1,12 +1,8 @@
 package utils
 
 import (
-	"github.com/Dobefu/csb/cmd/api"
 	"github.com/Dobefu/csb/cmd/cs_sdk/structs"
 )
-
-var apiGetEntryByUid = api.GetEntryByUid
-var apiGetEntryByUrl = api.GetEntryByUrl
 
 func GetBreadcrumbs(entry structs.Route) ([]structs.Route, error) {
 	results := []structs.Route{entry}

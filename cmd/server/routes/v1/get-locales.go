@@ -4,14 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-
-	"github.com/Dobefu/csb/cmd/api"
-	"github.com/Dobefu/csb/cmd/server/utils"
 )
-
-var apiGetLocales = api.GetLocales
-var utilsConstructOutput = utils.ConstructOutput
-var utilsPrintError = utils.PrintError
 
 func GetLocales(w http.ResponseWriter, r *http.Request) {
 	locales, err := apiGetLocales()

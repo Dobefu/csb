@@ -7,8 +7,6 @@ import (
 	"github.com/Dobefu/csb/cmd/logger"
 )
 
-var listenAndServe = http.ListenAndServe
-
 func Start(port uint) error {
 	url := fmt.Sprintf(":%d", port)
 	mux := http.NewServeMux()

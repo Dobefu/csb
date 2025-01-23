@@ -4,11 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-
-	"github.com/Dobefu/csb/cmd/api"
 )
-
-var apiGetTranslations = api.GetTranslations
 
 func GetTranslations(w http.ResponseWriter, r *http.Request) {
 	params, err := validationCheckRequiredQueryParams(

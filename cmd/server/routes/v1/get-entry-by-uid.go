@@ -4,15 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-
-	"github.com/Dobefu/csb/cmd/api"
-	cs_api "github.com/Dobefu/csb/cmd/cs_sdk/api"
-	"github.com/Dobefu/csb/cmd/server/utils"
 )
-
-var apiGetEntryByUid = api.GetEntryByUid
-var csApiGetEntryWithMetadata = cs_api.GetEntryWithMetadata
-var utilsConstructEntryOutput = utils.ConstructEntryOutput
 
 func GetEntryByUid(w http.ResponseWriter, r *http.Request) {
 	params, err := validationCheckRequiredQueryParams(

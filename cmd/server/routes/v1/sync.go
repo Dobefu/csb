@@ -3,11 +3,7 @@ package v1
 import (
 	"fmt"
 	"net/http"
-
-	"github.com/Dobefu/csb/cmd/cs_sdk/functions"
 )
-
-var functionsSync = functions.Sync
 
 func Sync(w http.ResponseWriter, r *http.Request) {
 	err := functionsSync(false)

@@ -6,13 +6,8 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/Dobefu/csb/cmd/api"
 	"github.com/Dobefu/csb/cmd/server/utils"
-	"github.com/Dobefu/csb/cmd/server/validation"
 )
-
-var validationCheckRequiredQueryParams = validation.CheckRequiredQueryParams
-var apiGetContentType = api.GetContentType
 
 func GetContentType(w http.ResponseWriter, r *http.Request) {
 	params, err := validationCheckRequiredQueryParams(

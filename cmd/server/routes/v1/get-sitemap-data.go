@@ -7,22 +7,9 @@ import (
 	"time"
 
 	api_structs "github.com/Dobefu/csb/cmd/api/structs"
-	api_utils "github.com/Dobefu/csb/cmd/api/utils"
 	"github.com/Dobefu/csb/cmd/cs_sdk/structs"
-	"github.com/Dobefu/csb/cmd/database/query"
 	db_structs "github.com/Dobefu/csb/cmd/database/structs"
 )
-
-type queryRows interface {
-	Next() bool
-	Scan(dest ...interface{}) error
-}
-
-var queryQueryRows = func(table string, columns []string, where []db_structs.QueryWhere) (queryRows, error) {
-	return query.QueryRows(table, columns, where)
-}
-
-var apiUtilsGetAltLocales = api_utils.GetAltLocales
 
 func GetSitemapData(w http.ResponseWriter, r *http.Request) {
 	sitemapData, err := getEntries()
