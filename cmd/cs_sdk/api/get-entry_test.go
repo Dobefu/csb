@@ -1,30 +1,51 @@
 package api
 
 import (
+	"errors"
 	"testing"
 
+	"github.com/Dobefu/csb/cmd/cs_sdk"
 	"github.com/Dobefu/csb/cmd/cs_sdk/structs"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestGetEntry(t *testing.T) {
-	var entry map[string]interface{}
-	var emptyEntry map[string]interface{}
-	var err error
+func setupGetEntryTest() func() {
+	csSdkRequest = func(path string, method string, body map[string]interface{}, useManagementToken bool) (map[string]interface{}, error) {
+		if path == "content_types/test/entries/test?locale=en" {
+			return map[string]interface{}{
+				"entry": map[string]interface{}{},
+			}, nil
 
-	entry, err = GetEntry(structs.Route{
-		Uid:         "blt0617c28651fb44bf",
-		ContentType: "basic_page",
+		}
+
+		return nil, errors.New("cannot get entry")
+	}
+
+	return func() {
+		csSdkRequest = cs_sdk.Request
+	}
+}
+
+func TestGetEntrySuccess(t *testing.T) {
+	cleanup := setupGetEntryTest()
+	defer cleanup()
+
+	entry, err := GetEntry(structs.Route{
+		Uid:         "test",
+		ContentType: "test",
 		Locale:      "en",
 	})
-	assert.Equal(t, nil, err)
-	assert.NotEqual(t, nil, entry)
+	assert.NoError(t, err)
+	assert.Equal(t, map[string]interface{}{
+		"content_type": "test",
+	}, entry)
+}
 
-	entry, err = GetEntry(structs.Route{
-		Uid:         "bogus",
-		ContentType: "basic_page",
-		Locale:      "en",
-	})
-	assert.NotEqual(t, nil, err)
-	assert.Equal(t, emptyEntry, entry)
+func TestGetEntryErrInvalid(t *testing.T) {
+	cleanup := setupGetEntryTest()
+	defer cleanup()
+
+	entry, err := GetEntry(structs.Route{Uid: "bogus", ContentType: "test"})
+	assert.EqualError(t, err, "cannot get entry")
+	assert.Equal(t, map[string]interface{}(nil), entry)
 }
