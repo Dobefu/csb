@@ -11,7 +11,7 @@ func DeleteGlobalField(uid string, isForced bool) error {
 	globalField := GetGlobalField(uid)
 
 	if globalField == nil {
-		return errors.New("The global field does not exist")
+		return errors.New("the global field does not exist")
 	}
 
 	_, err := csSdkRequest(
@@ -25,7 +25,7 @@ func DeleteGlobalField(uid string, isForced bool) error {
 		return err
 	}
 
-	logger.Info("The global field has been deleted")
+	logger.Info("the global field has been deleted")
 
 	return nil
 }
