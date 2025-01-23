@@ -30,7 +30,7 @@ func TestCreateContentTypeSuccess(t *testing.T) {
 	assert.NoError(t, err)
 }
 
-func TestCreateContentTypeErr(t *testing.T) {
+func TestCreateContentTypeErrGlobalField(t *testing.T) {
 	cleanup := setupCreateContentTypeTest()
 	defer cleanup()
 
@@ -48,4 +48,24 @@ func TestCreateContentTypeErr(t *testing.T) {
 
 	err := CreateContentType("Test Name", "test_id", true)
 	assert.EqualError(t, err, "cannot create or update global field")
+}
+
+func TestCreateContentTypeErr(t *testing.T) {
+	cleanup := setupCreateContentTypeTest()
+	defer cleanup()
+
+	csSdkRequest = func(path string, method string, body map[string]interface{}, useManagementToken bool) (map[string]interface{}, error) {
+		if path == "content_types" && method == "POST" {
+			return nil, errors.New("cannot create content type")
+		}
+
+		if method == "GET" {
+			return nil, errors.New("cannot find content type")
+		}
+
+		return map[string]interface{}{}, nil
+	}
+
+	err := CreateContentType("Test Name", "test_id", false)
+	assert.EqualError(t, err, "cannot create content type")
 }
