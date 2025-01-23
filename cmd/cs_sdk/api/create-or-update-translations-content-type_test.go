@@ -1,23 +1,47 @@
 package api
 
 import (
-	"os"
+	"errors"
 	"testing"
 
+	"github.com/Dobefu/csb/cmd/cs_sdk"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestCreateOrUpdateTranslationsContentType(t *testing.T) {
-	var err error
+func setupCreateOrUpdateTranslationsContentTypeTest() func() {
+	return func() {
+		csSdkRequest = cs_sdk.Request
+	}
+}
 
-	oldApiKey := os.Getenv("CS_API_KEY")
-	os.Setenv("CS_API_KEY", "bogus")
+func TestCreateOrUpdateTranslationsContentTypeSuccess(t *testing.T) {
+	cleanup := setupCreateOrUpdateTranslationsContentTypeTest()
+	defer cleanup()
 
-	err = CreateOrUpdateTranslationsContentType()
-	assert.NotEqual(t, nil, err)
+	csSdkRequest = func(path string, method string, body map[string]interface{}, useManagementToken bool) (map[string]interface{}, error) {
+		if method == "POST" {
+			return nil, errors.New("cannot find content type")
+		}
 
-	os.Setenv("CS_API_KEY", oldApiKey)
+		return map[string]interface{}{}, nil
+	}
 
-	err = CreateOrUpdateTranslationsContentType()
-	assert.Equal(t, nil, err)
+	err := CreateOrUpdateTranslationsContentType()
+	assert.NoError(t, err)
+}
+
+func TestCreateOrUpdateTranslationsContentTypeErrRequest(t *testing.T) {
+	cleanup := setupCreateOrUpdateTranslationsContentTypeTest()
+	defer cleanup()
+
+	csSdkRequest = func(path string, method string, body map[string]interface{}, useManagementToken bool) (map[string]interface{}, error) {
+		if method != "PUT" {
+			return map[string]interface{}{}, nil
+		}
+
+		return nil, errors.New("cannot create content type")
+	}
+
+	err := CreateOrUpdateTranslationsContentType()
+	assert.EqualError(t, err, "cannot create content type")
 }
