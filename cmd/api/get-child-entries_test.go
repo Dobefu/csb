@@ -1,85 +1,83 @@
 package api
 
 import (
-	"os"
+	"database/sql"
 	"testing"
 	"time"
 
-	"github.com/Dobefu/csb/cmd/database"
+	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/Dobefu/csb/cmd/database/query"
 	db_structs "github.com/Dobefu/csb/cmd/database/structs"
-	"github.com/Dobefu/csb/cmd/init_env"
-	"github.com/Dobefu/csb/cmd/migrate_db"
+
+	"github.com/Dobefu/csb/cmd/cs_sdk/structs"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestGetChildEntriesByUid(t *testing.T) {
-	init_env.Main("../../.env.test")
-	err := database.Connect()
-	assert.Equal(t, nil, err)
+func setupGetChildEntriesTest(t *testing.T) (sqlmock.Sqlmock, func()) {
+	db, mock, err := sqlmock.New()
+	assert.NoError(t, err)
 
-	err = migrate_db.Main(true)
-	assert.Equal(t, nil, err)
+	queryQueryRows = func(table string, fields []string, where []db_structs.QueryWhere) (*sql.Rows, error) {
+		return db.Query("SELECT (.+) FROM routes", nil)
+	}
 
-	oldDb := os.Getenv("DB_CONN")
-	os.Setenv("DB_CONN", "file:/")
-	err = database.Connect()
-	assert.Equal(t, nil, err)
-
-	_, err = GetChildEntriesByUid("", "", false)
-	assert.NotEqual(t, nil, err)
-
-	os.Setenv("DB_CONN", oldDb)
-	err = database.Connect()
-	assert.Equal(t, nil, err)
-
-	err = insertPage("testingen", "testing", "parent_uid")
-	assert.Equal(t, nil, err)
-
-	err = insertPage("parent_uiden", "parent_uid", "")
-	assert.Equal(t, nil, err)
-
-	_, err = GetChildEntriesByUid("parent_uid", "en", true)
-	assert.Equal(t, nil, err)
+	return mock, func() {
+		db.Close()
+		queryQueryRows = query.QueryRows
+	}
 }
 
-func insertPage(id string, uid string, parent string) error {
-	return query.Insert("routes", []db_structs.QueryValue{
-		{
-			Name:  "id",
-			Value: id,
-		},
-		{
-			Name:  "uid",
-			Value: uid,
-		},
-		{
-			Name:  "title",
-			Value: "Title",
-		},
-		{
-			Name:  "content_type",
-			Value: "basic_page",
-		},
-		{
-			Name:  "locale",
-			Value: "en",
-		},
-		{
-			Name:  "slug",
-			Value: "/testing",
-		},
-		{
-			Name:  "url",
-			Value: "/testing",
-		},
-		{
-			Name:  "parent",
-			Value: parent,
-		},
-		{
-			Name:  "updated_at",
-			Value: time.Now(),
-		},
-	})
+func TestGetChildEntriesByUidSuccess(t *testing.T) {
+	mock, cleanup := setupGetChildEntriesTest(t)
+	defer cleanup()
+
+	cols := []string{"id", "uid", "content_type", "locale", "slug", "url", "parent", "updated_at", "exclude_sitemap", "published"}
+	mock.ExpectQuery("SELECT (.+) FROM routes").WillReturnRows(
+		sqlmock.NewRows(cols).AddRow("id", "uid", "content_type", "locale", "slug", "url", "parent", time.Time{}, true, true),
+	)
+
+	routes, err := GetChildEntriesByUid("uid", "en", false)
+	assert.NoError(t, err)
+	assert.Equal(t, []structs.Route{{
+		Id:             "id",
+		Uid:            "uid",
+		Title:          "",
+		ContentType:    "content_type",
+		Locale:         "locale",
+		Slug:           "slug",
+		Url:            "url",
+		Parent:         "parent",
+		Version:        0,
+		UpdatedAt:      time.Time{},
+		ExcludeSitemap: true,
+		Published:      true,
+	}}, routes)
+	assert.NoError(t, mock.ExpectationsWereMet())
+}
+
+func TestGetChildEntriesByUidErrQuery(t *testing.T) {
+	mock, cleanup := setupGetChildEntriesTest(t)
+	defer cleanup()
+
+	mock.ExpectQuery("SELECT (.+) FROM routes").WillReturnError(sql.ErrNoRows)
+
+	routes, err := GetChildEntriesByUid("uid", "en", false)
+	assert.EqualError(t, err, sql.ErrNoRows.Error())
+	assert.Equal(t, []structs.Route([]structs.Route{}), routes)
+	assert.NoError(t, mock.ExpectationsWereMet())
+}
+
+func TestGetChildEntriesByUidErrScan(t *testing.T) {
+	mock, cleanup := setupGetChildEntriesTest(t)
+	defer cleanup()
+
+	cols := []string{"locacle"}
+	mock.ExpectQuery("SELECT (.+) FROM routes").WillReturnRows(
+		sqlmock.NewRows(cols).AddRow("locale"),
+	)
+
+	routes, err := GetChildEntriesByUid("uid", "en", false)
+	assert.NoError(t, err)
+	assert.Equal(t, []structs.Route([]structs.Route(nil)), routes)
+	assert.NoError(t, mock.ExpectationsWereMet())
 }

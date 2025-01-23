@@ -2,7 +2,6 @@ package api
 
 import (
 	"github.com/Dobefu/csb/cmd/cs_sdk/structs"
-	"github.com/Dobefu/csb/cmd/database/query"
 	db_structs "github.com/Dobefu/csb/cmd/database/structs"
 )
 
@@ -25,7 +24,7 @@ func GetChildEntriesByUid(uid string, locale string, includeUnpublished bool) ([
 		})
 	}
 
-	rows, err := query.QueryRows(
+	rows, err := queryQueryRows(
 		"routes",
 		[]string{"*"},
 		where,
