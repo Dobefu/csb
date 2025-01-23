@@ -1,65 +1,43 @@
 package api
 
 import (
-	"os"
+	"errors"
 	"testing"
-	"time"
 
-	"github.com/Dobefu/csb/cmd/init_env"
+	"github.com/Dobefu/csb/cmd/cs_sdk"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestCreateGlobalField(t *testing.T) {
-	var err error
+func setupCreateGlobalFieldTest() func() {
+	return func() {
+		csSdkRequest = cs_sdk.Request
+	}
+}
 
-	init_env.Main("../../../.env.test")
+func TestCreateGlobalFieldSuccess(t *testing.T) {
+	cleanup := setupCreateGlobalFieldTest()
+	defer cleanup()
 
-	gfName := "__csb_test"
-	gfData := map[string]interface{}{
-		"global_field": map[string]interface{}{
-			"title": gfName,
-			"uid":   gfName,
-			"schema": []map[string]interface{}{
-				{
-					"display_name": "Title",
-					"uid":          "title",
-					"data_type":    "text",
-				},
-			},
-		},
+	csSdkRequest = func(path string, method string, body map[string]interface{}, useManagementToken bool) (map[string]interface{}, error) {
+		if method == "GET" {
+			return nil, errors.New("cannot find global field")
+		}
+
+		return map[string]interface{}{}, nil
 	}
 
-	// If a test has failed before, clean up the global field now.
-	_ = DeleteGlobalField(gfName, true)
-	time.Sleep(time.Second / 2)
+	err := CreateGlobalField("Test", map[string]interface{}{})
+	assert.NoError(t, err)
+}
 
-	err = CreateGlobalField(gfName, gfData)
-	assert.Equal(t, nil, err)
-	time.Sleep(time.Second / 2)
+func TestCreateGlobalFieldErrAlreadyExists(t *testing.T) {
+	cleanup := setupCreateGlobalFieldTest()
+	defer cleanup()
 
-	err = CreateGlobalField(gfName, gfData)
-	assert.NotEqual(t, nil, err)
+	csSdkRequest = func(path string, method string, body map[string]interface{}, useManagementToken bool) (map[string]interface{}, error) {
+		return map[string]interface{}{}, nil
+	}
 
-	oldApiKey := os.Getenv("CS_API_KEY")
-	os.Setenv("CS_API_KEY", "bogus")
-
-	err = CreateGlobalField(gfName, gfData)
-	assert.NotEqual(t, nil, err)
-
-	os.Setenv("CS_API_KEY", oldApiKey)
-
-	oldManagementToken := os.Getenv("CS_MANAGEMENT_TOKEN")
-	os.Setenv("CS_MANAGEMENT_TOKEN", "bogus")
-
-	err = DeleteGlobalField(gfName, false)
-	assert.NotEqual(t, nil, err)
-
-	os.Setenv("CS_MANAGEMENT_TOKEN", oldManagementToken)
-
-	err = DeleteGlobalField(gfName, false)
-	assert.Equal(t, nil, err)
-	time.Sleep(time.Second / 2)
-
-	err = DeleteGlobalField(gfName, false)
-	assert.NotEqual(t, nil, err)
+	err := CreateGlobalField("Test", map[string]interface{}{})
+	assert.EqualError(t, err, "the global field already exists")
 }
