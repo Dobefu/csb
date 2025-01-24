@@ -1,15 +1,43 @@
 package init_env
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/Dobefu/csb/cmd/logger"
+	"github.com/joho/godotenv"
+	"github.com/stretchr/testify/assert"
 )
 
-func TestInitEnv(t *testing.T) {
-	Main("../../.env.test")
+func setupInitEnvTest() func() {
+	godotenvLoad = func(filenames ...string) error {
+		if filenames[0] == "bogus" {
+			return errors.New("cannot find the file")
+		}
+
+		return nil
+	}
+
+	return func() {
+		godotenvLoad = godotenv.Load
+		logger.SetExitOnFatal(true)
+	}
+}
+
+func TestInitEnvSuccess(t *testing.T) {
+	cleanup := setupInitEnvTest()
+	defer cleanup()
+
+	Main(".env")
+	assert.NoError(t, godotenvLoad(".env"))
+}
+
+func TestInitEnvErrFileNotFound(t *testing.T) {
+	cleanup := setupInitEnvTest()
+	defer cleanup()
 
 	logger.SetExitOnFatal(false)
 
-	Main("../../.env.test.bogus")
+	Main("bogus")
+	assert.EqualError(t, godotenvLoad("bogus"), "cannot find the file")
 }
