@@ -1,82 +1,53 @@
 package api
 
 import (
-	"os"
+	"database/sql"
 	"testing"
 	"time"
 
-	"github.com/Dobefu/csb/cmd/database"
+	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/Dobefu/csb/cmd/cs_sdk/structs"
 	"github.com/Dobefu/csb/cmd/database/query"
 	db_structs "github.com/Dobefu/csb/cmd/database/structs"
-	"github.com/Dobefu/csb/cmd/init_env"
-	"github.com/Dobefu/csb/cmd/migrate_db"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestGetEntryByUrl(t *testing.T) {
-	init_env.Main("../../.env.test")
-	err := database.Connect()
-	assert.Equal(t, nil, err)
+func setupGetEntryByUrlTest(t *testing.T) (sqlmock.Sqlmock, func()) {
+	db, mock, err := sqlmock.New()
+	assert.NoError(t, err)
 
-	err = migrate_db.Main(true)
-	assert.Equal(t, nil, err)
+	queryQueryRow = func(table string, fields []string, where []db_structs.QueryWhere) *sql.Row {
+		return db.QueryRow("SELECT (.+) FROM routes", nil)
+	}
 
-	oldDb := os.Getenv("DB_CONN")
-	os.Setenv("DB_CONN", "file:/")
-	err = database.Connect()
-	assert.Equal(t, nil, err)
-
-	_, err = GetEntryByUrl("", "", false)
-	assert.NotEqual(t, nil, err)
-
-	os.Setenv("DB_CONN", oldDb)
-	err = database.Connect()
-	assert.Equal(t, nil, err)
-
-	err = insertPage("testingen", "testing", "")
-	assert.Equal(t, nil, err)
-
-	_, err = GetEntryByUrl("/testing", "en", true)
-	assert.Equal(t, nil, err)
+	return mock, func() {
+		queryQueryRow = query.QueryRow
+	}
 }
 
-func insertPage(id string, uid string, parent string) error {
-	return query.Insert("routes", []db_structs.QueryValue{
-		{
-			Name:  "id",
-			Value: id,
-		},
-		{
-			Name:  "uid",
-			Value: uid,
-		},
-		{
-			Name:  "title",
-			Value: "Title",
-		},
-		{
-			Name:  "content_type",
-			Value: "basic_page",
-		},
-		{
-			Name:  "locale",
-			Value: "en",
-		},
-		{
-			Name:  "slug",
-			Value: "/testing",
-		},
-		{
-			Name:  "url",
-			Value: "/testing",
-		},
-		{
-			Name:  "parent",
-			Value: parent,
-		},
-		{
-			Name:  "updated_at",
-			Value: time.Now(),
-		},
-	})
+func TestGetEntryByUrl(t *testing.T) {
+	mock, cleanup := setupGetEntryByUrlTest(t)
+	defer cleanup()
+
+	cols := []string{"id", "uid", "title", "content_type", "locale", "slug", "url", "parent", "version", "updated_at", "exclude_sitemap", "published"}
+	mock.ExpectQuery("SELECT (.+) FROM routes").WillReturnRows(
+		sqlmock.NewRows(cols).AddRow("id", "uid", "title", "content_type", "locale", "slug", "url", "parent", 0, time.Time{}, true, true),
+	)
+
+	entry, err := GetEntryByUrl("/test-url", "test-locale", false)
+	assert.NoError(t, err)
+	assert.Equal(t, structs.Route{
+		Id:             "id",
+		Uid:            "uid",
+		Title:          "title",
+		ContentType:    "content_type",
+		Locale:         "locale",
+		Slug:           "slug",
+		Url:            "url",
+		Parent:         "parent",
+		Version:        0,
+		UpdatedAt:      time.Time{},
+		ExcludeSitemap: true,
+		Published:      true,
+	}, entry)
 }
