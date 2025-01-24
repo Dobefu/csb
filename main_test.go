@@ -18,7 +18,7 @@ import (
 )
 
 var err error
-var envFile = "--env-file=.env.test"
+var envFile = "--env-file=.env.example"
 
 func TestInitDB(t *testing.T) {
 	isLoggerFatalCalled := false
