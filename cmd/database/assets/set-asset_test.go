@@ -1,35 +1,43 @@
 package assets
 
 import (
-	"os"
+	"errors"
 	"testing"
 
 	"github.com/Dobefu/csb/cmd/cs_sdk/structs"
-	"github.com/Dobefu/csb/cmd/database"
-	"github.com/Dobefu/csb/cmd/init_env"
-	"github.com/Dobefu/csb/cmd/migrate_db"
+	"github.com/Dobefu/csb/cmd/cs_sdk/utils"
+	"github.com/Dobefu/csb/cmd/database/query"
+	db_structs "github.com/Dobefu/csb/cmd/database/structs"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestSetAsset(t *testing.T) {
-	init_env.Main("../../../.env.test")
-	var err error
+func setupSetAssetTest() func() {
+	queryUpsert = func(table string, values []db_structs.QueryValue) error {
+		return nil
+	}
 
-	oldDb := os.Getenv("DB_CONN")
-	os.Setenv("DB_CONN", "file:/")
-	err = database.Connect()
-	assert.Equal(t, nil, err)
+	return func() {
+		queryUpsert = query.Upsert
+		utilsGenerateId = utils.GenerateId
+	}
+}
 
-	err = SetAsset(structs.Asset{})
-	assert.NotEqual(t, nil, err)
+func TestSetAssetSuccess(t *testing.T) {
+	cleanup := setupSetAssetTest()
+	defer cleanup()
 
-	os.Setenv("DB_CONN", oldDb)
-	err = database.Connect()
-	assert.Equal(t, nil, err)
+	err := SetAsset(structs.Asset{})
+	assert.NoError(t, err)
+}
 
-	err = migrate_db.Main(true)
-	assert.Equal(t, nil, err)
+func TestSetAssetErrUpsert(t *testing.T) {
+	cleanup := setupSetAssetTest()
+	defer cleanup()
 
-	err = SetAsset(structs.Asset{})
-	assert.Equal(t, nil, err)
+	queryUpsert = func(table string, values []db_structs.QueryValue) error {
+		return errors.New("cannot upsert asset")
+	}
+
+	err := SetAsset(structs.Asset{})
+	assert.EqualError(t, err, "cannot upsert asset")
 }

@@ -2,15 +2,13 @@ package assets
 
 import (
 	"github.com/Dobefu/csb/cmd/cs_sdk/structs"
-	"github.com/Dobefu/csb/cmd/cs_sdk/utils"
-	"github.com/Dobefu/csb/cmd/database/query"
 	db_structs "github.com/Dobefu/csb/cmd/database/structs"
 )
 
 func SetAsset(
 	asset structs.Asset,
 ) error {
-	err := query.Upsert("assets", getAssetValues(asset))
+	err := queryUpsert("assets", getAssetValues(asset))
 
 	if err != nil {
 		return err
@@ -23,7 +21,7 @@ func getAssetValues(asset structs.Asset) []db_structs.QueryValue {
 	return []db_structs.QueryValue{
 		{
 			Name:  "id",
-			Value: utils.GenerateId(asset.Uid, asset.Locale),
+			Value: utilsGenerateId(asset.Uid, asset.Locale),
 		},
 		{
 			Name:  "uid",
