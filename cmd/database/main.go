@@ -19,7 +19,7 @@ func Connect() error {
 		return err
 	}
 
-	db, err := sql.Open(dbType, connString)
+	db, err := sqlOpen(dbType, connString)
 
 	if err != nil {
 		return err

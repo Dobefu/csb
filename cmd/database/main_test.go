@@ -1,45 +1,73 @@
 package database
 
 import (
+	"database/sql"
+	"errors"
 	"os"
 	"testing"
 
-	"github.com/Dobefu/csb/cmd/init_env"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestConnect(t *testing.T) {
-	var err error
+func setupDatabaseTest() func() {
+	sqlOpen = func(driverName, dataSourceName string) (*sql.DB, error) {
+		if driverName == "bogus" {
+			return nil, errors.New("invalid database type")
+		}
 
-	err = Connect()
-	assert.NotEqual(t, nil, err)
+		return nil, nil
+	}
 
-	init_env.Main("../../.env.test")
+	return func() {
+		sqlOpen = sql.Open
 
-	err = Connect()
-	assert.Equal(t, nil, err)
-
-	oldDbType := os.Getenv("DB_TYPE")
-	os.Setenv("DB_TYPE", "bogus")
-
-	err = Connect()
-	assert.NotEqual(t, nil, err)
-
-	os.Setenv("DB_TYPE", oldDbType)
+		os.Unsetenv("DB_CONN")
+		os.Unsetenv("DB_TYPE")
+	}
 }
 
-func TestGetConnectionDetails(t *testing.T) {
-	var err error
+func TestConnectSuccess(t *testing.T) {
+	cleanup := setupDatabaseTest()
+	defer cleanup()
 
-	init_env.Main("../../.env.test")
+	os.Setenv("DB_CONN", "test-conn")
+	os.Setenv("DB_TYPE", "test-type")
 
-	oldDbType := os.Getenv("DB_TYPE")
-	os.Setenv("DB_TYPE", "")
+	err := Connect()
+	assert.NoError(t, err)
 
-	_, _, err = getConnectionDetails()
-	assert.NotEqual(t, nil, err)
+}
 
-	os.Setenv("DB_TYPE", oldDbType)
-	_, _, err = getConnectionDetails()
-	assert.Equal(t, nil, err)
+func TestConnectErrInvalidDriver(t *testing.T) {
+	cleanup := setupDatabaseTest()
+	defer cleanup()
+
+	os.Setenv("DB_CONN", "test-conn")
+	os.Setenv("DB_TYPE", "bogus")
+
+	err := Connect()
+	assert.EqualError(t, err, "invalid database type")
+
+}
+
+func TestConnectErrNoConn(t *testing.T) {
+	cleanup := setupDatabaseTest()
+	defer cleanup()
+
+	os.Setenv("DB_TYPE", "test-type")
+
+	err := Connect()
+	assert.EqualError(t, err, "DB_CONN is not set")
+
+}
+
+func TestConnectErrNoType(t *testing.T) {
+	cleanup := setupDatabaseTest()
+	defer cleanup()
+
+	os.Setenv("DB_CONN", "test-conn")
+
+	err := Connect()
+	assert.EqualError(t, err, "DB_TYPE is not set")
+
 }
