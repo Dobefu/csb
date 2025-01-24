@@ -7,3 +7,4 @@ import (
 
 var csSdkRequest = cs_sdk.Request
 var queryQueryRows = query.QueryRows
+var queryQueryRow = query.QueryRow
