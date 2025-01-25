@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestHandleRoutes(t *testing.T) {
+func TestHandleRoutesSuccess(t *testing.T) {
 	mux := http.NewServeMux()
 	apiPath := "/api"
 	HandleRoutes(mux, apiPath)
