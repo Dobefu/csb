@@ -31,13 +31,21 @@ func DashboardEntriesTree(w http.ResponseWriter, r *http.Request) {
 		"templates/dashboard-entries-tree.html.tmpl",
 	}
 
-	tpl := template.Must(template.ParseFS(getFs(), templates...))
-	var buf bytes.Buffer
-	err := tpl.Execute(&buf, data)
+	tpl, err := (template.ParseFS(getFs(), templates...))
 
 	if err != nil {
 		logger.Error(err.Error())
-		http.NotFound(w, r)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	var buf bytes.Buffer
+	tpl.Option("missingkey=error")
+	err = tpl.Execute(&buf, data)
+
+	if err != nil {
+		logger.Error(err.Error())
+		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
