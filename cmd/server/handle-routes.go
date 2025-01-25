@@ -23,6 +23,10 @@ func HandleRoutes(mux *http.ServeMux, apiPath string) {
 	apiRoute(mux, apiPath, "/translations", "GET", v1.GetTranslations)
 	apiRoute(mux, apiPath, "/sitemap-data", "GET", v1.GetSitemapData)
 	apiRoute(mux, apiPath, "/sync", "POST", v1.Sync)
+
+	mux.HandleFunc("GET /dashboard-entries-tree", func(w http.ResponseWriter, r *http.Request) {
+		routes.DashboardEntriesTree(w, r)
+	})
 }
 
 func apiRoute(
