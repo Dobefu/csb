@@ -25,11 +25,57 @@
       padding: 1.875rem;
       padding-top: 0;
     }
+
+    .leaf {
+      padding: 5px 0;
+      padding-inline-start: 10px;
+    }
+
+    .leaf,
+    details {
+      border-bottom: 1px solid #748590;
+    }
+
+    .leaf .leaf,
+    .leaf details,
+    details .leaf,
+    details details {
+      border: 0;
+    }
+    
+    summary ~ details,
+    summary ~ .leaf span {
+      cursor: default;
+      padding-inline-start: 16px;
+    }
+    
+    summary {
+      padding: 5px 0;
+    }
   </style>
 </head>
 
 <body class="DashboardItem">
-  <script>document.body.innerHTML = "<pre>"+JSON.stringify({{ .Entries }}, null, 2)+"</pre>"</script>
+  {{ define "renderEntry" }}
+    {{ if .children }}
+      <details>
+        <summary>{{ .title }}</summary>
+        {{ range .children }}
+          {{ template "renderEntry" . }}
+        {{ end }}
+      </details>
+    {{ else }}
+      <div class="leaf">
+        <span>{{ .title }}</span>
+      </div>
+    {{ end }}
+  {{ end }}
+
+  {{ range $key, $value := .Entries }}
+    {{ if eq $value.parent "" }}
+      {{ template "renderEntry" $value }}
+    {{ end }}
+  {{ end }}
 </body>
 
 </html>
