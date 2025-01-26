@@ -7,31 +7,16 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/fs"
 	"net/http"
 	"strings"
 	"text/template"
 
-	"github.com/Dobefu/csb/cmd/cs_sdk"
 	"github.com/Dobefu/csb/cmd/logger"
 	jwt "github.com/golang-jwt/jwt/v5"
 )
 
-type FS interface {
-	fs.FS
-	ReadDir(string) ([]fs.DirEntry, error)
-	ReadFile(string) ([]byte, error)
-}
-
 //go:embed templates/*
 var content embed.FS
-var getFs = func() FS { return content }
-
-var httpClient HttpClient = &http.Client{}
-
-type HttpClient interface {
-	Do(req *http.Request) (*http.Response, error)
-}
 
 func DashboardEntriesTree(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("Content-Type", "text/html")
@@ -89,7 +74,7 @@ func validateToken(r *http.Request) (*jwt.Token, error) {
 	}
 
 	payload, err := jwt.Parse(token, func(*jwt.Token) (interface{}, error) {
-		publicKey, err := jwt.ParseRSAPublicKeyFromPEM([]byte(key))
+		publicKey, err := jwtParseRSAPublicKeyFromPEM([]byte(key))
 
 		if err != nil {
 			return nil, err
@@ -111,7 +96,7 @@ func validateToken(r *http.Request) (*jwt.Token, error) {
 }
 
 func getPublicKey() (string, error) {
-	url := strings.Replace(cs_sdk.GetUrl(true), "api", "app", 1)
+	url := strings.Replace(csSdkGetUrl(true), "api", "app", 1)
 	url = fmt.Sprintf("%s/.well-known/public-keys.json", url)
 
 	req, err := http.NewRequest("GET", url, nil)

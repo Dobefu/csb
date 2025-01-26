@@ -6,14 +6,22 @@ import (
 	"testing"
 	"testing/fstest"
 
+	"github.com/Dobefu/csb/cmd/cs_sdk"
+	jwt "github.com/golang-jwt/jwt/v5"
 	"github.com/stretchr/testify/assert"
 )
 
 func setupDashboardEntriesTreeTest() (*httptest.ResponseRecorder, func()) {
 	rr := httptest.NewRecorder()
 
+	csSdkGetUrl = func(useManagementToken bool) string {
+		return ""
+	}
+
 	return rr, func() {
 		getFs = func() FS { return content }
+		jwtParseRSAPublicKeyFromPEM = jwt.ParseRSAPublicKeyFromPEM
+		csSdkGetUrl = cs_sdk.GetUrl
 	}
 }
 
