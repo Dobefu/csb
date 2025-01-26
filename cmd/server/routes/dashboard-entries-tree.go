@@ -122,6 +122,7 @@ func getPublicKey() (string, error) {
 	err = json.Unmarshal(respBody, &data)
 
 	if err != nil {
+		fmt.Println("TEST")
 		return "", err
 	}
 
