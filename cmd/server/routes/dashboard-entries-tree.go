@@ -6,11 +6,13 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"html/template"
 	"io"
 	"net/http"
 	"strings"
-	"text/template"
 
+	"github.com/Dobefu/csb/cmd/database/query"
+	"github.com/Dobefu/csb/cmd/database/structs"
 	"github.com/Dobefu/csb/cmd/logger"
 	jwt "github.com/golang-jwt/jwt/v5"
 )
@@ -39,7 +41,7 @@ func DashboardEntriesTree(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data := make(map[string]interface{})
+	data, err := getData()
 
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -147,4 +149,98 @@ func getPublicKey() (string, error) {
 	}
 
 	return key.(string), nil
+}
+
+func getData() (map[string]interface{}, error) {
+	data := make(map[string]interface{})
+
+	entries, err := getEntries()
+
+	if err != nil {
+		return nil, err
+	}
+
+	nestedEntries, err := getNestedEntries(entries)
+
+	if err != nil {
+		return nil, err
+	}
+
+	data["Entries"] = nestedEntries
+
+	return data, nil
+}
+
+func getNestedEntries(entries map[string]interface{}) (map[string]interface{}, error) {
+	entryMap := make(map[string]map[string]interface{})
+
+	for uid, entry := range entries {
+		entry.(map[string]interface{})["children"] = []interface{}{}
+		entryMap[uid] = entry.(map[string]interface{})
+	}
+
+	for _, entry := range entryMap {
+		parentID := entry["parent"].(string)
+
+		if parentID != "" {
+			parentEntry, hasParentEntry := entryMap[parentID]
+
+			if hasParentEntry {
+				parentEntry["children"] = append(parentEntry["children"].([]interface{}), entry)
+			}
+		}
+	}
+
+	nestedEntries := make(map[string]interface{})
+
+	for uid, entry := range entryMap {
+		parentID := entry["parent"].(string)
+
+		if parentID == "" {
+			nestedEntries[uid] = entry
+		}
+	}
+
+	return nestedEntries, nil
+}
+
+func getEntries() (map[string]interface{}, error) {
+	rows, err := query.QueryRows("routes", []string{"uid", "parent", "title"}, []structs.QueryWhere{
+		{
+			Name:  "locale",
+			Value: "en",
+		},
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	entries := make(map[string]interface{})
+
+	for rows.Next() {
+		var uid string
+		var parent string
+		var title string
+
+		err := rows.Scan(
+			&uid,
+			&parent,
+			&title,
+		)
+
+		if err != nil {
+			continue
+		}
+
+		entries[uid] = map[string]interface{}{
+			"uid":    uid,
+			"title":  title,
+			"parent": parent,
+		}
+	}
+
+	fmt.Println(entries)
+
+	return entries, nil
 }

@@ -29,7 +29,7 @@
 </head>
 
 <body class="DashboardItem">
-  PLACEHOLDER
+  <script>document.body.innerHTML = "<pre>"+JSON.stringify({{ .Entries }}, null, 2)+"</pre>"</script>
 </body>
 
 </html>
