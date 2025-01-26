@@ -230,7 +230,5 @@ func getEntries() (map[string]interface{}, error) {
 		}
 	}
 
-	fmt.Println(entries)
-
 	return entries, nil
 }
