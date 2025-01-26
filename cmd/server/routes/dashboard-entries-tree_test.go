@@ -3,9 +3,11 @@ package routes
 import (
 	"bytes"
 	"crypto/rsa"
+	"errors"
 	"io"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 	"testing/fstest"
 
@@ -24,12 +26,16 @@ func (m *MockClient) Do(req *http.Request) (*http.Response, error) {
 
 var mockClient = &MockClient{
 	DoFunc: func(req *http.Request) (*http.Response, error) {
-		return &http.Response{
-			StatusCode: http.StatusOK,
-			Body: io.NopCloser(bytes.NewBufferString(
-				`{"signing-key":"test-key"}`,
-			)),
-		}, nil
+		if strings.Contains(req.URL.String(), "https://") {
+			return &http.Response{
+				StatusCode: http.StatusOK,
+				Body: io.NopCloser(bytes.NewBufferString(
+					`{"signing-key":"test-key"}`,
+				)),
+			}, nil
+		}
+
+		return nil, errors.New("invalid URL")
 	},
 }
 
@@ -40,7 +46,7 @@ func setupDashboardEntriesTreeTest() (*httptest.ResponseRecorder, func()) {
 	httpClient = mockClient
 
 	csSdkGetUrl = func(useManagementToken bool) string {
-		return ""
+		return "https://test.url"
 	}
 
 	jwtParse = func(tokenString string, keyFunc jwt.Keyfunc, options ...jwt.ParserOption) (*jwt.Token, error) {
@@ -64,10 +70,23 @@ func TestDashboardEntriesTreeSuccess(t *testing.T) {
 	rr, cleanup := setupDashboardEntriesTreeTest()
 	defer cleanup()
 
-	req, _ := http.NewRequest("GET", "/?app-token=test-token", nil)
+	req, err := http.NewRequest("GET", "/?app-token=test-token", nil)
+	assert.NoError(t, err)
+
 	DashboardEntriesTree(rr, req)
 	assert.Equal(t, http.StatusOK, rr.Code)
 	assert.NotEmpty(t, rr.Body.String())
+}
+
+func TestDashboardEntriesTreeErrNoToken(t *testing.T) {
+	rr, cleanup := setupDashboardEntriesTreeTest()
+	defer cleanup()
+
+	req, err := http.NewRequest("GET", "/", nil)
+	assert.NoError(t, err)
+
+	DashboardEntriesTree(rr, req)
+	assert.Equal(t, http.StatusForbidden, rr.Code)
 }
 
 func TestDashboardEntriesTreeErrNoTemplate(t *testing.T) {
@@ -76,7 +95,9 @@ func TestDashboardEntriesTreeErrNoTemplate(t *testing.T) {
 
 	getFs = func() FS { return fstest.MapFS{} }
 
-	req, _ := http.NewRequest("GET", "/?app-token=test-token", nil)
+	req, err := http.NewRequest("GET", "/?app-token=test-token", nil)
+	assert.NoError(t, err)
+
 	DashboardEntriesTree(rr, req)
 	assert.Equal(t, http.StatusInternalServerError, rr.Code)
 	assert.Equal(t, "", rr.Body.String())
@@ -94,8 +115,25 @@ func TestDashboardEntriesTreeErrInvalidTemplate(t *testing.T) {
 		}
 	}
 
-	req, _ := http.NewRequest("GET", "/?app-token=test-token", nil)
+	req, err := http.NewRequest("GET", "/?app-token=test-token", nil)
+	assert.NoError(t, err)
+
 	DashboardEntriesTree(rr, req)
 	assert.Equal(t, http.StatusInternalServerError, rr.Code)
 	assert.Equal(t, "", rr.Body.String())
+}
+
+func TestDashboardEntriesTreeErrGetPublicKey(t *testing.T) {
+	rr, cleanup := setupDashboardEntriesTreeTest()
+	defer cleanup()
+
+	csSdkGetUrl = func(useManagementToken bool) string {
+		return "https://bogus\\"
+	}
+
+	req, err := http.NewRequest("GET", "/?app-token=test-token", nil)
+	assert.NoError(t, err)
+
+	DashboardEntriesTree(rr, req)
+	assert.Equal(t, http.StatusForbidden, rr.Code)
 }
