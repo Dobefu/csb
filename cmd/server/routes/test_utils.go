@@ -22,5 +22,6 @@ type HttpClient interface {
 var utilsConstructOutput = utils.ConstructOutput
 var httpClient HttpClient = &http.Client{}
 var csSdkGetUrl = cs_sdk.GetUrl
+var jwtParse = jwt.Parse
 var jwtParseRSAPublicKeyFromPEM = jwt.ParseRSAPublicKeyFromPEM
 var getFs = func() FS { return content }

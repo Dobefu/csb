@@ -73,7 +73,7 @@ func validateToken(r *http.Request) (*jwt.Token, error) {
 		return nil, err
 	}
 
-	payload, err := jwt.Parse(token, func(*jwt.Token) (interface{}, error) {
+	payload, err := jwtParse(token, func(*jwt.Token) (interface{}, error) {
 		publicKey, err := jwtParseRSAPublicKeyFromPEM([]byte(key))
 
 		if err != nil {
