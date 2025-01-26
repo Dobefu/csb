@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/Dobefu/csb/cmd/cs_sdk"
+	"github.com/Dobefu/csb/cmd/database/query"
 	"github.com/Dobefu/csb/cmd/server/utils"
 	jwt "github.com/golang-jwt/jwt/v5"
 )
@@ -24,4 +25,5 @@ var httpClient HttpClient = &http.Client{}
 var csSdkGetUrl = cs_sdk.GetUrl
 var jwtParse = jwt.Parse
 var jwtParseRSAPublicKeyFromPEM = jwt.ParseRSAPublicKeyFromPEM
+var queryQueryRows = query.QueryRows
 var getFs = func() FS { return content }

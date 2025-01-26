@@ -11,7 +11,6 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/Dobefu/csb/cmd/database/query"
 	"github.com/Dobefu/csb/cmd/database/structs"
 	"github.com/Dobefu/csb/cmd/logger"
 	jwt "github.com/golang-jwt/jwt/v5"
@@ -205,7 +204,7 @@ func getNestedEntries(entries map[string]interface{}) (map[string]interface{}, e
 }
 
 func getEntries() (map[string]interface{}, error) {
-	rows, err := query.QueryRows("routes", []string{"uid", "parent", "title"}, []structs.QueryWhere{
+	rows, err := queryQueryRows("routes", []string{"uid", "parent", "title"}, []structs.QueryWhere{
 		{
 			Name:  "locale",
 			Value: "en",

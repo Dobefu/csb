@@ -3,6 +3,7 @@ package routes
 import (
 	"bytes"
 	"crypto/rsa"
+	"database/sql"
 	"errors"
 	"fmt"
 	"io"
@@ -12,7 +13,10 @@ import (
 	"testing"
 	"testing/fstest"
 
+	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/Dobefu/csb/cmd/cs_sdk"
+	"github.com/Dobefu/csb/cmd/database/query"
+	"github.com/Dobefu/csb/cmd/database/structs"
 	jwt "github.com/golang-jwt/jwt/v5"
 	"github.com/stretchr/testify/assert"
 )
@@ -77,7 +81,10 @@ var mockClient = &MockClient{
 	},
 }
 
-func setupDashboardEntriesTreeTest() (*httptest.ResponseRecorder, func()) {
+func setupDashboardEntriesTreeTest(t *testing.T) (sqlmock.Sqlmock, *httptest.ResponseRecorder, func()) {
+	db, mock, err := sqlmock.New()
+	assert.NoError(t, err)
+
 	rr := httptest.NewRecorder()
 
 	originalClient := httpClient
@@ -95,17 +102,22 @@ func setupDashboardEntriesTreeTest() (*httptest.ResponseRecorder, func()) {
 		return &rsa.PublicKey{}, nil
 	}
 
-	return rr, func() {
+	queryQueryRows = func(table string, fields []string, where []structs.QueryWhere) (*sql.Rows, error) {
+		return db.Query("SELECT (.+) FROM routes", nil)
+	}
+
+	return mock, rr, func() {
 		getFs = func() FS { return content }
 		httpClient = originalClient
 		csSdkGetUrl = cs_sdk.GetUrl
 		jwtParse = jwt.Parse
 		jwtParseRSAPublicKeyFromPEM = jwt.ParseRSAPublicKeyFromPEM
+		queryQueryRows = query.QueryRows
 	}
 }
 
 func TestDashboardEntriesTreeSuccess(t *testing.T) {
-	rr, cleanup := setupDashboardEntriesTreeTest()
+	mock, rr, cleanup := setupDashboardEntriesTreeTest(t)
 	defer cleanup()
 
 	jwtParse = func(tokenString string, keyFunc jwt.Keyfunc, options ...jwt.ParserOption) (*jwt.Token, error) {
@@ -116,6 +128,11 @@ func TestDashboardEntriesTreeSuccess(t *testing.T) {
 		return key, nil
 	}
 
+	cols := []string{"uid", "parent", "title"}
+	mock.ExpectQuery("SELECT (.+) FROM routes").WillReturnRows(
+		sqlmock.NewRows(cols).AddRow("uid", "parent", "title"),
+	)
+
 	req, err := http.NewRequest("GET", "/?app-token=some.test.token", nil)
 	assert.NoError(t, err)
 
@@ -125,7 +142,7 @@ func TestDashboardEntriesTreeSuccess(t *testing.T) {
 }
 
 func TestDashboardEntriesTreeErrParsePublicKeyFromPem(t *testing.T) {
-	rr, cleanup := setupDashboardEntriesTreeTest()
+	_, rr, cleanup := setupDashboardEntriesTreeTest(t)
 	defer cleanup()
 
 	jwtParse = func(tokenString string, keyFunc jwt.Keyfunc, options ...jwt.ParserOption) (*jwt.Token, error) {
@@ -147,7 +164,7 @@ func TestDashboardEntriesTreeErrParsePublicKeyFromPem(t *testing.T) {
 }
 
 func TestDashboardEntriesTreeErrInvalidPayload(t *testing.T) {
-	rr, cleanup := setupDashboardEntriesTreeTest()
+	_, rr, cleanup := setupDashboardEntriesTreeTest(t)
 	defer cleanup()
 
 	jwtParse = func(tokenString string, keyFunc jwt.Keyfunc, options ...jwt.ParserOption) (*jwt.Token, error) {
@@ -162,7 +179,7 @@ func TestDashboardEntriesTreeErrInvalidPayload(t *testing.T) {
 }
 
 func TestDashboardEntriesTreeErrNoToken(t *testing.T) {
-	rr, cleanup := setupDashboardEntriesTreeTest()
+	_, rr, cleanup := setupDashboardEntriesTreeTest(t)
 	defer cleanup()
 
 	req, err := http.NewRequest("GET", "/", nil)
@@ -173,7 +190,7 @@ func TestDashboardEntriesTreeErrNoToken(t *testing.T) {
 }
 
 func TestDashboardEntriesTreeErrNoTemplate(t *testing.T) {
-	rr, cleanup := setupDashboardEntriesTreeTest()
+	_, rr, cleanup := setupDashboardEntriesTreeTest(t)
 	defer cleanup()
 
 	getFs = func() FS { return fstest.MapFS{} }
@@ -187,7 +204,7 @@ func TestDashboardEntriesTreeErrNoTemplate(t *testing.T) {
 }
 
 func TestDashboardEntriesTreeErrInvalidTemplate(t *testing.T) {
-	rr, cleanup := setupDashboardEntriesTreeTest()
+	_, rr, cleanup := setupDashboardEntriesTreeTest(t)
 	defer cleanup()
 
 	getFs = func() FS {
@@ -207,7 +224,7 @@ func TestDashboardEntriesTreeErrInvalidTemplate(t *testing.T) {
 }
 
 func TestDashboardEntriesTreeErrGetPublicKey(t *testing.T) {
-	rr, cleanup := setupDashboardEntriesTreeTest()
+	_, rr, cleanup := setupDashboardEntriesTreeTest(t)
 	defer cleanup()
 
 	csSdkGetUrl = func(useManagementToken bool) string {
@@ -222,7 +239,7 @@ func TestDashboardEntriesTreeErrGetPublicKey(t *testing.T) {
 }
 
 func TestDashboardEntriesTreeErrJwtParseErr(t *testing.T) {
-	rr, cleanup := setupDashboardEntriesTreeTest()
+	_, rr, cleanup := setupDashboardEntriesTreeTest(t)
 	defer cleanup()
 
 	jwtParse = jwt.Parse
@@ -235,7 +252,7 @@ func TestDashboardEntriesTreeErrJwtParseErr(t *testing.T) {
 }
 
 func TestDashboardEntriesTreeErrJwtParse(t *testing.T) {
-	rr, cleanup := setupDashboardEntriesTreeTest()
+	_, rr, cleanup := setupDashboardEntriesTreeTest(t)
 	defer cleanup()
 
 	csSdkGetUrl = func(useManagementToken bool) string {
@@ -250,7 +267,7 @@ func TestDashboardEntriesTreeErrJwtParse(t *testing.T) {
 }
 
 func TestDashboardEntriesTreeErrBody(t *testing.T) {
-	rr, cleanup := setupDashboardEntriesTreeTest()
+	_, rr, cleanup := setupDashboardEntriesTreeTest(t)
 	defer cleanup()
 
 	csSdkGetUrl = func(useManagementToken bool) string {
@@ -265,7 +282,7 @@ func TestDashboardEntriesTreeErrBody(t *testing.T) {
 }
 
 func TestDashboardEntriesTreeErrJsonUnmarshal(t *testing.T) {
-	rr, cleanup := setupDashboardEntriesTreeTest()
+	_, rr, cleanup := setupDashboardEntriesTreeTest(t)
 	defer cleanup()
 
 	csSdkGetUrl = func(useManagementToken bool) string {
@@ -280,7 +297,7 @@ func TestDashboardEntriesTreeErrJsonUnmarshal(t *testing.T) {
 }
 
 func TestDashboardEntriesTreeErrNoSigningKey(t *testing.T) {
-	rr, cleanup := setupDashboardEntriesTreeTest()
+	_, rr, cleanup := setupDashboardEntriesTreeTest(t)
 	defer cleanup()
 
 	csSdkGetUrl = func(useManagementToken bool) string {
