@@ -35,11 +35,6 @@ func DashboardEntriesTree(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err != nil {
-		w.WriteHeader(http.StatusForbidden)
-		return
-	}
-
 	data, err := getData()
 
 	if err != nil {
@@ -159,18 +154,14 @@ func getData() (map[string]interface{}, error) {
 		return nil, err
 	}
 
-	nestedEntries, err := getNestedEntries(entries)
-
-	if err != nil {
-		return nil, err
-	}
+	nestedEntries := getNestedEntries(entries)
 
 	data["Entries"] = nestedEntries
 
 	return data, nil
 }
 
-func getNestedEntries(entries map[string]interface{}) (map[string]interface{}, error) {
+func getNestedEntries(entries map[string]interface{}) map[string]interface{} {
 	entryMap := make(map[string]map[string]interface{})
 
 	for uid, entry := range entries {
@@ -200,7 +191,7 @@ func getNestedEntries(entries map[string]interface{}) (map[string]interface{}, e
 		}
 	}
 
-	return nestedEntries, nil
+	return nestedEntries
 }
 
 func getEntries() (map[string]interface{}, error) {

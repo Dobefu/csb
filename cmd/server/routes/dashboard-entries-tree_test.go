@@ -141,6 +141,30 @@ func TestDashboardEntriesTreeSuccess(t *testing.T) {
 	assert.NotEmpty(t, rr.Body.String())
 }
 
+func TestDashboardEntriesTreeErrNoClaim(t *testing.T) {
+	mock, rr, cleanup := setupDashboardEntriesTreeTest(t)
+	defer cleanup()
+
+	jwtParse = func(tokenString string, keyFunc jwt.Keyfunc, options ...jwt.ParserOption) (*jwt.Token, error) {
+		key := &jwt.Token{Valid: true}
+		_, err := keyFunc(key)
+		assert.NoError(t, err)
+
+		return key, nil
+	}
+
+	cols := []string{"uid", "parent", "title"}
+	mock.ExpectQuery("SELECT (.+) FROM routes").WillReturnRows(
+		sqlmock.NewRows(cols).AddRow("uid", "parent", "title"),
+	)
+
+	req, err := http.NewRequest("GET", "/?app-token=some.test.token", nil)
+	assert.NoError(t, err)
+
+	DashboardEntriesTree(rr, req)
+	assert.Equal(t, http.StatusInternalServerError, rr.Code)
+}
+
 func TestDashboardEntriesTreeErrParsePublicKeyFromPem(t *testing.T) {
 	_, rr, cleanup := setupDashboardEntriesTreeTest(t)
 	defer cleanup()
@@ -178,6 +202,25 @@ func TestDashboardEntriesTreeErrInvalidPayload(t *testing.T) {
 	assert.Equal(t, http.StatusForbidden, rr.Code)
 }
 
+func TestDashboardEntriesTreeErrGetData(t *testing.T) {
+	_, rr, cleanup := setupDashboardEntriesTreeTest(t)
+	defer cleanup()
+
+	jwtParse = func(tokenString string, keyFunc jwt.Keyfunc, options ...jwt.ParserOption) (*jwt.Token, error) {
+		key := &jwt.Token{Valid: true, Claims: jwt.MapClaims{"stack_api_key": ""}}
+		_, err := keyFunc(key)
+		assert.NoError(t, err)
+
+		return key, nil
+	}
+
+	req, err := http.NewRequest("GET", "/?app-token=test-token", nil)
+	assert.NoError(t, err)
+
+	DashboardEntriesTree(rr, req)
+	assert.Equal(t, http.StatusInternalServerError, rr.Code)
+}
+
 func TestDashboardEntriesTreeErrNoToken(t *testing.T) {
 	_, rr, cleanup := setupDashboardEntriesTreeTest(t)
 	defer cleanup()
@@ -190,10 +233,23 @@ func TestDashboardEntriesTreeErrNoToken(t *testing.T) {
 }
 
 func TestDashboardEntriesTreeErrNoTemplate(t *testing.T) {
-	_, rr, cleanup := setupDashboardEntriesTreeTest(t)
+	mock, rr, cleanup := setupDashboardEntriesTreeTest(t)
 	defer cleanup()
 
+	jwtParse = func(tokenString string, keyFunc jwt.Keyfunc, options ...jwt.ParserOption) (*jwt.Token, error) {
+		key := &jwt.Token{Valid: true, Claims: jwt.MapClaims{"stack_api_key": ""}}
+		_, err := keyFunc(key)
+		assert.NoError(t, err)
+
+		return key, nil
+	}
+
 	getFs = func() FS { return fstest.MapFS{} }
+
+	cols := []string{"uid", "parent", "title"}
+	mock.ExpectQuery("SELECT (.+) FROM routes").WillReturnRows(
+		sqlmock.NewRows(cols).AddRow("uid", "parent", "title"),
+	)
 
 	req, err := http.NewRequest("GET", "/?app-token=test-token", nil)
 	assert.NoError(t, err)
@@ -204,8 +260,16 @@ func TestDashboardEntriesTreeErrNoTemplate(t *testing.T) {
 }
 
 func TestDashboardEntriesTreeErrInvalidTemplate(t *testing.T) {
-	_, rr, cleanup := setupDashboardEntriesTreeTest(t)
+	mock, rr, cleanup := setupDashboardEntriesTreeTest(t)
 	defer cleanup()
+
+	jwtParse = func(tokenString string, keyFunc jwt.Keyfunc, options ...jwt.ParserOption) (*jwt.Token, error) {
+		key := &jwt.Token{Valid: true, Claims: jwt.MapClaims{"stack_api_key": ""}}
+		_, err := keyFunc(key)
+		assert.NoError(t, err)
+
+		return key, nil
+	}
 
 	getFs = func() FS {
 		return fstest.MapFS{
@@ -214,6 +278,11 @@ func TestDashboardEntriesTreeErrInvalidTemplate(t *testing.T) {
 			},
 		}
 	}
+
+	cols := []string{"uid", "parent", "title"}
+	mock.ExpectQuery("SELECT (.+) FROM routes").WillReturnRows(
+		sqlmock.NewRows(cols).AddRow("uid", "parent", "title"),
+	)
 
 	req, err := http.NewRequest("GET", "/?app-token=test-token", nil)
 	assert.NoError(t, err)
@@ -309,4 +378,54 @@ func TestDashboardEntriesTreeErrNoSigningKey(t *testing.T) {
 
 	DashboardEntriesTree(rr, req)
 	assert.Equal(t, http.StatusForbidden, rr.Code)
+}
+
+func TestGetNestedEntriesErrNoRows(t *testing.T) {
+	_, _, cleanup := setupDashboardEntriesTreeTest(t)
+	defer cleanup()
+
+	nestedEntries := getNestedEntries(map[string]interface{}{
+		"test-uid": map[string]interface{}{
+			"uid":    "test-uid",
+			"title":  "test-title",
+			"parent": "",
+		},
+		"test-uid2": map[string]interface{}{
+			"uid":    "test-uid2",
+			"title":  "test-title2",
+			"parent": "test-uid",
+		},
+	})
+
+	assert.Equal(t, map[string]interface{}(
+		map[string]interface{}{
+			"test-uid": map[string]interface{}{
+				"children": []interface{}{
+					map[string]interface{}{
+						"children": []interface{}{},
+						"parent":   "test-uid",
+						"title":    "test-title2",
+						"uid":      "test-uid2",
+					},
+				},
+				"parent": "",
+				"title":  "test-title",
+				"uid":    "test-uid",
+			},
+		},
+	), nestedEntries)
+}
+
+func TestGetEntriesErrNoRows(t *testing.T) {
+	mock, _, cleanup := setupDashboardEntriesTreeTest(t)
+	defer cleanup()
+
+	cols := []string{"uid", "parent", "title"}
+	mock.ExpectQuery("SELECT (.+) FROM routes").WillReturnRows(
+		sqlmock.NewRows(cols).AddRow("uid", "parent", nil),
+	)
+
+	entries, err := getEntries()
+	assert.NoError(t, err)
+	assert.Equal(t, map[string]interface{}{}, entries)
 }
