@@ -34,14 +34,17 @@ func DashboardEntriesTree(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	apiKey, err := getApiKeyFromClaims(jwtToken.Claims.(jwt.MapClaims))
-
 	if err != nil {
 		w.WriteHeader(http.StatusForbidden)
 		return
 	}
 
-	data := getData(apiKey)
+	data := make(map[string]interface{})
+
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
 
 	templates := []string{
 		"templates/dashboard-entries-tree.html.tmpl",
@@ -144,20 +147,4 @@ func getPublicKey() (string, error) {
 	}
 
 	return key.(string), nil
-}
-
-func getApiKeyFromClaims(claims jwt.MapClaims) (string, error) {
-	apiKey, hasApiKey := claims["stack_api_key"]
-
-	if !hasApiKey {
-		return "", errors.New("stack_api_key does not exist")
-	}
-
-	return apiKey.(string), nil
-}
-
-func getData(apiKey string) map[string]interface{} {
-	data := map[string]interface{}{}
-
-	return data
 }
