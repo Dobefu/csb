@@ -29,6 +29,11 @@ func DashboardEntriesTree(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if jwtToken.Claims == nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
 	apiKey, err := getApiKeyFromClaims(jwtToken.Claims.(jwt.MapClaims))
 
 	if err != nil {

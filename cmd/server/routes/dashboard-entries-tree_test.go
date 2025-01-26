@@ -109,7 +109,7 @@ func TestDashboardEntriesTreeSuccess(t *testing.T) {
 	defer cleanup()
 
 	jwtParse = func(tokenString string, keyFunc jwt.Keyfunc, options ...jwt.ParserOption) (*jwt.Token, error) {
-		key := &jwt.Token{Valid: true}
+		key := &jwt.Token{Valid: true, Claims: jwt.MapClaims{"stack_api_key": ""}}
 		_, err := keyFunc(key)
 		assert.NoError(t, err)
 
