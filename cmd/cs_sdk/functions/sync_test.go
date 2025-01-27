@@ -15,6 +15,7 @@ import (
 	db_routes "github.com/Dobefu/csb/cmd/database/routes"
 	"github.com/Dobefu/csb/cmd/database/state"
 	db_structs "github.com/Dobefu/csb/cmd/database/structs"
+	"github.com/Dobefu/csb/cmd/logger"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -23,6 +24,9 @@ func setupTestSync() func() {
 	queryUpsert = func(table string, values []db_structs.QueryValue) error { return nil }
 	stateSetState = func(name string, value string) error { return nil }
 	stateGetState = func(name string) (string, error) { return "", nil }
+	loggerInfo = func(format string, a ...any) string { return "" }
+	loggerWarning = func(format string, a ...any) string { return "" }
+	loggerVerbose = func(format string, a ...any) string { return "" }
 
 	csSdkRequest = func(path string, method string, body map[string]interface{}, useManagementToken bool) (map[string]interface{}, error) {
 		data := map[string]interface{}{
@@ -76,6 +80,9 @@ func setupTestSync() func() {
 		apiGetEntryByUid = api.GetEntryByUid
 		dbRoutesSetRoute = db_routes.SetRoute
 		assetsSetAsset = assets.SetAsset
+		loggerInfo = logger.Info
+		loggerWarning = logger.Warning
+		loggerVerbose = logger.Verbose
 	}
 
 	return cleanup

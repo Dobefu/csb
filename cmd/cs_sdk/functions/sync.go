@@ -9,14 +9,13 @@ import (
 
 	"github.com/Dobefu/csb/cmd/cs_sdk/structs"
 	db_structs "github.com/Dobefu/csb/cmd/database/structs"
-	"github.com/Dobefu/csb/cmd/logger"
 )
 
 func Sync(reset bool) error {
 	routes := make(map[string]structs.Route)
 
 	if reset {
-		logger.Info("Truncating the routes table")
+		loggerInfo("Truncating the routes table")
 		err := queryTruncate("routes")
 
 		if err != nil {
@@ -61,14 +60,14 @@ func Sync(reset bool) error {
 		}
 	}
 
-	logger.Info("Processing the sync items")
+	loggerInfo("Processing the sync items")
 	err := processSyncData(routes)
 
 	if err != nil {
 		return err
 	}
 
-	logger.Info("Data sync completed successfully")
+	loggerInfo("Data sync completed successfully")
 
 	return nil
 }
@@ -107,7 +106,7 @@ func addAllAssets(data map[string]interface{}) error {
 			continue
 		}
 
-		logger.Info("Fetching item data (%d/%d)", (idx + 1), itemCount)
+		loggerInfo("Fetching item data (%d/%d)", (idx + 1), itemCount)
 
 		assetData := item["data"].(map[string]interface{})
 		publishDetails, hasPublishDetails := assetData["publish_details"].(map[string]interface{})
@@ -163,14 +162,14 @@ func addAllRoutes(data map[string]interface{}, routes *map[string]structs.Route)
 		return err
 	}
 
-	logger.Info("Adding child routes")
+	loggerInfo("Adding child routes")
 	err = addChildRoutes(routes)
 
 	if err != nil {
 		return err
 	}
 
-	logger.Info("Adding parent routes")
+	loggerInfo("Adding parent routes")
 	err = addParentRoutes(routes)
 
 	if err != nil {
@@ -189,15 +188,15 @@ func getSyncData(paginationToken string, reset bool, syncToken string) (map[stri
 	}
 
 	if paginationToken != "" {
-		logger.Info("Getting a new sync page")
+		loggerInfo("Getting a new sync page")
 		path := fmt.Sprintf("stacks/sync?pagination_token=%s", paginationToken)
 		data, err = csSdkRequest(path, "GET", nil, false)
 	} else if err != nil || reset {
-		logger.Info("Initialising a fresh sync")
+		loggerInfo("Initialising a fresh sync")
 		path := "stacks/sync?init=true&type=entry_published,entry_unpublished,entry_deleted,asset_published,asset_unpublished,asset_deleted"
 		data, err = csSdkRequest(path, "GET", nil, false)
 	} else {
-		logger.Info("Syncing data using an existing sync token")
+		loggerInfo("Syncing data using an existing sync token")
 		path := fmt.Sprintf("stacks/sync?sync_token=%s", syncToken)
 		data, err = csSdkRequest(path, "GET", nil, false)
 	}
@@ -227,7 +226,7 @@ func addSyncRoutes(data map[string]interface{}, routes *map[string]structs.Route
 			continue
 		}
 
-		logger.Info("Fetching item data (%d/%d)", (idx + 1), itemCount)
+		loggerInfo("Fetching item data (%d/%d)", (idx + 1), itemCount)
 
 		data := item["data"].(map[string]interface{})
 		publishDetails, hasPublishDetails := data["publish_details"]
@@ -250,7 +249,7 @@ func addSyncRoutes(data map[string]interface{}, routes *map[string]structs.Route
 		isPublished := hasPublishDetails
 		id := utilsGenerateId(uid, locale)
 
-		logger.Verbose("Found entry: %s", uid)
+		loggerVerbose("Found entry: %s", uid)
 
 		(*routes)[id] = structs.Route{
 			Uid:            uid,
@@ -370,7 +369,7 @@ func addRouteChildren(route structs.Route, routes *map[string]structs.Route, dep
 		err = addRouteChildren(childRoute, routes, depth+1)
 
 		if err != nil {
-			logger.Warning("Error getting a child route for %s: %s", id, err.Error())
+			loggerWarning("Error getting a child route for %s: %s", id, err.Error())
 			return err
 		}
 	}
@@ -413,7 +412,7 @@ func addRouteParents(route structs.Route, routes *map[string]structs.Route, dept
 	err = addRouteParents(parentRoute, routes, depth+1)
 
 	if err != nil {
-		logger.Warning("Error getting a parent route for %s: %s", id, err.Error())
+		loggerWarning("Error getting a parent route for %s: %s", id, err.Error())
 		return err
 	}
 
@@ -499,7 +498,7 @@ func processSyncData(routes map[string]structs.Route) error {
 	idx := 0
 
 	for uid, route := range routes {
-		logger.Info("Processing entry %s (%d/%d)", route.Uid, (idx + 1), routeCount)
+		loggerInfo("Processing entry %s (%d/%d)", route.Uid, (idx + 1), routeCount)
 		url := constructRouteUrl(route, routes)
 
 		if url == "" {
@@ -600,7 +599,7 @@ func processTranslations(route structs.Route) {
 		})
 
 		if err != nil {
-			logger.Warning(err.Error())
+			loggerWarning(err.Error())
 		}
 	}
 }
@@ -615,7 +614,7 @@ func constructRouteUrl(route structs.Route, routes map[string]structs.Route) str
 
 	for {
 		if depth > maxDepth {
-			logger.Warning("Maximum nesting depth of %d exceeded in entry %s", maxDepth, route.Uid)
+			loggerWarning("Maximum nesting depth of %d exceeded in entry %s", maxDepth, route.Uid)
 			return url
 		}
 
@@ -634,7 +633,7 @@ func constructRouteUrl(route structs.Route, routes map[string]structs.Route) str
 		}
 
 		if !parent.Published {
-			logger.Warning(
+			loggerWarning(
 				"The entry %s, a parent of %s, is unpublished. This will break the URL. Please be sure to publish it",
 				parent.Uid,
 				route.Uid,

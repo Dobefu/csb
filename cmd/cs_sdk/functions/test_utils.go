@@ -8,6 +8,7 @@ import (
 	"github.com/Dobefu/csb/cmd/database/query"
 	db_routes "github.com/Dobefu/csb/cmd/database/routes"
 	"github.com/Dobefu/csb/cmd/database/state"
+	"github.com/Dobefu/csb/cmd/logger"
 )
 
 var queryTruncate = query.Truncate
@@ -20,3 +21,6 @@ var apiGetChildEntriesByUid = api.GetChildEntriesByUid
 var apiGetEntryByUid = api.GetEntryByUid
 var dbRoutesSetRoute = db_routes.SetRoute
 var assetsSetAsset = assets.SetAsset
+var loggerInfo = logger.Info
+var loggerWarning = logger.Warning
+var loggerVerbose = logger.Verbose
