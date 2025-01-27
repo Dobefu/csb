@@ -89,7 +89,7 @@ func getNewSyncToken(data map[string]interface{}) (string, error) {
 }
 
 func addAllAssets(data map[string]interface{}) error {
-	items, hasItems := data["items"].([]map[string]interface{})
+	items, hasItems := data["items"].([]interface{})
 
 	if !hasItems {
 		return errors.New("sync data has no items")
@@ -98,6 +98,8 @@ func addAllAssets(data map[string]interface{}) error {
 	itemCount := len(items)
 
 	for idx, item := range items {
+		item := item.(map[string]interface{})
+
 		contentTypeUid, hasContentTypeUid := item["content_type_uid"]
 
 		if !hasContentTypeUid || contentTypeUid.(string) != "sys_assets" {
@@ -344,7 +346,7 @@ func addParentRoutes(routes *map[string]structs.Route) error {
 }
 
 func addRouteChildren(route structs.Route, routes *map[string]structs.Route, depth uint8) error {
-	var maxDepth uint8 = 10
+	const maxDepth uint8 = 10
 
 	if depth > maxDepth {
 		return errors.New("potential infinite loop detected")
@@ -376,7 +378,7 @@ func addRouteChildren(route structs.Route, routes *map[string]structs.Route, dep
 }
 
 func addRouteParents(route structs.Route, routes *map[string]structs.Route, depth uint8) error {
-	var maxDepth uint8 = 10
+	const maxDepth uint8 = 10
 
 	if depth > maxDepth {
 		return errors.New("potential infinite loop detected")
@@ -608,7 +610,7 @@ func constructRouteUrl(route structs.Route, routes map[string]structs.Route) str
 	currentRoute := route
 
 	var depth uint8 = 0
-	var maxDepth uint8 = 10
+	const maxDepth uint8 = 10
 
 	for {
 		if depth > maxDepth {
