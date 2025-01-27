@@ -11,6 +11,8 @@ import (
 	db_structs "github.com/Dobefu/csb/cmd/database/structs"
 )
 
+const maxDepth uint8 = 10
+
 func Sync(reset bool) error {
 	routes := make(map[string]structs.Route)
 
@@ -346,7 +348,6 @@ func addParentRoutes(routes *map[string]structs.Route) error {
 }
 
 func addRouteChildren(route structs.Route, routes *map[string]structs.Route, depth uint8) error {
-	const maxDepth uint8 = 10
 
 	if depth > maxDepth {
 		return errors.New("potential infinite loop detected")
@@ -378,8 +379,6 @@ func addRouteChildren(route structs.Route, routes *map[string]structs.Route, dep
 }
 
 func addRouteParents(route structs.Route, routes *map[string]structs.Route, depth uint8) error {
-	const maxDepth uint8 = 10
-
 	if depth > maxDepth {
 		return errors.New("potential infinite loop detected")
 	}
@@ -610,7 +609,6 @@ func constructRouteUrl(route structs.Route, routes map[string]structs.Route) str
 	currentRoute := route
 
 	var depth uint8 = 0
-	const maxDepth uint8 = 10
 
 	for {
 		if depth > maxDepth {
