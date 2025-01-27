@@ -89,7 +89,7 @@ func getNewSyncToken(data map[string]interface{}) (string, error) {
 }
 
 func addAllAssets(data map[string]interface{}) error {
-	items, hasItems := data["items"].([]interface{})
+	items, hasItems := data["items"].([]map[string]interface{})
 
 	if !hasItems {
 		return errors.New("sync data has no items")
@@ -98,8 +98,6 @@ func addAllAssets(data map[string]interface{}) error {
 	itemCount := len(items)
 
 	for idx, item := range items {
-		item := item.(map[string]interface{})
-
 		contentTypeUid, hasContentTypeUid := item["content_type_uid"]
 
 		if !hasContentTypeUid || contentTypeUid.(string) != "sys_assets" {
