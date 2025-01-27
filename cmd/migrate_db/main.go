@@ -24,13 +24,14 @@ var queryQueryRaw = query.QueryRaw
 var queryQueryRow = query.QueryRow
 var queryTruncate = query.Truncate
 var queryInsert = query.Insert
+var loggerInfo = logger.Info
 var getFs = func() FS { return content }
 
 func Main(reset bool) error {
 	var err error
 
 	if reset {
-		logger.Info("Reverting existing migrations")
+		loggerInfo("Reverting existing migrations")
 		err = down()
 
 		if err != nil {
@@ -38,7 +39,7 @@ func Main(reset bool) error {
 		}
 	}
 
-	logger.Info("Performing migrations")
+	loggerInfo("Performing migrations")
 	err = up()
 
 	if err != nil {
@@ -56,7 +57,7 @@ func down() error {
 	}
 
 	if version == 0 {
-		logger.Info("Nothing to revert")
+		loggerInfo("Nothing to revert")
 		return nil
 	}
 
@@ -82,7 +83,7 @@ func down() error {
 			continue
 		}
 
-		logger.Info("Running migration: %s", name)
+		loggerInfo("Running migration: %s", name)
 		err = runMigration(name, migrationIndex)
 
 		if err != nil {
@@ -127,7 +128,7 @@ func up() error {
 			continue
 		}
 
-		logger.Info("Running migration: %s", name)
+		loggerInfo("Running migration: %s", name)
 		err = runMigration(name, migrationIndex)
 
 		if err != nil {

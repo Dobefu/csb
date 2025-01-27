@@ -9,6 +9,7 @@ import (
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/Dobefu/csb/cmd/database/query"
 	"github.com/Dobefu/csb/cmd/database/structs"
+	"github.com/Dobefu/csb/cmd/logger"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -32,11 +33,14 @@ func setupMigrateDbTest(t *testing.T) (sqlmock.Sqlmock, func()) {
 		return nil
 	}
 
+	loggerInfo = func(format string, a ...any) string { return "" }
+
 	cleanup := func() {
 		queryQueryRaw = query.QueryRaw
 		queryQueryRow = query.QueryRow
 		queryTruncate = query.Truncate
 		queryInsert = query.Insert
+		loggerInfo = logger.Info
 		getFs = func() FS { return content }
 	}
 

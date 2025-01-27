@@ -18,6 +18,8 @@ func setupInitEnvTest() func() {
 		return nil
 	}
 
+	logger.SetExitOnFatal(false)
+
 	return func() {
 		godotenvLoad = godotenv.Load
 		logger.SetExitOnFatal(true)
@@ -35,8 +37,6 @@ func TestInitEnvSuccess(t *testing.T) {
 func TestInitEnvErrFileNotFound(t *testing.T) {
 	cleanup := setupInitEnvTest()
 	defer cleanup()
-
-	logger.SetExitOnFatal(false)
 
 	Main("bogus")
 	assert.EqualError(t, godotenvLoad("bogus"), "cannot find the file")
