@@ -674,3 +674,14 @@ func TestConstructRouteUrlNoParent(t *testing.T) {
 
 	assert.Equal(t, "", url)
 }
+
+func BenchmarkSyncReset(b *testing.B) {
+	cleanup := setupTestSync()
+	defer cleanup()
+
+	b.ResetTimer()
+
+	for i := 0; i < b.N; i++ {
+		_ = Sync(true)
+	}
+}
