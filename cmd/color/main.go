@@ -61,8 +61,6 @@ const (
 	BgWhite
 )
 
-var osStatFn = os.Stdout.Stat
-
 func SprintColor(fg Color, bg Color, message string) string {
 	fileInfo, _ := osStatFn()
 
