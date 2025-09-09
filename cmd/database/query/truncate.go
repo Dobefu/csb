@@ -1,7 +1,6 @@
 package query
 
 import (
-	"fmt"
 	"os"
 
 	"github.com/Dobefu/csb/cmd/database"
@@ -29,8 +28,7 @@ func Truncate(table string) error {
 }
 
 func truncateMysql(table string) error {
-	sql := fmt.Sprintf("TRUNCATE %s", table)
-	_, err := database.DB.Exec(sql)
+	_, err := database.DB.Exec("TRUNCATE ?", table)
 
 	if err != nil {
 		return err
@@ -40,8 +38,7 @@ func truncateMysql(table string) error {
 }
 
 func truncateSqlite3(table string) error {
-	sql := fmt.Sprintf("DELETE FROM %s", table)
-	_, err := database.DB.Exec(sql)
+	_, err := database.DB.Exec("DELETE FROM ?", table)
 
 	if err != nil {
 		return err
